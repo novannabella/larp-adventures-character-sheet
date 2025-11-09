@@ -258,8 +258,6 @@ tbody tr:hover {
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.25);
   color: var(--muted);
-  white-space: nowrap;    /* prevent "-1 SP" from wrapping */
-  display: inline-block;  /* keep pill shape intact */
 }
 
 .tag.free {
@@ -330,22 +328,5 @@ tbody tr:hover {
   }
   .org-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* Extra small-screen handling for wide tables (Events, Skills) */
-@media (max-width: 700px) {
-  .card table {
-    display: block;
-    overflow-x: auto;
-    min-width: 650px;  /* force scroll so nothing is cut off */
-  }
-
-  .card table thead,
-  .card table tbody,
-  .card table tr,
-  .card table th,
-  .card table td {
-    white-space: nowrap;  /* keep each cell on one line */
   }
 }
