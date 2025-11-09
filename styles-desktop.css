@@ -341,6 +341,16 @@ tbody tr:hover {
   max-width: 60px;
 }
 
+/* Basic info: Tier / Skill Points column */
+.basic-bottom-row {
+  align-items: flex-start;
+}
+
+.basic-tier-col input[type="number"],
+#tier,
+#totalSkillPoints {
+  max-width: 60px; /* ~3 digits */
+}
 
 @media (max-width: 900px) {
   body {
