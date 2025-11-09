@@ -57,7 +57,9 @@ let skillsData = [];
 let skillsByPath = {};
 let selectedSkills = [];
 let skillNameSet = new Set(); // normalized skill names
-let eventsData = [];          // NEW: all events live here
+
+let eventsData = [];          // all events stored here
+let editingEventIndex = null; // index of event being edited, or null
 
 const EVENT_BASE_POINTS = {
   "Day Event": 1,
@@ -86,13 +88,14 @@ const skillDescription = document.getElementById("skillDescription");
 const selectedSkillsBody = document.getElementById("selectedSkillsBody");
 const totalSkillCostSpan = document.getElementById("totalSkillCost");
 
-// Events UI
 const addEventBtn = document.getElementById("addEventBtn");
 const eventsBody = document.getElementById("eventsBody");
 const totalEventPointsSpan = document.getElementById("totalEventPoints");
-const qualifyingEventsCountSpan = document.getElementById("qualifyingEventsCount");
+const qualifyingEventsCountSpan = document.getElementById(
+  "qualifyingEventsCount"
+);
 
-// NEW: event input controls (top row)
+// event input controls
 const eventNameInput = document.getElementById("eventNameInput");
 const eventDateInput = document.getElementById("eventDateInput");
 const eventTypeSelect = document.getElementById("eventTypeSelect");
@@ -108,7 +111,9 @@ const loadCharacterBtn = document.getElementById("loadCharacterBtn");
 const exportPdfBtn = document.getElementById("exportPdfBtn");
 const loadCharacterFile = document.getElementById("loadCharacterFile");
 
-const organizationsContainer = document.getElementById("organizationsContainer");
+const organizationsContainer = document.getElementById(
+  "organizationsContainer"
+);
 
 const characterNameInput = document.getElementById("characterName");
 const playerNameInput = document.getElementById("playerName");
@@ -481,7 +486,7 @@ function addSelectedSkill() {
 
   const free = skillFreeFlag.checked;
 
-  // Recompute BEFORE adding so we know how many SP we have
+  // Recompute totals first so we know how many SP we have
   recomputeTotals();
   const available =
     parseInt(totalSkillPointsInput.value, 10) >= 0
@@ -584,7 +589,7 @@ function renderSelectedSkills() {
   updatePathAndProfessionDisplays();
 }
 
-// ---------- EVENTS (NEW STYLE, LIKE SKILLS) ----------
+// ---------- EVENTS (add + edit) ----------
 function addEventFromInputs() {
   const name = eventNameInput.value.trim();
   const date = eventDateInput.value;
@@ -608,7 +613,17 @@ function addEventFromInputs() {
     skillPoints: 0
   };
 
-  eventsData.push(ev);
+  if (editingEventIndex !== null && editingEventIndex >= 0 && editingEventIndex < eventsData.length) {
+    // Update existing event
+    eventsData[editingEventIndex] = ev;
+  } else {
+    // Add new event
+    eventsData.push(ev);
+  }
+
+  // Reset editing state
+  editingEventIndex = null;
+  addEventBtn.textContent = "Add Event";
 
   // Clear inputs
   eventNameInput.value = "";
@@ -624,23 +639,57 @@ function addEventFromInputs() {
 function renderEvents() {
   eventsBody.innerHTML = "";
 
-  eventsData.forEach((ev, index) => {
+  eventsData.forEach((ev) => {
     const tr = document.createElement("tr");
 
-    const tdMinus = document.createElement("td");
+    const tdButtons = document.createElement("td");
+
     const minusBtn = document.createElement("button");
     minusBtn.textContent = "−";
     minusBtn.className = "button small secondary";
     minusBtn.title = "Remove event";
-    minusBtn.style.minWidth = "32px";
+    minusBtn.style.minWidth = "28px";
     minusBtn.addEventListener("click", () => {
       if (confirm("Are you sure you want to remove this event?")) {
-        eventsData.splice(index, 1);
-        recomputeTotals();
+        const idx = eventsData.indexOf(ev);
+        if (idx !== -1) {
+          eventsData.splice(idx, 1);
+          // if we were editing this one, reset editing state
+          if (editingEventIndex === idx) {
+            editingEventIndex = null;
+            addEventBtn.textContent = "Add Event";
+          }
+          recomputeTotals();
+        }
       }
     });
-    tdMinus.appendChild(minusBtn);
-    tr.appendChild(tdMinus);
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
+    editBtn.className = "button small secondary";
+    editBtn.style.minWidth = "40px";
+    editBtn.style.marginLeft = "4px";
+    editBtn.title = "Edit event";
+    editBtn.addEventListener("click", () => {
+      const idx = eventsData.indexOf(ev);
+      if (idx === -1) return;
+      editingEventIndex = idx;
+
+      // Load event into input controls
+      eventNameInput.value = ev.name || "";
+      eventDateInput.value = ev.date || "";
+      eventTypeSelect.value = ev.type || "";
+      eventNpcInput.checked = !!ev.npc;
+      eventMotInput.checked = !!ev.merchantOT;
+      eventBonusInput.value =
+        ev.bonusSP != null && ev.bonusSP !== "" ? String(ev.bonusSP) : "0";
+
+      addEventBtn.textContent = "Update Event";
+    });
+
+    tdButtons.appendChild(minusBtn);
+    tdButtons.appendChild(editBtn);
+    tr.appendChild(tdButtons);
 
     function addCell(text) {
       const td = document.createElement("td");
@@ -732,7 +781,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 6,
+    version: 7,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -773,6 +822,9 @@ function applyCharacterState(state) {
         skillPoints: ev.skillPoints ? parseInt(ev.skillPoints, 10) || 0 : 0
       }))
     : [];
+
+  editingEventIndex = null;
+  addEventBtn.textContent = "Add Event";
 
   recomputeTotals();
   updatePathAndProfessionDisplays();
