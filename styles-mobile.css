@@ -1,432 +1,87 @@
-:root {
-  --bg: #0b1020;
-  --bg-alt: #151b30;
-  --card: #1e2640;
-  --accent: #f4c76b;
-  --accent-soft: rgba(244, 199, 107, 0.2);
-  --text: #f2f4ff;
-  --muted: #b7bdd7;
-  --border: #2b3658;
-  --danger: #ff6b81;
-  --success: #7ed957;
-  --radius-lg: 14px;
-  --radius-sm: 8px;
-  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
-}
+/* ---------- EVENTS: STACKED LAYOUT (Improved Width) ---------- */
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 16px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  background: radial-gradient(circle at top, #151b30 0, #050813 55%);
-  color: var(--text);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 6px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 22px;
-  color: var(--accent);
-}
-
-.subtitle {
-  text-align: center;
-  margin-bottom: 16px;
-  color: var(--muted);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.app {
-  max-width: 100%;
-  margin: 0 auto 24px auto;
-  display: grid;
-  gap: 16px;
-}
-
-/* Cards */
-.card {
-  background: linear-gradient(145deg, var(--card), #141a2b);
-  border-radius: var(--radius-lg);
-  padding: 12px 14px 14px;
-  box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top left, var(--accent-soft), transparent 55%);
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-.card-inner {
-  position: relative;
-  z-index: 1;
-}
-
-.card h2 {
-  margin: 0 0 10px;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--accent);
-}
-
-/* Layout helpers */
-.section-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 6px 12px;
-  margin-bottom: 8px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 12px;
-}
-
-label {
-  color: var(--muted);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* Inputs */
-input[type="text"],
-input[type="number"],
-input[type="date"],
-select,
-textarea {
-  padding: 5px 7px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: rgba(10, 15, 34, 0.9);
-  color: var(--text);
-  font-size: 12px;
-  outline: none;
-  width: 100%;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent-soft);
-}
-
-textarea {
-  resize: vertical;
-  min-height: 60px;
-  max-height: 140px;
-}
-
-.inline {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.pill {
-  padding: 2px 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 10px;
-  color: var(--muted);
-}
-
-/* Totals */
-.total-row {
-  text-align: right;
-  font-size: 11px;
-  margin-top: 4px;
-  color: var(--muted);
-}
-
-.total-row span {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-/* Top controls */
-.top-controls {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 8px;
-  max-width: 100%;
-  margin: 0 auto 10px;
-  padding: 0 2px;
-}
-
-.save-load-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 6px;
-}
-
-/* Buttons */
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 5px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--accent);
-  background: linear-gradient(135deg, var(--accent), #f8983c);
-  color: #23120b;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-}
-
-.button.secondary {
-  background: transparent;
-  color: var(--accent);
-  border-color: var(--border);
-  box-shadow: none;
-}
-
-.button.small {
-  padding: 3px 8px;
-  font-size: 10px;
-}
-
-/* Tables (skills in particular) */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 11px;
-  margin-top: 4px;
-}
-
-.card table {
-  display: block;
-  width: 100%;
-  overflow-x: auto;
-}
-
-.card table thead,
-.card table tbody,
-.card table tr {
-  width: 100%;
-}
-
-th,
-td {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  padding: 5px 4px;
-  text-align: left;
-  vertical-align: middle;
-}
-
-th {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.015);
-}
-
-tbody tr:hover {
-  background: rgba(244, 199, 107, 0.06);
-}
-
-/* Cost / Free tags: keep "-1 SP" together */
-.tag {
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--muted);
-  white-space: nowrap;
-  display: inline-block;
-}
-
-.tag.free {
-  color: var(--success);
-  border: 1px solid rgba(126, 217, 87, 0.6);
-  background: rgba(126, 217, 87, 0.08);
-}
-
-.tag.paid {
-  color: var(--accent);
-  border: 1px solid rgba(244, 199, 107, 0.6);
-  background: rgba(244, 199, 107, 0.08);
-}
-
-/* Skills row layout on mobile */
-.skills-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  align-items: end;
-  margin-bottom: 8px;
-}
-
-.select-path {
-  width: 100%;
-  max-width: 100%;
-}
-
-.skill-free-field {
-  align-self: flex-end;
-}
-
-.skill-add-field {
-  align-items: flex-end;
-}
-
-/* Organizations grid: 2 columns, checkbox + label inline */
-.org-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 8px;
-  margin-top: 2px;
-}
-
-.org-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.org-item input[type="checkbox"] {
-  margin: 0;
-}
-
-/* ---------- SKILLS: tweak cost spacing + label text ---------- */
-
-/* Right-align and give a bit of space to the Cost column in the skills table */
-#selectedSkillsBody td:last-child {
-  text-align: right;
-  padding-left: 10px;
-}
-
-/* Shorten the label under the skills table:
-   "Total skill points spent on non-free skills"
-   -> "Skill points spent" on mobile only */
-#selectedSkillsBody + .total-row {
-  font-size: 0;          /* hide original text layout */
-  text-align: right;
-  margin-top: 4px;
-}
-
-#selectedSkillsBody + .total-row::before {
-  content: "Skill points spent: ";
-  font-size: 11px;
-  color: var(--muted);
-}
-
-#selectedSkillsBody + .total-row span {
-  font-size: 11px;
-  color: var(--accent);
-  font-weight: 600;
-}
-
-/* ---------- EVENTS: STACKED LAYOUT ---------- */
-
-/* Each event row becomes a mini card, stacked vertically */
 #eventsBody tr {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  padding: 6px 8px;
-  margin-bottom: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
   background: rgba(255, 255, 255, 0.03);
 }
 
-/* Cells inside the event row */
+/* Ensure event inputs stretch wider on small screens */
 #eventsBody td {
   border: none;
-  padding: 2px 0;
+  padding: 4px 0;
   width: 100%;
   font-size: 12px;
 }
 
-/* 1st cell = minus button (keep at top, left) */
+#eventsBody input[type="text"],
+#eventsBody input[type="date"],
+#eventsBody select,
+#eventsBody input[type="number"] {
+  width: 95%;           /* give more breathing room */
+  max-width: 95%;
+}
 
-/* 2nd cell = Event Name line */
+/* Reflow layout and labels for clarity */
 #eventsBody td:nth-child(2)::before {
-  content: "Event Name: ";
+  content: "Event Name:";
   font-weight: 600;
   color: var(--accent);
+  display: block;
+  margin-bottom: 2px;
 }
 
-/* 3rd cell = Date line */
 #eventsBody td:nth-child(3)::before {
-  content: "Date: ";
+  content: "Date:";
   font-weight: 600;
   color: var(--accent);
+  display: block;
+  margin-bottom: 2px;
 }
 
-/* 4th cell = Type line */
 #eventsBody td:nth-child(4)::before {
-  content: "Type: ";
+  content: "Type:";
   font-weight: 600;
   color: var(--accent);
+  display: block;
+  margin-bottom: 2px;
 }
 
-/* 5th, 6th, 7th cells (NPC, Merchant OT, Bonus SP) on same line */
+/* Group NPC / OT / Bonus SP neatly across the same line */
+#eventsBody .event-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+
 #eventsBody td:nth-child(5),
 #eventsBody td:nth-child(6),
 #eventsBody td:nth-child(7) {
-  display: inline-block;
-  width: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   margin-right: 10px;
+  width: auto;
 }
 
-/* Add labels before the controls */
-#eventsBody td:nth-child(5)::before {
-  content: "NPC ";
-  color: var(--muted);
-}
+/* Labels for grouped controls */
+#eventsBody td:nth-child(5)::before { content: "NPC"; color: var(--muted); margin-right: 3px; }
+#eventsBody td:nth-child(6)::before { content: "Merchant OT"; color: var(--muted); margin-right: 3px; }
+#eventsBody td:nth-child(7)::before { content: "Bonus SP"; color: var(--muted); margin-right: 3px; }
 
-#eventsBody td:nth-child(6)::before {
-  content: "Merchant OT ";
-  color: var(--muted);
-}
-
-#eventsBody td:nth-child(7)::before {
-  content: "Bonus SP ";
-  color: var(--muted);
-}
-
-/* 8th cell = Skill Points line */
+/* Skill points line */
 #eventsBody td:nth-child(8)::before {
-  content: "Skill Points: ";
+  content: "Skill Points:";
   font-weight: 600;
   color: var(--accent);
+  display: block;
+  margin-top: 4px;
 }
