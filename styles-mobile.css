@@ -159,6 +159,7 @@ textarea {
   margin-top: 4px;
   color: var(--muted);
 }
+
 .total-row span {
   color: var(--accent);
   font-weight: 600;
@@ -214,7 +215,7 @@ textarea {
   font-size: 10px;
 }
 
-/* Skills table (keep scrollable if wide) */
+/* Tables (skills in particular) */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -303,7 +304,7 @@ tbody tr:hover {
   align-items: flex-end;
 }
 
-/* Organizations grid: 2 columns */
+/* Organizations grid: 2 columns, checkbox + label inline */
 .org-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -313,6 +314,7 @@ tbody tr:hover {
 
 .org-item {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 4px;
   font-size: 11px;
@@ -321,6 +323,35 @@ tbody tr:hover {
 
 .org-item input[type="checkbox"] {
   margin: 0;
+}
+
+/* ---------- SKILLS: tweak cost spacing + label text ---------- */
+
+/* Right-align and give a bit of space to the Cost column in the skills table */
+#selectedSkillsBody td:last-child {
+  text-align: right;
+  padding-left: 10px;
+}
+
+/* Shorten the label under the skills table:
+   "Total skill points spent on non-free skills"
+   -> "Skill points spent" on mobile only */
+#selectedSkillsBody + .total-row {
+  font-size: 0;          /* hide original text layout */
+  text-align: right;
+  margin-top: 4px;
+}
+
+#selectedSkillsBody + .total-row::before {
+  content: "Skill points spent: ";
+  font-size: 11px;
+  color: var(--muted);
+}
+
+#selectedSkillsBody + .total-row span {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
 }
 
 /* ---------- EVENTS: STACKED LAYOUT ---------- */
@@ -345,7 +376,7 @@ tbody tr:hover {
   font-size: 12px;
 }
 
-/* 1st cell = minus button (keep as-is, but on top) */
+/* 1st cell = minus button (keep at top, left) */
 
 /* 2nd cell = Event Name line */
 #eventsBody td:nth-child(2)::before {
@@ -368,7 +399,7 @@ tbody tr:hover {
   color: var(--accent);
 }
 
-/* 5th, 6th, 7th cells (NPC, Merchant OT, Bonus SP) on same visual line */
+/* 5th, 6th, 7th cells (NPC, Merchant OT, Bonus SP) on same line */
 #eventsBody td:nth-child(5),
 #eventsBody td:nth-child(6),
 #eventsBody td:nth-child(7) {
@@ -382,10 +413,12 @@ tbody tr:hover {
   content: "NPC ";
   color: var(--muted);
 }
+
 #eventsBody td:nth-child(6)::before {
   content: "Merchant OT ";
   color: var(--muted);
 }
+
 #eventsBody td:nth-child(7)::before {
   content: "Bonus SP ";
   color: var(--muted);
