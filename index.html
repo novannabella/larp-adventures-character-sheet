@@ -109,41 +109,54 @@
             </div>
           </div>
 
-     <div class="section-row basic-bottom-row">
-  <div class="field basic-tier-col">
-    <label for="tier">Tier</label>
-    <input type="number" id="tier" readonly />
-    <label for="totalSkillPoints" style="margin-top: 6px;">Skill Points</label>
-    <input type="number" id="totalSkillPoints" readonly />
-  </div>
-  <div class="field">
-    <label>Organizations</label>
-    <div id="organizationsContainer" class="org-grid">
-      <label class="org-item">
-        <input type="checkbox" value="Merchant Guild" />Merchant Guild
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="The Sentinels" />The Sentinels
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="The Shield" />The Shield
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="Order of Light" />Order of Light
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="Sanguine Order" />Sanguine Order
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="THoTH" />THoTH
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="Archivist Guild" />Archivist Guild
-      </label>
-    </div>
-  </div>
-</div>
-
+          <!-- Tier / Skill Points (left) + Organizations (right) -->
+          <div class="section-row basic-bottom-row">
+            <div class="field basic-tier-col">
+              <label for="tier">Tier</label>
+              <input type="number" id="tier" readonly />
+              <label for="totalSkillPoints" style="margin-top: 6px;">
+                Skill Points
+              </label>
+              <input type="number" id="totalSkillPoints" readonly />
+            </div>
+            <div class="field">
+              <label>Organizations</label>
+              <div id="organizationsContainer" class="org-grid">
+                <label class="org-item">
+                  <input type="checkbox" value="Merchant Guild" />Merchant Guild
+                </label>
+                <label class="org-item">
+                  <input type="checkbox" value="The Sentinels" />The Sentinels
+                </label>
+                <label class="org-item">
+                  <input type="checkbox" value="The Shield" />The Shield
+                </label>
+                <label class="org-item">
+                  <input
+                    type="checkbox"
+                    value="Order of Light"
+                  />Order of Light
+                </label>
+                <label class="org-item">
+                  <input
+                    type="checkbox"
+                    value="Sanguine Order"
+                  />Sanguine Order
+                </label>
+                <label class="org-item">
+                  <input type="checkbox" value="THoTH" />THoTH
+                </label>
+                <label class="org-item">
+                  <input
+                    type="checkbox"
+                    value="Archivist Guild"
+                  />Archivist Guild
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- SKILLS -->
       <div class="card">
@@ -158,7 +171,7 @@
               </select>
             </div>
             <div class="field skill-free-field">
-              <label for="skillFreeFlag">Earned for Free?</label>
+              <label for="skillFreeFlag">Earned for<br />Free?</label>
               <input type="checkbox" id="skillFreeFlag" />
             </div>
             <div class="field">
@@ -201,15 +214,20 @@
         </div>
       </div>
 
-      <!-- EVENTS (NEW ADD-EVENT STYLE) -->
+      <!-- EVENTS (with add + edit) -->
       <div class="card">
         <div class="card-inner">
           <h2>Events</h2>
 
-          <!-- Event input row, like Skills -->
+          <!-- Event input row -->
           <div
             class="event-input-row"
-            style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 8px;"
+            style="
+              display: grid;
+              grid-template-columns: repeat(4, minmax(0, 1fr));
+              gap: 8px;
+              margin-bottom: 8px;
+            "
           >
             <div class="field">
               <label for="eventNameInput">Event Name</label>
@@ -233,7 +251,7 @@
             </div>
             <div class="field">
               <label for="eventBonusInput">Bonus SP</label>
-              <input type="number" id="eventBonusInput" min="0" value="0" />
+              <input type="number" id="eventBonusInput" min="0" max="99" value="0" />
             </div>
 
             <div class="field">
@@ -288,4 +306,3 @@
     <script src="script.js"></script>
   </body>
 </html>
-
