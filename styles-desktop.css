@@ -315,6 +315,33 @@ tbody tr:hover {
   margin: 0;
 }
 
+
+/* Desktop layout for the event input row */
+.event-input-row {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 3fr)   /* Event Name */
+    130px           /* Date */
+    1.5fr           /* Type */
+    auto            /* NPC? */
+    auto            /* Merchant OT? */
+    70px            /* Bonus SP */
+    auto !important;/* Add Event */
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+/* Make date and bonus SP nice and compact */
+.event-input-row #eventDateInput {
+  max-width: 130px;
+}
+
+.event-input-row #eventBonusInput {
+  max-width: 60px;
+}
+
+
 @media (max-width: 900px) {
   body {
     padding: 16px;
