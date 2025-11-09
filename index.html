@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Larp Adventures – Character Sheet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
       --bg: #0b1020;
@@ -169,7 +170,7 @@
 
     .top-controls {
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-start; /* moved to the left */
       align-items: center;
       gap: 10px;
       max-width: 1200px;
@@ -181,7 +182,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-left: auto;
     }
 
     .button {
@@ -327,7 +327,7 @@
       }
       .save-load-controls {
         flex-direction: column;
-        align-items: flex-end;
+        align-items: flex-start;
       }
       .skills-row {
         grid-template-columns: 1fr 1fr;
@@ -344,12 +344,12 @@
   <h1>Larp Adventures</h1>
   <div class="subtitle">Character Sheet • Skills & Events Tracker</div>
 
-  <!-- Save / Load / Export (top right) -->
+  <!-- Load / Save / Export (top left now) -->
   <div class="top-controls">
     <div class="save-load-controls">
-      <button class="button small secondary" id="saveCharacterBtn">Save Character</button>
       <button class="button small secondary" id="loadCharacterBtn">Load Character</button>
-      <button class="button small secondary" id="exportPdfBtn">Export PDF</button>
+      <button class="button small secondary" id="saveCharacterBtn">Save Character</button>
+      <button class="button small secondary" id="exportPdfBtn">Export Character</button>
       <input type="file" id="loadCharacterFile" accept=".json" style="display:none;" />
     </div>
   </div>
@@ -469,16 +469,6 @@
           <div class="field">
             <!-- empty placeholder right column -->
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SKILLS CSV LOADER -->
-    <div class="card">
-      <div class="card-inner">
-        <div class="field">
-          <label for="csvFileInput">Load skills csv</label>
-          <input type="file" id="csvFileInput" accept=".csv" />
         </div>
       </div>
     </div>
@@ -666,7 +656,6 @@
     const PROFESSION_NAMES = new Set(["Artificer", "Bard", "Merchant", "Scholar"]);
 
     // ---------- DOM REFS ----------
-    const csvFileInput = document.getElementById("csvFileInput");
     const skillPathSelect = document.getElementById("skillPath");
     const skillSelect = document.getElementById("skillSelect");
     const skillFreeFlag = document.getElementById("skillFreeFlag");
@@ -1585,7 +1574,7 @@
       doc.save(filenameBase + "_sheet.pdf");
     }
 
-    // ---------- CSV LOADING ----------
+    // ---------- CSV AUTO-LOAD ----------
     function tryAutoLoadCSV() {
       fetch("larp_skills.csv")
         .then((res) => {
@@ -1599,26 +1588,10 @@
         })
         .catch(() => {
           console.warn(
-            "Could not auto-load larp_skills.csv. Use the file picker instead."
+            "Could not auto-load larp_skills.csv. Make sure it's alongside index.html."
           );
         });
     }
-
-    csvFileInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const text = ev.target.result;
-        const rows = parseCSV(text);
-        if (!rows.length) {
-          alert("CSV seems empty or invalid.");
-          return;
-        }
-        buildSkillsStructures(rows);
-      };
-      reader.readAsText(file);
-    });
 
     // ---------- INIT ----------
     window.addEventListener("DOMContentLoaded", () => {
