@@ -57,10 +57,11 @@ let skillsData = [];
 let skillsByPath = {};
 let selectedSkills = [];
 let skillNameSet = new Set(); // normalized skill names
+let eventsData = [];          // NEW: all events live here
 
 const EVENT_BASE_POINTS = {
   "Day Event": 1,
-  "Campout": 2,
+  Campout: 2,
   "Festival Event": 3,
   "Virtual Event": 1,
   "Work Weekend": 1,
@@ -85,10 +86,19 @@ const skillDescription = document.getElementById("skillDescription");
 const selectedSkillsBody = document.getElementById("selectedSkillsBody");
 const totalSkillCostSpan = document.getElementById("totalSkillCost");
 
+// Events UI
 const addEventBtn = document.getElementById("addEventBtn");
 const eventsBody = document.getElementById("eventsBody");
 const totalEventPointsSpan = document.getElementById("totalEventPoints");
 const qualifyingEventsCountSpan = document.getElementById("qualifyingEventsCount");
+
+// NEW: event input controls (top row)
+const eventNameInput = document.getElementById("eventNameInput");
+const eventDateInput = document.getElementById("eventDateInput");
+const eventTypeSelect = document.getElementById("eventTypeSelect");
+const eventNpcInput = document.getElementById("eventNpcInput");
+const eventMotInput = document.getElementById("eventMotInput");
+const eventBonusInput = document.getElementById("eventBonusInput");
 
 const tierInput = document.getElementById("tier");
 const totalSkillPointsInput = document.getElementById("totalSkillPoints");
@@ -166,11 +176,9 @@ function computeSkillCost(record) {
   const isProfession = PROFESSION_NAMES.has(path);
 
   if (isMainPath || isProfession) {
-    // Main path & professions: Tier 0 free, otherwise cost = tier
     if (tier === 0) return 0;
     return tier;
   } else {
-    // Secondary paths: Tier 0 costs 1, others cost 2 * tier
     if (tier === 0) return 1;
     return tier * 2;
   }
@@ -184,8 +192,6 @@ function extractPrereqSkillNames(prereqRaw) {
   if (!raw) return [];
 
   const lower = raw.toLowerCase();
-
-  // 1) Things in [brackets]
   const bracketRegex = /\[([^\]]+)\]/g;
   let m;
   while ((m = bracketRegex.exec(raw)) !== null) {
@@ -213,14 +219,12 @@ function extractPrereqSkillNames(prereqRaw) {
     });
   }
 
-  // 2) After "Requirement:"
   const reqIdx = lower.indexOf("requirement:");
   if (reqIdx !== -1) {
     const afterReq = raw.slice(reqIdx + "requirement:".length).trim();
     processChunk(afterReq);
   }
 
-  // 3) Whole cell as fallback
   if (names.size === 0) {
     const normWhole = normalizeSkillName(raw);
     if (normWhole && skillNameSet.has(normWhole)) {
@@ -352,18 +356,15 @@ function updateSkillDescriptionFromSelect() {
   skillDescription.value = desc.trim();
 }
 
-// Common sorter for skills (used in table + PDF)
 function getSortedSelectedSkills() {
   const mainPath = pathDisplaySelect.value || "";
   return selectedSkills.slice().sort((a, b) => {
     const aMain = a.path === mainPath;
     const bMain = b.path === mainPath;
 
-    // 1) Main path always first
     if (aMain && !bMain) return -1;
     if (bMain && !aMain) return 1;
 
-    // 2) Among non-main paths: alphabetize by path
     if (!aMain && !bMain) {
       const pathCmp = a.path.localeCompare(b.path, undefined, {
         sensitivity: "base"
@@ -371,11 +372,9 @@ function getSortedSelectedSkills() {
       if (pathCmp !== 0) return pathCmp;
     }
 
-    // 3) Within a path: sort by tier ascending
     const tierDiff = (a.tier || 0) - (b.tier || 0);
     if (tierDiff !== 0) return tierDiff;
 
-    // 4) Then by skill name A→Z
     return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
   });
 }
@@ -414,7 +413,6 @@ function addSelectedSkill() {
   const isProfessionSkill = isExplicitProfession;
   const isSecondaryPathSkill = !isMainPathSkill && !isProfessionSkill;
 
-  // Profession gating
   if (isProfessionSkill) {
     if (currentTier < 3) {
       alert("You must be at least Tier 3 to purchase profession skills.");
@@ -440,7 +438,6 @@ function addSelectedSkill() {
     }
   }
 
-  // Tier restriction for main path skills
   if (isMainPathSkill && skill.tier > currentTier) {
     alert(
       `You are Tier ${currentTier}. You cannot take a Tier ${skill.tier} skill on your main path yet.`
@@ -448,7 +445,6 @@ function addSelectedSkill() {
     return;
   }
 
-  // Secondary path gating by Tier
   if (isSecondaryPathSkill) {
     let allowedSecondaryTier = 0;
     if (currentTier >= 6) {
@@ -474,7 +470,6 @@ function addSelectedSkill() {
     }
   }
 
-  // Prerequisite check
   const prereqCheck = checkPrerequisitesForSkill(skill);
   if (!prereqCheck.ok) {
     alert(
@@ -486,7 +481,7 @@ function addSelectedSkill() {
 
   const free = skillFreeFlag.checked;
 
-  // Recompute totals BEFORE adding, then enforce SP limit using true cost
+  // Recompute BEFORE adding so we know how many SP we have
   recomputeTotals();
   const available =
     parseInt(totalSkillPointsInput.value, 10) >= 0
@@ -589,134 +584,80 @@ function renderSelectedSkills() {
   updatePathAndProfessionDisplays();
 }
 
-// ---------- EVENTS ----------
-function addEventRow(data) {
-  const tr = document.createElement("tr");
+// ---------- EVENTS (NEW STYLE, LIKE SKILLS) ----------
+function addEventFromInputs() {
+  const name = eventNameInput.value.trim();
+  const date = eventDateInput.value;
+  const type = eventTypeSelect.value;
+  const npc = !!eventNpcInput.checked;
+  const mot = !!eventMotInput.checked;
+  const bonus = parseInt(eventBonusInput.value, 10) || 0;
 
-  const tdMinus = document.createElement("td");
-  const minusBtn = document.createElement("button");
-  minusBtn.textContent = "−";
-  minusBtn.className = "button small secondary";
-  minusBtn.title = "Remove event";
-  minusBtn.style.minWidth = "32px";
-  minusBtn.addEventListener("click", () => {
-    if (confirm("Are you sure you want to remove this event?")) {
-      tr.remove();
-      recomputeTotals();
-    }
-  });
-  tdMinus.appendChild(minusBtn);
-  tr.appendChild(tdMinus);
-
-  const tdName = document.createElement("td");
-  const nameInput = document.createElement("input");
-  nameInput.type = "text";
-  nameInput.addEventListener("input", recomputeTotals);
-  tdName.appendChild(nameInput);
-  tr.appendChild(tdName);
-
-  const tdDate = document.createElement("td");
-  const dateInput = document.createElement("input");
-  dateInput.type = "date";
-  dateInput.addEventListener("input", recomputeTotals);
-  tdDate.appendChild(dateInput);
-  tr.appendChild(tdDate);
-
-  const tdType = document.createElement("td");
-  const typeSelect = document.createElement("select");
-  [
-    "",
-    "Day Event",
-    "Campout",
-    "Festival Event",
-    "Virtual Event",
-    "Work Weekend",
-    "Survey/Misc"
-  ].forEach((t) => {
-    const opt = document.createElement("option");
-    opt.value = t;
-    opt.textContent = t || "-- Select --";
-    typeSelect.appendChild(opt);
-  });
-  typeSelect.addEventListener("change", () => {
-    updateEventRowPoints(tr);
-    recomputeTotals();
-  });
-  tdType.appendChild(typeSelect);
-  tr.appendChild(tdType);
-
-  const tdNPC = document.createElement("td");
-  const npcInput = document.createElement("input");
-  npcInput.type = "checkbox";
-  npcInput.addEventListener("change", () => {
-    updateEventRowPoints(tr);
-    recomputeTotals();
-  });
-  tdNPC.appendChild(npcInput);
-  tr.appendChild(tdNPC);
-
-  const tdMOT = document.createElement("td");
-  const motInput = document.createElement("input");
-  motInput.type = "checkbox";
-  motInput.addEventListener("change", () => {
-    updateEventRowPoints(tr);
-    recomputeTotals();
-  });
-  tdMOT.appendChild(motInput);
-  tr.appendChild(tdMOT);
-
-  const tdBonus = document.createElement("td");
-  const bonusInput = document.createElement("input");
-  bonusInput.type = "number";
-  bonusInput.min = "0";
-  bonusInput.value = "";
-  bonusInput.style.width = "50px";
-  bonusInput.addEventListener("input", () => {
-    updateEventRowPoints(tr);
-    recomputeTotals();
-  });
-  tdBonus.appendChild(bonusInput);
-  tr.appendChild(tdBonus);
-
-  const tdPoints = document.createElement("td");
-  const pointsSpan = document.createElement("span");
-  pointsSpan.textContent = "0";
-  tdPoints.appendChild(pointsSpan);
-  tr.appendChild(tdPoints);
-
-  tr._controls = {
-    nameInput,
-    dateInput,
-    typeSelect,
-    npcInput,
-    motInput,
-    bonusInput,
-    pointsSpan
-  };
-
-  if (data) {
-    nameInput.value = data.name || "";
-    dateInput.value = data.date || "";
-    typeSelect.value = data.type || "";
-    npcInput.checked = !!data.npc;
-    motInput.checked = !!data.merchantOT;
-    bonusInput.value = (data.bonusSP ?? "").toString();
-    updateEventRowPoints(tr);
+  if (!type) {
+    alert("Please choose an event type.");
+    return;
   }
 
-  eventsBody.appendChild(tr);
+  const ev = {
+    name,
+    date,
+    type,
+    npc,
+    merchantOT: mot,
+    bonusSP: bonus,
+    skillPoints: 0
+  };
+
+  eventsData.push(ev);
+
+  // Clear inputs
+  eventNameInput.value = "";
+  eventDateInput.value = "";
+  eventTypeSelect.value = "";
+  eventNpcInput.checked = false;
+  eventMotInput.checked = false;
+  eventBonusInput.value = "0";
+
+  recomputeTotals();
 }
 
-function updateEventRowPoints(tr) {
-  const { typeSelect, npcInput, motInput, bonusInput, pointsSpan } =
-    tr._controls;
-  const type = typeSelect.value;
-  const base = EVENT_BASE_POINTS[type] || 0;
-  const npc = npcInput.checked ? 1 : 0;
-  const mot = motInput.checked ? 1 : 0;
-  const bonus = parseInt(bonusInput.value, 10) || 0;
-  const total = base + npc + mot + bonus;
-  pointsSpan.textContent = total;
+function renderEvents() {
+  eventsBody.innerHTML = "";
+
+  eventsData.forEach((ev, index) => {
+    const tr = document.createElement("tr");
+
+    const tdMinus = document.createElement("td");
+    const minusBtn = document.createElement("button");
+    minusBtn.textContent = "−";
+    minusBtn.className = "button small secondary";
+    minusBtn.title = "Remove event";
+    minusBtn.style.minWidth = "32px";
+    minusBtn.addEventListener("click", () => {
+      if (confirm("Are you sure you want to remove this event?")) {
+        eventsData.splice(index, 1);
+        recomputeTotals();
+      }
+    });
+    tdMinus.appendChild(minusBtn);
+    tr.appendChild(tdMinus);
+
+    function addCell(text) {
+      const td = document.createElement("td");
+      td.textContent = text;
+      tr.appendChild(td);
+    }
+
+    addCell(ev.name || "");
+    addCell(ev.date || "");
+    addCell(ev.type || "");
+    addCell(ev.npc ? "Yes" : "");
+    addCell(ev.merchantOT ? "Yes" : "");
+    addCell(ev.bonusSP != null && ev.bonusSP !== "" ? String(ev.bonusSP) : "");
+    addCell(ev.skillPoints != null ? String(ev.skillPoints) : "0");
+
+    eventsBody.appendChild(tr);
+  });
 }
 
 // ---------- TOTALS & TIER ----------
@@ -736,18 +677,15 @@ function recomputeTotals() {
   let totalEventPoints = 0;
   let qualifyingCount = 0;
 
-  Array.from(eventsBody.rows).forEach((tr) => {
-    const { typeSelect, npcInput, motInput, bonusInput, pointsSpan } =
-      tr._controls;
-    const type = typeSelect.value;
+  eventsData.forEach((ev) => {
+    const type = ev.type || "";
     const base = EVENT_BASE_POINTS[type] || 0;
-    const npc = npcInput.checked ? 1 : 0;
-    const mot = motInput.checked ? 1 : 0;
-    const bonus = parseInt(bonusInput.value, 10) || 0;
+    const npc = ev.npc ? 1 : 0;
+    const mot = ev.merchantOT ? 1 : 0;
+    const bonus = ev.bonusSP ? parseInt(ev.bonusSP, 10) || 0 : 0;
     const total = base + npc + mot + bonus;
-    pointsSpan.textContent = total;
+    ev.skillPoints = total;
     totalEventPoints += total;
-
     if (QUALIFYING_FOR_TIER.has(type)) {
       qualifyingCount++;
     }
@@ -767,34 +705,24 @@ function recomputeTotals() {
 
   const available = Math.max(0, totalEventPoints - totalSkillCost);
   totalSkillPointsInput.value = available;
+
+  renderEvents();
 }
 
 // ---------- SAVE / LOAD CHARACTER ----------
 function collectCharacterState() {
   const organizations = getOrganizations();
 
-  const events = Array.from(eventsBody.rows).map((tr) => {
-    const {
-      nameInput,
-      dateInput,
-      typeSelect,
-      npcInput,
-      motInput,
-      bonusInput,
-      pointsSpan
-    } = tr._controls;
-    return {
-      name: nameInput.value || "",
-      date: dateInput.value || "",
-      type: typeSelect.value || "",
-      npc: !!npcInput.checked,
-      merchantOT: !!motInput.checked,
-      bonusSP: bonusInput.value ? parseInt(bonusInput.value, 10) || 0 : 0,
-      skillPoints: parseInt(pointsSpan.textContent, 10) || 0
-    };
-  });
+  const events = eventsData.map((ev) => ({
+    name: ev.name || "",
+    date: ev.date || "",
+    type: ev.type || "",
+    npc: !!ev.npc,
+    merchantOT: !!ev.merchantOT,
+    bonusSP: ev.bonusSP ? parseInt(ev.bonusSP, 10) || 0 : 0,
+    skillPoints: ev.skillPoints ? parseInt(ev.skillPoints, 10) || 0 : 0
+  }));
 
-  // Derived professions from selected skills
   const professions = Array.from(
     new Set(
       selectedSkills
@@ -834,12 +762,17 @@ function applyCharacterState(state) {
     : [];
   renderSelectedSkills();
 
-  eventsBody.innerHTML = "";
-  if (Array.isArray(state.events) && state.events.length) {
-    state.events.forEach((ev) => addEventRow(ev));
-  } else {
-    addEventRow();
-  }
+  eventsData = Array.isArray(state.events)
+    ? state.events.map((ev) => ({
+        name: ev.name || "",
+        date: ev.date || "",
+        type: ev.type || "",
+        npc: !!ev.npc,
+        merchantOT: !!ev.merchantOT,
+        bonusSP: ev.bonusSP ? parseInt(ev.bonusSP, 10) || 0 : 0,
+        skillPoints: ev.skillPoints ? parseInt(ev.skillPoints, 10) || 0 : 0
+      }))
+    : [];
 
   recomputeTotals();
   updatePathAndProfessionDisplays();
@@ -910,7 +843,6 @@ function exportCharacterPDF() {
   const remainingSP = totalSkillPointsInput.value || "0";
   const organizations = getOrganizations().join(", ");
 
-  // Title
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(20);
   doc.text("Larp Adventures Character Sheet", margin, y);
@@ -922,7 +854,6 @@ function exportCharacterPDF() {
   const xL = margin;
   const xR = 310;
 
-  // Basic info - D&D-ish two-column band
   doc.text(`Character: ${charName}`, xL, y);
   doc.text(`Player: ${playerName}`, xR, y);
   y += lineH;
@@ -942,7 +873,6 @@ function exportCharacterPDF() {
   doc.text(`Remaining Skill Points: ${remainingSP}`, xR, y);
   y += lineH * 2;
 
-  // Skills section header
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(14);
   doc.text("Skills", margin, y);
@@ -965,7 +895,6 @@ function exportCharacterPDF() {
       doc.addPage();
       y = margin;
 
-      // repeat skills header on new page
       doc.setFont("Helvetica", "bold");
       doc.setFontSize(14);
       doc.text("Skills (cont.)", margin, y);
@@ -991,7 +920,6 @@ function exportCharacterPDF() {
     y += lineH * lines.length;
   });
 
-  // Prompt for filename
   let suggestedName = charName ? charName : "larp_character";
   let baseName = prompt("Enter a name for the exported PDF:", suggestedName);
   if (!baseName) {
@@ -1025,10 +953,7 @@ function tryAutoLoadCSV() {
 window.addEventListener("DOMContentLoaded", () => {
   tryAutoLoadCSV();
 
-  addEventBtn.addEventListener("click", () => {
-    addEventRow();
-    recomputeTotals();
-  });
+  addEventBtn.addEventListener("click", addEventFromInputs);
 
   addSkillBtn.addEventListener("click", () => {
     addSelectedSkill();
@@ -1056,8 +981,6 @@ window.addEventListener("DOMContentLoaded", () => {
     updatePathAndProfessionDisplays();
   });
 
-  // Start with one blank event row
-  addEventRow();
   recomputeTotals();
   updatePathAndProfessionDisplays();
 });
