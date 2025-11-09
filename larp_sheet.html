@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Larp Adventures – Character Sheet</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-alt: #151b30;
+      --card: #1e2640;
+      --accent: #f4c76b;
+      --accent-soft: rgba(244, 199, 107, 0.2);
+      --text: #f2f4ff;
+      --muted: #b7bdd7;
+      --border: #2b3658;
+      --danger: #ff6b81;
+      --success: #7ed957;
+      --radius-lg: 14px;
+      --radius-sm: 8px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #151b30 0, #050813 55%);
+      color: var(--text);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 26px;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      text-align: center;
+      margin-bottom: 24px;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto 40px auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, var(--card), #141a2b);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px 18px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, var(--accent-soft), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+    }
+
+    .section-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 20px;
+      margin-bottom: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(10, 15, 34, 0.85);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      width: 100%;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+      max-height: 160px;
+    }
+
+    .inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .total-row {
+      text-align: right;
+      font-size: 12px;
+      margin-top: 6px;
+      color: var(--muted);
+    }
+
+    .total-row span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .top-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      max-width: 1200px;
+      margin: 0 auto 12px;
+      padding: 0 2px;
+    }
+
+    .save-load-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: linear-gradient(135deg, var(--accent), #f8983c);
+      color: #23120b;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.46);
+    }
+
+    .button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--accent);
+      border-color: var(--border);
+      box-shadow: none;
+    }
+
+    .button.secondary:hover {
+      background: rgba(255, 255, 255, 0.03);
+      box-shadow: none;
+      transform: none;
+    }
+
+    .button.small {
+      padding: 3px 8px;
+      font-size: 11px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 6px 4px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    tbody tr:hover {
+      background: rgba(244, 199, 107, 0.06);
+    }
+
+    .tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--muted);
+    }
+
+    .tag.free {
+      color: var(--success);
+      border: 1px solid rgba(126, 217, 87, 0.6);
+      background: rgba(126, 217, 87, 0.08);
+    }
+
+    .tag.paid {
+      color: var(--accent);
+      border: 1px solid rgba(244, 199, 107, 0.6);
+      background: rgba(244, 199, 107, 0.08);
+    }
+
+    /* Skills row layout */
+    .skills-row {
+      display: grid;
+      grid-template-columns: auto auto minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 10px;
+    }
+
+    .select-path {
+      width: auto;
+      max-width: 220px;
+      white-space: nowrap;
+    }
+
+    .skill-free-field {
+      align-self: flex-end;
+    }
+
+    .skill-add-field {
+      align-items: flex-end;
+    }
+
+    /* Organizations grid */
+    .org-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px 10px;
+      margin-top: 2px;
+    }
+
+    .org-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .org-item input[type="checkbox"] {
+      margin: 0;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 16px;
+      }
+      .save-load-controls {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+      .skills-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .org-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+  <!-- jsPDF from CDN for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <h1>Larp Adventures</h1>
+  <div class="subtitle">Character Sheet • Skills & Events Tracker</div>
+
+  <!-- Save / Load / Export (top right) -->
+  <div class="top-controls">
+    <div class="save-load-controls">
+      <button class="button small secondary" id="saveCharacterBtn">Save Character</button>
+      <button class="button small secondary" id="loadCharacterBtn">Load Character</button>
+      <button class="button small secondary" id="exportPdfBtn">Export PDF</button>
+      <input type="file" id="loadCharacterFile" accept=".json" style="display:none;" />
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- BASIC INFO -->
+    <div class="card">
+      <div class="card-inner">
+        <h2>Basic Information</h2>
+        <div class="section-row">
+          <div class="field">
+            <label for="characterName">Character Name</label>
+            <input type="text" id="characterName" />
+          </div>
+          <div class="field">
+            <label for="playerName">Player Name</label>
+            <input type="text" id="playerName" />
+          </div>
+        </div>
+
+        <div class="section-row">
+          <div class="field">
+            <label for="pathDisplay">Path</label>
+            <select id="pathDisplay">
+              <option value="">-- Select Path --</option>
+              <option>Healer</option>
+              <option>Mage</option>
+              <option>Rogue</option>
+              <option>Warrior</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="faction">Faction</label>
+            <select id="faction">
+              <option value="">-- Select Faction --</option>
+              <option>Blackthorne Company</option>
+              <option>Catalpa</option>
+              <option>Cedar Hill</option>
+              <option>Eponore</option>
+              <option>Geth</option>
+              <option>Grimfrost</option>
+              <option>Guild of the Black Sky</option>
+              <option>Kult of Tharros</option>
+              <option>Mellondor</option>
+              <option>Prismatic Troupe</option>
+              <option>Sunsteel Company</option>
+              <option>The Dismissed</option>
+              <option>The Free Folk</option>
+              <option>The Grove</option>
+              <option>The House of Silver Branches</option>
+              <option>The Order</option>
+              <option>The Wardens</option>
+              <option>The White Ravens</option>
+              <option>Vidarian Khanate</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Secondary Paths / Professions -->
+        <div class="section-row">
+          <div class="field">
+            <label for="secondaryPathsDisplay">Secondary path(s)</label>
+            <input type="text" id="secondaryPathsDisplay" readonly />
+          </div>
+          <div class="field">
+            <label for="professionsDisplay">Profession(s)</label>
+            <input type="text" id="professionsDisplay" readonly />
+          </div>
+        </div>
+
+        <!-- Tier & Organizations -->
+        <div class="section-row">
+          <div class="field">
+            <label>Tier</label>
+            <div class="inline">
+              <input type="number" id="tier" readonly style="max-width:60px;" />
+              <span class="pill">auto from events</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Organization(s)</label>
+            <div id="organizationsContainer" class="org-grid">
+              <label class="org-item">
+                <input type="checkbox" value="Archivist Guild" /> Archivist Guild
+              </label>
+              <label class="org-item">
+                <input type="checkbox" value="Merchant Guild" /> Merchant Guild
+              </label>
+              <label class="org-item">
+                <input type="checkbox" value="Order of Light" /> Order of Light
+              </label>
+              <label class="org-item">
+                <input type="checkbox" value="Sanguine Order" /> Sanguine Order
+              </label>
+              <label class="org-item">
+                <input type="checkbox" value="The Sentinels" /> The Sentinels
+              </label>
+              <label class="org-item">
+                <input type="checkbox" value="The Shield" /> The Shield
+              </label>
+              <label class="org-item">
+                <input type="checkbox" value="THoTH" /> THoTH
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skill Points under Tier -->
+        <div class="section-row">
+          <div class="field">
+            <label>Skill Points</label>
+            <div class="inline">
+              <input type="number" id="totalSkillPoints" readonly style="max-width:80px;" />
+              <span class="pill">events − spent</span>
+            </div>
+          </div>
+          <div class="field">
+            <!-- empty placeholder right column -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKILLS CSV LOADER -->
+    <div class="card">
+      <div class="card-inner">
+        <div class="field">
+          <label for="csvFileInput">Load skills csv</label>
+          <input type="file" id="csvFileInput" accept=".csv" />
+        </div>
+      </div>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="card">
+      <div class="card-inner">
+        <h2>Skills</h2>
+
+        <!-- Compact skills row -->
+        <div class="skills-row">
+          <div class="field">
+            <label for="skillPath">Path / Profession</label>
+            <select id="skillPath" class="select-path">
+              <option value="">-- Select Path / Profession --</option>
+            </select>
+          </div>
+
+          <div class="field inline skill-free-field">
+            <label for="skillFreeFlag">Earned for Free?</label>
+            <input type="checkbox" id="skillFreeFlag" />
+          </div>
+
+          <div class="field">
+            <label for="skillSelect">Skill</label>
+            <select id="skillSelect">
+              <option value="">-- Select Skill --</option>
+            </select>
+          </div>
+
+          <div class="field skill-add-field">
+            <label>&nbsp;</label>
+            <button class="button small" id="addSkillBtn">Add Skill</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="skillDescription">Skill Description</label>
+          <textarea id="skillDescription" readonly></textarea>
+        </div>
+
+        <div class="field">
+          <label>Selected Skills</label>
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Tier</th>
+                <th>Path / Profession</th>
+                <th>Skill Name</th>
+                <th>Cost</th>
+              </tr>
+            </thead>
+            <tbody id="selectedSkillsBody">
+              <!-- populated by JS -->
+            </tbody>
+          </table>
+          <div class="total-row">
+            Total skill points spent on non-free skills: <span id="totalSkillCost">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENTS -->
+    <div class="card">
+      <div class="card-inner">
+        <h2>Events</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Event Name</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>NPC?</th>
+              <th>Merchant<br>OT?</th>
+              <th>Bonus SP</th>
+              <th>Skill Pts</th>
+            </tr>
+          </thead>
+          <tbody id="eventsBody">
+            <!-- populated by JS -->
+          </tbody>
+        </table>
+
+        <div class="field" style="margin-top:8px; align-items:flex-start; width:auto;">
+          <button class="button small secondary" id="addEventBtn" title="Add Event" style="min-width:32px; justify-content:center;">+</button>
+        </div>
+
+        <div class="total-row">
+          Total event skill points: <span id="totalEventPoints">0</span> •
+          Qualifying events for Tier: <span id="qualifyingEventsCount">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- CSV PARSING ----------
+    function parseCSV(text) {
+      const rows = [];
+      let field = "";
+      let row = [];
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+
+        if (c === '"') {
+          if (inQuotes && i + 1 < text.length && text[i + 1] === '"') {
+            field += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (c === "," && !inQuotes) {
+          row.push(field);
+          field = "";
+        } else if ((c === "\n" || c === "\r") && !inQuotes) {
+          row.push(field);
+          field = "";
+          if (row.length > 1 || (row.length === 1 && row[0].trim() !== "")) {
+            rows.push(
+              row.map((s) =>
+                s.trim().replace(/^\ufeff/, "")
+              )
+            );
+          }
+          row = [];
+          if (c === "\r" && i + 1 < text.length && text[i + 1] === "\n") {
+            i++;
+          }
+        } else {
+          field += c;
+        }
+      }
+
+      if (field.length > 0 || row.length) {
+        row.push(field);
+        rows.push(
+          row.map((s) =>
+            s.trim().replace(/^\ufeff/, "")
+          )
+        );
+      }
+
+      if (!rows.length) return [];
+
+      const header = rows[0];
+      const dataRows = rows.slice(1);
+
+      return dataRows.map((cols) => {
+        const obj = {};
+        header.forEach((h, idx) => {
+          obj[h] = cols[idx] ?? "";
+        });
+        return obj;
+      });
+    }
+
+    // ---------- DATA ----------
+    let skillsData = [];
+    let skillsByPath = {};
+    let selectedSkills = [];
+    let skillNameSet = new Set(); // normalized skill names
+
+    const EVENT_BASE_POINTS = {
+      "Day Event": 1,
+      "Campout": 2,
+      "Festival Event": 3,
+      "Virtual Event": 1,
+      "Work Weekend": 1,
+      "Survey/Misc": 1
+    };
+
+    const QUALIFYING_FOR_TIER = new Set([
+      "Day Event",
+      "Campout",
+      "Festival Event",
+      "Virtual Event"
+    ]);
+
+    const PROFESSION_NAMES = new Set(["Artificer", "Bard", "Merchant", "Scholar"]);
+
+    // ---------- DOM REFS ----------
+    const csvFileInput = document.getElementById("csvFileInput");
+    const skillPathSelect = document.getElementById("skillPath");
+    const skillSelect = document.getElementById("skillSelect");
+    const skillFreeFlag = document.getElementById("skillFreeFlag");
+    const addSkillBtn = document.getElementById("addSkillBtn");
+    const skillDescription = document.getElementById("skillDescription");
+    const selectedSkillsBody = document.getElementById("selectedSkillsBody");
+    const totalSkillCostSpan = document.getElementById("totalSkillCost");
+
+    const addEventBtn = document.getElementById("addEventBtn");
+    const eventsBody = document.getElementById("eventsBody");
+    const totalEventPointsSpan = document.getElementById("totalEventPoints");
+    const qualifyingEventsCountSpan = document.getElementById("qualifyingEventsCount");
+
+    const tierInput = document.getElementById("tier");
+    const totalSkillPointsInput = document.getElementById("totalSkillPoints");
+
+    const saveCharacterBtn = document.getElementById("saveCharacterBtn");
+    const loadCharacterBtn = document.getElementById("loadCharacterBtn");
+    const exportPdfBtn = document.getElementById("exportPdfBtn");
+    const loadCharacterFile = document.getElementById("loadCharacterFile");
+
+    const organizationsContainer = document.getElementById("organizationsContainer");
+
+    const characterNameInput = document.getElementById("characterName");
+    const playerNameInput = document.getElementById("playerName");
+    const pathDisplaySelect = document.getElementById("pathDisplay");
+    const factionSelect = document.getElementById("faction");
+
+    const secondaryPathsDisplay = document.getElementById("secondaryPathsDisplay");
+    const professionsDisplay = document.getElementById("professionsDisplay");
+
+    // ---------- HELPERS ----------
+    function getOrganizations() {
+      return Array.from(
+        organizationsContainer.querySelectorAll('input[type="checkbox"]:checked')
+      ).map((cb) => cb.value);
+    }
+
+    function setOrganizations(values) {
+      const set = new Set(values || []);
+      organizationsContainer
+        .querySelectorAll('input[type="checkbox"]')
+        .forEach((cb) => {
+          cb.checked = set.has(cb.value);
+        });
+    }
+
+    function getCurrentTier() {
+      return parseInt(tierInput.value, 10) || 0;
+    }
+
+    function normalizeSkillName(name) {
+      return (name || "")
+        .toLowerCase()
+        .replace(/[\.\,\;\:\!\?]+$/g, "")
+        .trim();
+    }
+
+    function updatePathAndProfessionDisplays() {
+      const mainPath = pathDisplaySelect.value || "";
+      const secondaryPaths = new Set();
+      const professionPaths = new Set();
+
+      selectedSkills.forEach((sk) => {
+        if (!sk.path) return;
+        if (sk.path === mainPath) return;
+        if (PROFESSION_NAMES.has(sk.path)) {
+          professionPaths.add(sk.path);
+        } else {
+          secondaryPaths.add(sk.path);
+        }
+      });
+
+      secondaryPathsDisplay.value = Array.from(secondaryPaths).join(", ");
+      professionsDisplay.value = Array.from(professionPaths).join(", ");
+    }
+
+    function computeSkillCost(record) {
+      const mainPath = pathDisplaySelect.value || "";
+      const tier = record.tier || 0;
+      const free = !!record.free;
+      const path = record.path || "";
+
+      if (free) return 0;
+
+      const isMainPath = path === mainPath;
+      const isProfession = PROFESSION_NAMES.has(path);
+
+      if (isMainPath || isProfession) {
+        // Main path & professions: Tier 0 free, otherwise cost = tier
+        if (tier === 0) return 0;
+        return tier;
+      } else {
+        // Secondary paths: Tier 0 costs 1, others cost 2 * tier
+        if (tier === 0) return 1;
+        return tier * 2;
+      }
+    }
+
+    function extractPrereqSkillNames(prereqRaw) {
+      const names = new Set();
+      if (!prereqRaw) return [];
+
+      const raw = prereqRaw.trim();
+      if (!raw) return [];
+
+      const lower = raw.toLowerCase();
+
+      // 1) Things in [brackets]
+      const bracketRegex = /\[([^\]]+)\]/g;
+      let m;
+      while ((m = bracketRegex.exec(raw)) !== null) {
+        const partRaw = m[1].trim();
+        const norm = normalizeSkillName(partRaw);
+        if (norm && skillNameSet.has(norm)) {
+          names.add(partRaw);
+        }
+      }
+
+      function processChunk(text) {
+        if (!text) return;
+        let chunk = text.trim();
+        const dotIdx = chunk.indexOf(".");
+        if (dotIdx !== -1) {
+          chunk = chunk.slice(0, dotIdx);
+        }
+        const pieces = chunk.split(/,| and /i);
+        pieces.forEach((p) => {
+          const partRaw = p.trim();
+          const norm = normalizeSkillName(partRaw);
+          if (norm && skillNameSet.has(norm)) {
+            names.add(partRaw);
+          }
+        });
+      }
+
+      // 2) After "Requirement:"
+      const reqIdx = lower.indexOf("requirement:");
+      if (reqIdx !== -1) {
+        const afterReq = raw.slice(reqIdx + "requirement:".length).trim();
+        processChunk(afterReq);
+      }
+
+      // 3) Whole cell as fallback
+      if (names.size === 0) {
+        const normWhole = normalizeSkillName(raw);
+        if (normWhole && skillNameSet.has(normWhole)) {
+          names.add(raw);
+        }
+      }
+
+      return Array.from(names);
+    }
+
+    function checkPrerequisitesForSkill(skill) {
+      const prereqRaw = (skill.prereq || "").trim();
+      if (!prereqRaw) return { ok: true };
+
+      const requiredNames = extractPrereqSkillNames(prereqRaw);
+      if (!requiredNames.length) {
+        return { ok: true };
+      }
+
+      const missing = [];
+      requiredNames.forEach((rName) => {
+        const normReq = normalizeSkillName(rName);
+        const hasReq = selectedSkills.some(
+          (sk) => normalizeSkillName(sk.name) === normReq
+        );
+        if (!hasReq) {
+          missing.push(rName);
+        }
+      });
+
+      if (missing.length) {
+        return {
+          ok: false,
+          message:
+            "This skill has prerequisites you don't meet yet: " +
+            missing.join(", ") +
+            "."
+        };
+      }
+
+      return { ok: true };
+    }
+
+    // ---------- SKILLS LOADING ----------
+    function buildSkillsStructures(rows) {
+      skillsData = [];
+      skillsByPath = {};
+      skillNameSet = new Set();
+
+      rows.forEach((r) => {
+        const name = (r["Skill Name"] || "").trim();
+        const path = (r["Path"] || "").trim();
+        if (!name || !path) return;
+
+        const skill = {
+          name,
+          path,
+          description: r["Description"] || "",
+          tier: parseInt(r["Tier"], 10) || 0,
+          limitations: r["Limitations"] || "",
+          phys: r["Phys Rep"] || "",
+          prereq: r["Prerequisite"] || ""
+        };
+
+        skillsData.push(skill);
+        skillNameSet.add(normalizeSkillName(name));
+        if (!skillsByPath[path]) skillsByPath[path] = [];
+        skillsByPath[path].push(skill);
+      });
+
+      const paths = Object.keys(skillsByPath).sort((a, b) =>
+        a.localeCompare(b, undefined, { sensitivity: "base" })
+      );
+
+      skillPathSelect.innerHTML =
+        '<option value="">-- Select Path / Profession --</option>';
+      paths.forEach((p) => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        skillPathSelect.appendChild(opt);
+      });
+
+      populateSkillSelect();
+    }
+
+    function populateSkillSelect() {
+      const path = skillPathSelect.value;
+      skillSelect.innerHTML = '<option value="">-- Select Skill --</option>';
+      skillDescription.value = "";
+
+      let skills = [];
+      if (path && skillsByPath[path]) {
+        skills = skillsByPath[path];
+      } else {
+        skills = skillsData;
+      }
+
+      const usedKeys = new Set(
+        selectedSkills.map((sk) => `${sk.path}::${sk.name}`)
+      );
+
+      skills.forEach((s) => {
+        const key = `${s.path}::${s.name}`;
+        if (usedKeys.has(key)) return;
+        const opt = document.createElement("option");
+        opt.value = key;
+        opt.textContent = `Tier ${s.tier || 0}: ${s.name}`;
+        skillSelect.appendChild(opt);
+      });
+    }
+
+    function updateSkillDescriptionFromSelect() {
+      const val = skillSelect.value;
+      if (!val) {
+        skillDescription.value = "";
+        return;
+      }
+      const [path, name] = val.split("::");
+      const skill = (skillsByPath[path] || []).find((s) => s.name === name);
+      if (!skill) {
+        skillDescription.value = "";
+        return;
+      }
+      let desc = skill.description || "";
+      if (skill.prereq) desc += `\n\nPrerequisite: ${skill.prereq}`;
+      if (skill.limitations) desc += `\n\nLimitations: ${skill.limitations}`;
+      if (skill.phys) desc += `\n\nPhys Rep: ${skill.phys}`;
+      skillDescription.value = desc.trim();
+    }
+
+    // Common sorter for skills (used in table + PDF)
+    function getSortedSelectedSkills() {
+      const mainPath = pathDisplaySelect.value || "";
+      return selectedSkills.slice().sort((a, b) => {
+        const aMain = a.path === mainPath;
+        const bMain = b.path === mainPath;
+
+        // 1) Main path always first
+        if (aMain && !bMain) return -1;
+        if (bMain && !aMain) return 1;
+
+        // 2) Among non-main paths: alphabetize by path
+        if (!aMain && !bMain) {
+          const pathCmp = a.path.localeCompare(b.path, undefined, {
+            sensitivity: "base"
+          });
+          if (pathCmp !== 0) return pathCmp;
+        }
+
+        // 3) Within a path: sort by tier ascending
+        const tierDiff = (a.tier || 0) - (b.tier || 0);
+        if (tierDiff !== 0) return tierDiff;
+
+        // 4) Then by skill name A→Z
+        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      });
+    }
+
+    function addSelectedSkill() {
+      const val = skillSelect.value;
+      if (!val) {
+        alert("Please choose a skill first.");
+        return;
+      }
+
+      const mainPath = pathDisplaySelect.value || "";
+      if (!mainPath) {
+        alert("Please choose your main Path in Basic Information before selecting skills.");
+        return;
+      }
+
+      const [path, name] = val.split("::");
+      const skill = (skillsByPath[path] || []).find((s) => s.name === name);
+      if (!skill) {
+        alert("Could not find data for this skill.");
+        return;
+      }
+
+      const already = selectedSkills.find(
+        (sk) => sk.name === name && sk.path === path
+      );
+      if (already) {
+        alert("That skill is already in your list.");
+        return;
+      }
+
+      const currentTier = getCurrentTier();
+      const isMainPathSkill = path === mainPath;
+      const isExplicitProfession = PROFESSION_NAMES.has(path);
+      const isProfessionSkill = isExplicitProfession;
+      const isSecondaryPathSkill = !isMainPathSkill && !isProfessionSkill;
+
+      // Profession gating
+      if (isProfessionSkill) {
+        if (currentTier < 3) {
+          alert("You must be at least Tier 3 to purchase profession skills.");
+          return;
+        }
+        if (skill.tier > currentTier) {
+          alert(
+            `You are Tier ${currentTier}. You cannot take a Tier ${skill.tier} profession skill yet.`
+          );
+          return;
+        }
+        if (skill.tier > 1) {
+          const prevTier = skill.tier - 1;
+          const hasPrev = selectedSkills.some(
+            (sk) => sk.path === path && sk.tier === prevTier
+          );
+          if (!hasPrev) {
+            alert(
+              `You must have at least one Tier ${prevTier} ${path} skill before purchasing a Tier ${skill.tier} ${path} skill.`
+            );
+            return;
+          }
+        }
+      }
+
+      // Tier restriction for main path skills
+      if (isMainPathSkill && skill.tier > currentTier) {
+        alert(
+          `You are Tier ${currentTier}. You cannot take a Tier ${skill.tier} skill on your main path yet.`
+        );
+        return;
+      }
+
+      // Secondary path gating by Tier
+      if (isSecondaryPathSkill) {
+        let allowedSecondaryTier = 0;
+        if (currentTier >= 6) {
+          allowedSecondaryTier = 3;
+        } else if (currentTier >= 4) {
+          allowedSecondaryTier = 2;
+        } else if (currentTier >= 2) {
+          allowedSecondaryTier = 1;
+        } else {
+          allowedSecondaryTier = 0;
+        }
+
+        if (allowedSecondaryTier === 0) {
+          alert("You cannot choose skills from other paths until you reach Tier 2.");
+          return;
+        }
+
+        if (skill.tier > allowedSecondaryTier) {
+          alert(
+            `At Tier ${currentTier}, you may choose secondary-path skills up to Tier ${allowedSecondaryTier}, but this skill is Tier ${skill.tier}.`
+          );
+          return;
+        }
+      }
+
+      // Prerequisite check
+      const prereqCheck = checkPrerequisitesForSkill(skill);
+      if (!prereqCheck.ok) {
+        alert(
+          prereqCheck.message ||
+            "You do not meet the prerequisites for this skill."
+        );
+        return;
+      }
+
+      const free = skillFreeFlag.checked;
+
+      // Recompute totals BEFORE adding, then enforce SP limit using true cost
+      recomputeTotals();
+      const available =
+        parseInt(totalSkillPointsInput.value, 10) >= 0
+          ? parseInt(totalSkillPointsInput.value, 10)
+          : 0;
+
+      const candidateRecord = {
+        name,
+        path,
+        tier: skill.tier,
+        free
+      };
+      const candidateCost = computeSkillCost(candidateRecord);
+
+      if (candidateCost > available) {
+        alert(
+          `You don't have enough Skill Points for this skill.\n\nCost: ${candidateCost} SP\nAvailable: ${available} SP`
+        );
+        return;
+      }
+
+      selectedSkills.push(candidateRecord);
+
+      skillFreeFlag.checked = false;
+      populateSkillSelect();
+      renderSelectedSkills();
+      recomputeTotals();
+      updatePathAndProfessionDisplays();
+    }
+
+    function renderSelectedSkills() {
+      selectedSkillsBody.innerHTML = "";
+
+      const sorted = getSortedSelectedSkills();
+
+      sorted.forEach((sk) => {
+        const tr = document.createElement("tr");
+
+        const tdMinus = document.createElement("td");
+        const minusBtn = document.createElement("button");
+        minusBtn.textContent = "−";
+        minusBtn.className = "button small secondary";
+        minusBtn.title = "Remove skill";
+        minusBtn.style.minWidth = "32px";
+        minusBtn.addEventListener("click", () => {
+          const originalIndex = selectedSkills.findIndex(
+            (s) =>
+              s.name === sk.name &&
+              s.path === sk.path &&
+              s.tier === sk.tier &&
+              s.free === sk.free
+          );
+          if (originalIndex !== -1) {
+            if (confirm("Are you sure you want to remove this skill?")) {
+              selectedSkills.splice(originalIndex, 1);
+              populateSkillSelect();
+              renderSelectedSkills();
+              recomputeTotals();
+              updatePathAndProfessionDisplays();
+            }
+          }
+        });
+        tdMinus.appendChild(minusBtn);
+        tr.appendChild(tdMinus);
+
+        const tdTier = document.createElement("td");
+        tdTier.textContent = sk.tier;
+        tr.appendChild(tdTier);
+
+        const tdPath = document.createElement("td");
+        tdPath.textContent = sk.path;
+        tr.appendChild(tdPath);
+
+        const tdName = document.createElement("td");
+        tdName.textContent = sk.name;
+        tr.appendChild(tdName);
+
+        const tdCost = document.createElement("td");
+        const tag = document.createElement("span");
+        const cost = computeSkillCost(sk);
+        if (cost === 0) {
+          tag.classList.add("tag", "free");
+          tag.textContent = "Free";
+        } else {
+          tag.classList.add("tag", "paid");
+          tag.textContent = `-${cost} SP`;
+        }
+        tdCost.appendChild(tag);
+        tr.appendChild(tdCost);
+
+        selectedSkillsBody.appendChild(tr);
+      });
+
+      const totalCost = selectedSkills.reduce(
+        (sum, sk) => sum + computeSkillCost(sk),
+        0
+      );
+      totalSkillCostSpan.textContent = totalCost;
+
+      updatePathAndProfessionDisplays();
+    }
+
+    // ---------- EVENTS ----------
+    function addEventRow(data) {
+      const tr = document.createElement("tr");
+
+      const tdMinus = document.createElement("td");
+      const minusBtn = document.createElement("button");
+      minusBtn.textContent = "−";
+      minusBtn.className = "button small secondary";
+      minusBtn.title = "Remove event";
+      minusBtn.style.minWidth = "32px";
+      minusBtn.addEventListener("click", () => {
+        if (confirm("Are you sure you want to remove this event?")) {
+          tr.remove();
+          recomputeTotals();
+        }
+      });
+      tdMinus.appendChild(minusBtn);
+      tr.appendChild(tdMinus);
+
+      const tdName = document.createElement("td");
+      const nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.addEventListener("input", recomputeTotals);
+      tdName.appendChild(nameInput);
+      tr.appendChild(tdName);
+
+      const tdDate = document.createElement("td");
+      const dateInput = document.createElement("input");
+      dateInput.type = "date";
+      dateInput.addEventListener("input", recomputeTotals);
+      tdDate.appendChild(dateInput);
+      tr.appendChild(tdDate);
+
+      const tdType = document.createElement("td");
+      const typeSelect = document.createElement("select");
+      [
+        "",
+        "Day Event",
+        "Campout",
+        "Festival Event",
+        "Virtual Event",
+        "Work Weekend",
+        "Survey/Misc"
+      ].forEach((t) => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t || "-- Select --";
+        typeSelect.appendChild(opt);
+      });
+      typeSelect.addEventListener("change", () => {
+        updateEventRowPoints(tr);
+        recomputeTotals();
+      });
+      tdType.appendChild(typeSelect);
+      tr.appendChild(tdType);
+
+      const tdNPC = document.createElement("td");
+      const npcInput = document.createElement("input");
+      npcInput.type = "checkbox";
+      npcInput.addEventListener("change", () => {
+        updateEventRowPoints(tr);
+        recomputeTotals();
+      });
+      tdNPC.appendChild(npcInput);
+      tr.appendChild(tdNPC);
+
+      const tdMOT = document.createElement("td");
+      const motInput = document.createElement("input");
+      motInput.type = "checkbox";
+      motInput.addEventListener("change", () => {
+        updateEventRowPoints(tr);
+        recomputeTotals();
+      });
+      tdMOT.appendChild(motInput);
+      tr.appendChild(tdMOT);
+
+      const tdBonus = document.createElement("td");
+      const bonusInput = document.createElement("input");
+      bonusInput.type = "number";
+      bonusInput.min = "0";
+      bonusInput.value = "";
+      bonusInput.style.width = "50px";
+      bonusInput.addEventListener("input", () => {
+        updateEventRowPoints(tr);
+        recomputeTotals();
+      });
+      tdBonus.appendChild(bonusInput);
+      tr.appendChild(tdBonus);
+
+      const tdPoints = document.createElement("td");
+      const pointsSpan = document.createElement("span");
+      pointsSpan.textContent = "0";
+      tdPoints.appendChild(pointsSpan);
+      tr.appendChild(tdPoints);
+
+      tr._controls = {
+        nameInput,
+        dateInput,
+        typeSelect,
+        npcInput,
+        motInput,
+        bonusInput,
+        pointsSpan
+      };
+
+      if (data) {
+        nameInput.value = data.name || "";
+        dateInput.value = data.date || "";
+        typeSelect.value = data.type || "";
+        npcInput.checked = !!data.npc;
+        motInput.checked = !!data.merchantOT;
+        bonusInput.value = (data.bonusSP ?? "").toString();
+        updateEventRowPoints(tr);
+      }
+
+      eventsBody.appendChild(tr);
+    }
+
+    function updateEventRowPoints(tr) {
+      const { typeSelect, npcInput, motInput, bonusInput, pointsSpan } =
+        tr._controls;
+      const type = typeSelect.value;
+      const base = EVENT_BASE_POINTS[type] || 0;
+      const npc = npcInput.checked ? 1 : 0;
+      const mot = motInput.checked ? 1 : 0;
+      const bonus = parseInt(bonusInput.value, 10) || 0;
+      const total = base + npc + mot + bonus;
+      pointsSpan.textContent = total;
+    }
+
+    // ---------- TOTALS & TIER ----------
+    function computeTierFromEvents(qualifyingCount) {
+      let remaining = qualifyingCount;
+      let tier = 0;
+      let needed = 1;
+      while (remaining >= needed) {
+        tier++;
+        remaining -= needed;
+        needed++;
+      }
+      return tier;
+    }
+
+    function recomputeTotals() {
+      let totalEventPoints = 0;
+      let qualifyingCount = 0;
+
+      Array.from(eventsBody.rows).forEach((tr) => {
+        const { typeSelect, npcInput, motInput, bonusInput, pointsSpan } =
+          tr._controls;
+        const type = typeSelect.value;
+        const base = EVENT_BASE_POINTS[type] || 0;
+        const npc = npcInput.checked ? 1 : 0;
+        const mot = motInput.checked ? 1 : 0;
+        const bonus = parseInt(bonusInput.value, 10) || 0;
+        const total = base + npc + mot + bonus;
+        pointsSpan.textContent = total;
+        totalEventPoints += total;
+
+        if (QUALIFYING_FOR_TIER.has(type)) {
+          qualifyingCount++;
+        }
+      });
+
+      totalEventPointsSpan.textContent = totalEventPoints;
+      qualifyingEventsCountSpan.textContent = qualifyingCount;
+
+      const tier = computeTierFromEvents(qualifyingCount);
+      tierInput.value = tier;
+
+      const totalSkillCost = selectedSkills.reduce(
+        (sum, sk) => sum + computeSkillCost(sk),
+        0
+      );
+      totalSkillCostSpan.textContent = totalSkillCost;
+
+      const available = Math.max(0, totalEventPoints - totalSkillCost);
+      totalSkillPointsInput.value = available;
+    }
+
+    // ---------- SAVE / LOAD CHARACTER ----------
+    function collectCharacterState() {
+      const organizations = getOrganizations();
+
+      const events = Array.from(eventsBody.rows).map((tr) => {
+        const {
+          nameInput,
+          dateInput,
+          typeSelect,
+          npcInput,
+          motInput,
+          bonusInput,
+          pointsSpan
+        } = tr._controls;
+        return {
+          name: nameInput.value || "",
+          date: dateInput.value || "",
+          type: typeSelect.value || "",
+          npc: !!npcInput.checked,
+          merchantOT: !!motInput.checked,
+          bonusSP: bonusInput.value ? parseInt(bonusInput.value, 10) || 0 : 0,
+          skillPoints: parseInt(pointsSpan.textContent, 10) || 0
+        };
+      });
+
+      // Derived professions from selected skills
+      const professions = Array.from(
+        new Set(
+          selectedSkills
+            .map((sk) => sk.path)
+            .filter((p) => PROFESSION_NAMES.has(p))
+        )
+      );
+
+      return {
+        version: 6,
+        characterName: characterNameInput.value || "",
+        playerName: playerNameInput.value || "",
+        pathDisplay: pathDisplaySelect.value || "",
+        faction: factionSelect.value || "",
+        professions,
+        organizations,
+        selectedSkills: selectedSkills.slice(),
+        events
+      };
+    }
+
+    function applyCharacterState(state) {
+      if (!state || typeof state !== "object") return;
+
+      characterNameInput.value = state.characterName || "";
+      playerNameInput.value = state.playerName || "";
+      pathDisplaySelect.value = state.pathDisplay || "";
+      factionSelect.value = state.faction || "";
+
+      const orgs = state.organizations;
+      if (Array.isArray(orgs)) {
+        setOrganizations(orgs);
+      }
+
+      selectedSkills = Array.isArray(state.selectedSkills)
+        ? state.selectedSkills.slice()
+        : [];
+      renderSelectedSkills();
+
+      eventsBody.innerHTML = "";
+      if (Array.isArray(state.events) && state.events.length) {
+        state.events.forEach((ev) => addEventRow(ev));
+      } else {
+        addEventRow();
+      }
+
+      recomputeTotals();
+      updatePathAndProfessionDisplays();
+    }
+
+    function saveCharacter() {
+      const state = collectCharacterState();
+      const json = JSON.stringify(state, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      const defaultName =
+        state.characterName && state.characterName.trim()
+          ? state.characterName.trim()
+          : "larp_character";
+
+      let baseName = prompt("Enter a name for this character file:", defaultName);
+      if (!baseName) {
+        URL.revokeObjectURL(url);
+        return;
+      }
+      baseName = baseName.replace(/[^a-z0-9_\-]+/gi, "_");
+
+      a.href = url;
+      a.download = baseName + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function handleLoadCharacterFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const state = JSON.parse(ev.target.result);
+          applyCharacterState(state);
+        } catch (err) {
+          alert("Could not read character file. Is it a valid JSON save?");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ---------- PDF EXPORT ----------
+    function exportCharacterPDF() {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert("PDF library (jsPDF) not loaded. Check your internet connection.");
+        return;
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: "pt", format: "letter" });
+
+      const margin = 40;
+      const lineH = 14;
+      let y = margin;
+
+      const charName = characterNameInput.value || "";
+      const playerName = playerNameInput.value || "";
+      const path = pathDisplaySelect.value || "";
+      const faction = factionSelect.value || "";
+      const secondaryPaths = secondaryPathsDisplay.value || "";
+      const professions = professionsDisplay.value || "";
+      const tier = tierInput.value || "0";
+      const remainingSP = totalSkillPointsInput.value || "0";
+      const organizations = getOrganizations().join(", ");
+
+      // Title
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(20);
+      doc.text("Larp Adventures Character Sheet", margin, y);
+      y += 26;
+
+      doc.setFontSize(12);
+      doc.setFont("Helvetica", "normal");
+
+      const xL = margin;
+      const xR = 310;
+
+      // Basic info - D&D-ish two-column band
+      doc.text(`Character: ${charName}`, xL, y);
+      doc.text(`Player: ${playerName}`, xR, y);
+      y += lineH;
+
+      doc.text(`Path: ${path}`, xL, y);
+      doc.text(`Faction: ${faction}`, xR, y);
+      y += lineH;
+
+      doc.text(`Secondary Paths: ${secondaryPaths}`, xL, y);
+      doc.text(`Professions: ${professions}`, xR, y);
+      y += lineH;
+
+      doc.text(`Organizations: ${organizations}`, xL, y);
+      y += lineH;
+
+      doc.text(`Tier: ${tier}`, xL, y);
+      doc.text(`Remaining Skill Points: ${remainingSP}`, xR, y);
+      y += lineH * 2;
+
+      // Skills section header
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("Skills", margin, y);
+      y += 18;
+
+      doc.setFontSize(11);
+      doc.text("Tier", margin, y);
+      doc.text("Path / Profession", margin + 40, y);
+      doc.text("Skill Name", margin + 200, y);
+      y += 10;
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, 570, y);
+      y += 8;
+
+      doc.setFont("Helvetica", "normal");
+
+      const sorted = getSortedSelectedSkills();
+      sorted.forEach((sk) => {
+        if (y > 740) {
+          doc.addPage();
+          y = margin;
+
+          // repeat skills header on new page
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(14);
+          doc.text("Skills (cont.)", margin, y);
+          y += 18;
+
+          doc.setFontSize(11);
+          doc.text("Tier", margin, y);
+          doc.text("Path / Profession", margin + 40, y);
+          doc.text("Skill Name", margin + 200, y);
+          y += 10;
+          doc.setLineWidth(0.5);
+          doc.line(margin, y, 570, y);
+          y += 8;
+          doc.setFont("Helvetica", "normal");
+        }
+
+        doc.text(String(sk.tier), margin, y);
+        doc.text(sk.path, margin + 40, y);
+
+        const maxWidth = 350;
+        const lines = doc.splitTextToSize(sk.name, maxWidth);
+        doc.text(lines, margin + 200, y);
+        y += lineH * lines.length;
+      });
+
+      const filenameBase = charName ? charName.replace(/[^a-z0-9_\-]+/gi, "_") : "larp_character";
+      doc.save(filenameBase + "_sheet.pdf");
+    }
+
+    // ---------- CSV LOADING ----------
+    function tryAutoLoadCSV() {
+      fetch("larp_skills.csv")
+        .then((res) => {
+          if (!res.ok) throw new Error("No CSV found");
+          return res.text();
+        })
+        .then((text) => {
+          const rows = parseCSV(text);
+          if (!rows.length) throw new Error("Empty CSV");
+          buildSkillsStructures(rows);
+        })
+        .catch(() => {
+          console.warn(
+            "Could not auto-load larp_skills.csv. Use the file picker instead."
+          );
+        });
+    }
+
+    csvFileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target.result;
+        const rows = parseCSV(text);
+        if (!rows.length) {
+          alert("CSV seems empty or invalid.");
+          return;
+        }
+        buildSkillsStructures(rows);
+      };
+      reader.readAsText(file);
+    });
+
+    // ---------- INIT ----------
+    window.addEventListener("DOMContentLoaded", () => {
+      tryAutoLoadCSV();
+
+      addEventBtn.addEventListener("click", () => {
+        addEventRow();
+        recomputeTotals();
+      });
+
+      addSkillBtn.addEventListener("click", () => {
+        addSelectedSkill();
+      });
+
+      skillPathSelect.addEventListener("change", () => {
+        populateSkillSelect();
+        skillDescription.value = "";
+      });
+
+      skillSelect.addEventListener("change", updateSkillDescriptionFromSelect);
+
+      saveCharacterBtn.addEventListener("click", saveCharacter);
+
+      loadCharacterBtn.addEventListener("click", () => {
+        loadCharacterFile.click();
+      });
+      loadCharacterFile.addEventListener("change", handleLoadCharacterFile);
+
+      exportPdfBtn.addEventListener("click", exportCharacterPDF);
+
+      pathDisplaySelect.addEventListener("change", () => {
+        renderSelectedSkills();
+        recomputeTotals();
+        updatePathAndProfessionDisplays();
+      });
+
+      // Start with one blank event row
+      addEventRow();
+      recomputeTotals();
+      updatePathAndProfessionDisplays();
+    });
+  </script>
+</body>
+</html>
