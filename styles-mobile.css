@@ -376,13 +376,13 @@ table thead tr th:nth-child(3)::after {
 }
 
 /* --------- EVENTS: mobile layout --------- */
-/* Line 1: Event Name + Date
-   Line 2: Type + Bonus SP
+/* Line 1: Event Name (2/3) + Date (1/3)
+   Line 2: Type (2/3) + Bonus SP (1/3)
    Line 3: NPC + Merchant OT + Add Event */
 
 .event-input-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 2fr 1fr;
   grid-template-areas:
     "ename edate"
     "etype ebonus"
