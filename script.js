@@ -613,7 +613,11 @@ function addEventFromInputs() {
     skillPoints: 0
   };
 
-  if (editingEventIndex !== null && editingEventIndex >= 0 && editingEventIndex < eventsData.length) {
+  if (
+    editingEventIndex !== null &&
+    editingEventIndex >= 0 &&
+    editingEventIndex < eventsData.length
+  ) {
     // Update existing event
     eventsData[editingEventIndex] = ev;
   } else {
@@ -644,6 +648,7 @@ function renderEvents() {
 
     const tdButtons = document.createElement("td");
 
+    // Remove button
     const minusBtn = document.createElement("button");
     minusBtn.textContent = "−";
     minusBtn.className = "button small secondary";
@@ -664,6 +669,7 @@ function renderEvents() {
       }
     });
 
+    // Edit button
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     editBtn.className = "button small secondary";
@@ -685,6 +691,18 @@ function renderEvents() {
         ev.bonusSP != null && ev.bonusSP !== "" ? String(ev.bonusSP) : "0";
 
       addEventBtn.textContent = "Update Event";
+
+      // Scroll the editor into view and focus the first field
+      try {
+        eventNameInput.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      } catch (e) {
+        // fallback
+        eventNameInput.scrollIntoView();
+      }
+      eventNameInput.focus();
     });
 
     tdButtons.appendChild(minusBtn);
