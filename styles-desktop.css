@@ -315,6 +315,17 @@ tbody tr:hover {
   margin: 0;
 }
 
+/* Basic info: Tier / Skill Points column and organizations */
+.basic-bottom-row {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+}
+
+.basic-tier-col input[type="number"],
+#tier,
+#totalSkillPoints {
+  width: 60px; /* ~3 digits */
+}
 
 /* Desktop layout for the event input row */
 .event-input-row {
@@ -332,24 +343,13 @@ tbody tr:hover {
   margin-bottom: 8px;
 }
 
-/* Make date and bonus SP nice and compact */
+/* Date and Bonus SP sizing */
 .event-input-row #eventDateInput {
   max-width: 130px;
 }
 
 .event-input-row #eventBonusInput {
   max-width: 60px;
-}
-
-/* Basic info: Tier / Skill Points column */
-.basic-bottom-row {
-  align-items: flex-start;
-}
-
-.basic-tier-col input[type="number"],
-#tier,
-#totalSkillPoints {
-  max-width: 60px; /* ~3 digits */
 }
 
 @media (max-width: 900px) {
