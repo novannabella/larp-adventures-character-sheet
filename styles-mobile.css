@@ -14,12 +14,15 @@
   --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   padding: 16px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   background: radial-gradient(circle at top, #151b30 0, #050813 55%);
   color: var(--text);
 }
@@ -49,6 +52,7 @@ h1 {
   gap: 16px;
 }
 
+/* Cards */
 .card {
   background: linear-gradient(145deg, var(--card), #141a2b);
   border-radius: var(--radius-lg);
@@ -56,6 +60,21 @@ h1 {
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border);
   position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, var(--accent-soft), transparent 55%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.card-inner {
+  position: relative;
+  z-index: 1;
 }
 
 .card h2 {
@@ -66,22 +85,104 @@ h1 {
   color: var(--accent);
 }
 
+/* Layout helpers */
+.section-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px 12px;
+  margin-bottom: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+}
+
 label {
   color: var(--muted);
   font-size: 10px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-input, select, textarea {
-  width: 100%;
+/* Inputs */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
   padding: 5px 7px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: rgba(10, 15, 34, 0.9);
   color: var(--text);
   font-size: 12px;
+  outline: none;
+  width: 100%;
 }
 
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 60px;
+  max-height: 140px;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Totals */
+.total-row {
+  text-align: right;
+  font-size: 11px;
+  margin-top: 4px;
+  color: var(--muted);
+}
+.total-row span {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Top controls */
+.top-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 100%;
+  margin: 0 auto 10px;
+  padding: 0 2px;
+}
+
+.save-load-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* Buttons */
 .button {
   display: inline-flex;
   align-items: center;
@@ -97,64 +198,67 @@ input, select, textarea {
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.12em;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 
-/* Skills table stays horizontally scrollable */
-.card table {
+.button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.button.small {
+  padding: 3px 8px;
+  font-size: 10px;
+}
+
+/* Skills table (keep scrollable if wide) */
+table {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
   margin-top: 4px;
+}
+
+.card table {
   display: block;
+  width: 100%;
   overflow-x: auto;
 }
 
-/* --- EVENTS SECTION --- */
-#eventsBody tr {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  padding: 6px 8px;
-  margin-bottom: 6px;
-  background: rgba(255,255,255,0.03);
-}
-
-#eventsBody td {
-  border: none;
-  padding: 2px 0;
+.card table thead,
+.card table tbody,
+.card table tr {
   width: 100%;
-  font-size: 12px;
 }
 
-/* Show key labels inline for clarity */
-#eventsBody td:nth-child(2)::before { content: "Event Name: "; font-weight: 600; color: var(--accent); }
-#eventsBody td:nth-child(3)::before { content: "Date: "; font-weight: 600; color: var(--accent); }
-#eventsBody td:nth-child(4)::before { content: "Type: "; font-weight: 600; color: var(--accent); }
-
-/* Group NPC + OT + Bonus SP together visually */
-#eventsBody td:nth-child(5),
-#eventsBody td:nth-child(6),
-#eventsBody td:nth-child(7) {
-  display: inline-block;
-  width: auto;
-  margin-right: 10px;
+th,
+td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 5px 4px;
+  text-align: left;
+  vertical-align: middle;
 }
 
-#eventsBody td:nth-child(5)::before { content: "NPC "; color: var(--muted); }
-#eventsBody td:nth-child(6)::before { content: "Merchant OT "; color: var(--muted); }
-#eventsBody td:nth-child(7)::before { content: "Bonus SP "; color: var(--muted); }
-
-/* Skill Pts stays on its own line below group */
-#eventsBody td:nth-child(8)::before {
-  content: "Skill Points: ";
-  font-weight: 600;
-  color: var(--accent);
+th {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* Keep “-1 SP” style consistent */
+tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+tbody tr:hover {
+  background: rgba(244, 199, 107, 0.06);
+}
+
+/* Cost / Free tags: keep "-1 SP" together */
 .tag {
   font-size: 10px;
   padding: 2px 6px;
@@ -177,10 +281,119 @@ input, select, textarea {
   background: rgba(244, 199, 107, 0.08);
 }
 
-/* Organizations grid remains two columns */
+/* Skills row layout on mobile */
+.skills-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+.select-path {
+  width: 100%;
+  max-width: 100%;
+}
+
+.skill-free-field {
+  align-self: flex-end;
+}
+
+.skill-add-field {
+  align-items: flex-end;
+}
+
+/* Organizations grid: 2 columns */
 .org-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px 8px;
   margin-top: 2px;
+}
+
+.org-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.org-item input[type="checkbox"] {
+  margin: 0;
+}
+
+/* ---------- EVENTS: STACKED LAYOUT ---------- */
+
+/* Each event row becomes a mini card, stacked vertically */
+#eventsBody tr {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Cells inside the event row */
+#eventsBody td {
+  border: none;
+  padding: 2px 0;
+  width: 100%;
+  font-size: 12px;
+}
+
+/* 1st cell = minus button (keep as-is, but on top) */
+
+/* 2nd cell = Event Name line */
+#eventsBody td:nth-child(2)::before {
+  content: "Event Name: ";
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* 3rd cell = Date line */
+#eventsBody td:nth-child(3)::before {
+  content: "Date: ";
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* 4th cell = Type line */
+#eventsBody td:nth-child(4)::before {
+  content: "Type: ";
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* 5th, 6th, 7th cells (NPC, Merchant OT, Bonus SP) on same visual line */
+#eventsBody td:nth-child(5),
+#eventsBody td:nth-child(6),
+#eventsBody td:nth-child(7) {
+  display: inline-block;
+  width: auto;
+  margin-right: 10px;
+}
+
+/* Add labels before the controls */
+#eventsBody td:nth-child(5)::before {
+  content: "NPC ";
+  color: var(--muted);
+}
+#eventsBody td:nth-child(6)::before {
+  content: "Merchant OT ";
+  color: var(--muted);
+}
+#eventsBody td:nth-child(7)::before {
+  content: "Bonus SP ";
+  color: var(--muted);
+}
+
+/* 8th cell = Skill Points line */
+#eventsBody td:nth-child(8)::before {
+  content: "Skill Points: ";
+  font-weight: 600;
+  color: var(--accent);
 }
