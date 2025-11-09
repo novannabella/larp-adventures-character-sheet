@@ -327,6 +327,12 @@ tbody tr:hover {
   margin: 0;
 }
 
+/* Tier & Skill Points width (3 digits) on mobile too */
+#tier,
+#totalSkillPoints {
+  max-width: 60px;
+}
+
 /* --------- SKILLS: spacing & shorter label text --------- */
 
 /* Right-align cost & add a bit of space from the skill name */
@@ -369,17 +375,50 @@ table thead tr th:nth-child(3)::after {
   color: var(--muted);
 }
 
-/* --------- EVENTS: use normal table on mobile (scrollable if wide) --------- */
+/* --------- EVENTS: mobile layout --------- */
+/* Line 1: Event Name + Date
+   Line 2: Type + Bonus SP
+   Line 3: NPC + Merchant OT + Add Event */
 
-/* Event input row: stack fields vertically on mobile */
 .event-input-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "ename edate"
+    "etype ebonus"
+    "enpc  emot"
+    "eadd  eadd";
   gap: 8px;
   margin-bottom: 8px;
 }
 
-/* Make event inputs full-width */
+.event-input-row .field:nth-child(1) {
+  grid-area: ename;
+}
+.event-input-row .field:nth-child(2) {
+  grid-area: edate;
+}
+.event-input-row .field:nth-child(3) {
+  grid-area: etype;
+}
+.event-input-row .field:nth-child(4) {
+  grid-area: ebonus;
+}
+.event-input-row .field:nth-child(5) {
+  grid-area: enpc;
+  align-self: center;
+}
+.event-input-row .field:nth-child(6) {
+  grid-area: emot;
+  align-self: center;
+}
+.event-input-row .field:nth-child(7) {
+  grid-area: eadd;
+  align-self: flex-end;
+  justify-self: flex-start;
+}
+
+/* Make event inputs fill their grid cell */
 .event-input-row input[type="text"],
 .event-input-row input[type="date"],
 .event-input-row select,
@@ -390,6 +429,4 @@ table thead tr th:nth-child(3)::after {
 /* Keep the Add Event button from stretching too wide */
 .event-input-row #addEventBtn {
   width: auto;
-  align-self: flex-end;
-  justify-self: flex-start;
 }
