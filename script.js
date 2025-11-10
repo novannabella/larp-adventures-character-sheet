@@ -68,7 +68,7 @@ let skillsByPath = {};
 let selectedSkills = [];
 let skillNameSet = new Set(); // normalized skill names
 
-let eventsData = [];          // all events stored here
+let eventsData = []; // all events stored here
 let editingEventIndex = null; // index of event being edited, or null
 
 const EVENT_BASE_POINTS = {
@@ -923,7 +923,6 @@ function exportCharacterPDF() {
     if (typeof window.jspdf.jsPDF === "function") {
       jsPDFConstructor = window.jspdf.jsPDF;
     } else if (typeof window.jspdf.default === "function") {
-      // Some builds hang the constructor off .default
       jsPDFConstructor = window.jspdf.default;
     }
   }
@@ -933,7 +932,6 @@ function exportCharacterPDF() {
     jsPDFConstructor = window.jsPDF;
   }
 
-  // If we still don't see it, bail
   if (!jsPDFConstructor) {
     alert(
       "PDF library (jsPDF) not loaded. Try a hard refresh (Ctrl+F5 or Cmd+Shift+R) and make sure the jsPDF <script> tag is still in index.html."
@@ -945,6 +943,11 @@ function exportCharacterPDF() {
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
+
+  // --- Parchment-style background (flat color) ---
+  doc.setFillColor(245, 233, 210); // light parchment tan
+  doc.rect(0, 0, pageWidth, pageHeight, "F");
+
   const margin = 40;
   let y = margin;
 
@@ -1013,13 +1016,23 @@ function exportCharacterPDF() {
   doc.setFontSize(11);
   doc.setTextColor(60, 60, 80);
 
+  // dynamic label/value helper (fixes "Organizations" overlap)
   function labelValue(label, value, x, yLine) {
+    const labelText = `${label}:`;
+
+    // label
     doc.setFont("Helvetica", "bold");
     doc.setTextColor(80, 80, 110);
-    doc.text(`${label}:`, x, yLine);
+    doc.text(labelText, x, yLine);
+
+    // measure label & offset value
+    const labelWidth = doc.getTextWidth(labelText);
+    const valueX = x + labelWidth + 6; // 6pt gap
+
+    // value
     doc.setFont("Helvetica", "normal");
     doc.setTextColor(20, 20, 30);
-    doc.text(value || "-", x + 70, yLine);
+    doc.text(value || "-", valueX, yLine);
   }
 
   labelValue("Character", charName, colLeftX, infoY);
@@ -1071,8 +1084,16 @@ function exportCharacterPDF() {
   const rowLineHeight = 14;
 
   sorted.forEach((sk, index) => {
+    // Page break
     if (y > pageHeight - margin - 40) {
       doc.addPage();
+
+      // Re-apply parchment background on new page
+      const pw = doc.internal.pageSize.getWidth();
+      const ph = doc.internal.pageSize.getHeight();
+      doc.setFillColor(245, 233, 210);
+      doc.rect(0, 0, pw, ph, "F");
+
       y = margin;
 
       doc.setFont("Helvetica", "bold");
@@ -1125,7 +1146,6 @@ function exportCharacterPDF() {
 
   doc.save(baseName + "_sheet.pdf");
 }
-
 
 // ---------- CSV AUTO-LOAD ----------
 function tryAutoLoadCSV() {
