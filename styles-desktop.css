@@ -324,19 +324,28 @@ tbody tr:hover {
 }
 
 /* Organizations grid */
+
+.org-block {
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.8);
+  margin-top: 4px;
+}
+
 .org-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 4px 10px;
-  margin-top: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px; /* tighter grid horizontally */
 }
 
 .org-item {
+  font-size: 11px;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
-  color: var(--muted);
+  white-space: nowrap;
 }
 
 .org-item input[type="checkbox"] {
@@ -351,24 +360,40 @@ tbody tr:hover {
 
 .basic-milestones {
   display: flex;
-  flex-direction: row;   /* side-by-side instead of stacked */
-  gap: 8px;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 12px; /* a touch more breathing room */
 }
 
 .milestone-block {
-  flex: 1 1 0;
-  padding: 6px 8px;
+  flex: 1;
+  min-width: 220px; /* ensures Artificer has room for title */
+  padding: 8px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: rgba(15, 23, 42, 0.8);
+  white-space: nowrap; /* prevents wrapping in title */
 }
 
-.org-block {
-  padding: 6px 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: rgba(15, 23, 42, 0.8);
-  margin-top: 4px;
+.milestone-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 4px;
+  white-space: nowrap; /* ensure the title never wraps */
+}
+
+.milestone-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text);
+}
+
+.milestone-checkbox input[type="checkbox"] {
+  width: auto;
 }
 
 
