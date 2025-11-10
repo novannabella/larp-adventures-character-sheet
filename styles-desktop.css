@@ -343,10 +343,43 @@ tbody tr:hover {
   margin: 0;
 }
 
-/* Basic info: Tier / Skill Points column and organizations */
+/* Basic info: Tier / Skill Points | Milestones | Organizations */
 .basic-bottom-row {
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto auto minmax(0, 1fr);
   align-items: flex-start;
+}
+
+.basic-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.milestone-block {
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.milestone-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.milestone-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text);
+}
+
+.milestone-checkbox input[type="checkbox"] {
+  width: auto;
 }
 
 .basic-tier-col input[type="number"],
