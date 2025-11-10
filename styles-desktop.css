@@ -1,109 +1,169 @@
+/* ---------- Root + Base ---------- */
+
 :root {
-  --bg: #0b1020;
-  --bg-alt: #151b30;
-  --card: #1e2640;
-  --accent: #f4c76b;
-  --accent-soft: rgba(244, 199, 107, 0.2);
-  --text: #f2f4ff;
-  --muted: #b7bdd7;
-  --border: #2b3658;
-  --danger: #ff6b81;
-  --success: #7ed957;
-  --radius-lg: 14px;
-  --radius-sm: 8px;
-  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
+  --bg: radial-gradient(circle at top, #0b1020 0%, #020617 55%, #000000 100%);
+  --card-bg: rgba(15, 23, 42, 0.96);
+  --card-border: rgba(148, 163, 184, 0.35);
+  --accent: #facc15;
+  --accent-soft: rgba(250, 204, 21, 0.35);
+  --accent-strong: #eab308;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --danger: #f97373;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --shadow-soft: 0 24px 50px rgba(15, 23, 42, 0.9);
+  --border: rgba(148, 163, 184, 0.4);
 }
 
-* {
-  box-sizing: border-box;
+/* Zelda font for title (make sure the file exists in repo root) */
+@font-face {
+  font-family: "ZeldaWild";
+  src: url("TheWildBreathOfZelda.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 body {
-  margin: 0;
-  padding: 24px;
+  background: var(--bg);
+  color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  background: radial-gradient(circle at top, #151b30 0, #050813 55%);
-  color: var(--text);
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 8px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 26px;
-  color: var(--accent);
-}
-
-.subtitle {
-  text-align: center;
-  margin-bottom: 24px;
-  color: var(--muted);
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
+/* ---------- Layout ---------- */
 
 .app {
-  max-width: 1200px;
-  margin: 0 auto 40px auto;
-  display: grid;
-  gap: 20px;
+  max-width: 1100px;
+  margin: 24px auto 40px;
+  padding: 0 20px 20px;
 }
+
+.app-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 32px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 18px rgba(250, 204, 21, 0.45);
+}
+
+.app-subtitle {
+  margin: 4px 0 0;
+  font-size: 16px;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.title-zelda {
+  font-family: "ZeldaWild", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+/* Top toolbar */
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 12px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Cards & Fields ---------- */
 
 .card {
-  background: linear-gradient(145deg, var(--card), #141a2b);
-  border-radius: var(--radius-lg);
-  padding: 16px 18px 18px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
   box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top left, var(--accent-soft), transparent 55%);
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-.card-inner {
-  position: relative;
-  z-index: 1;
+  padding: 16px 18px 18px;
+  margin-bottom: 16px;
 }
 
 .card h2 {
   margin: 0 0 12px;
-  font-size: 16px;
+  font-size: 18px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--accent);
+  color: var(--accent-strong);
 }
 
-.section-row {
+/* Basic Info layout */
+
+.basic-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 20px;
-  margin-bottom: 10px;
+  grid-template-columns: 2fr 1.4fr;
+  gap: 18px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 13px;
+  margin-bottom: 10px;
 }
 
 label {
-  color: var(--muted);
   font-size: 11px;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 3px;
 }
+
+/* Inputs */
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  padding: 5px 7px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(10, 15, 34, 0.9);
+  color: var(--text);
+  font-size: 12px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+/* Hide number arrows for Tier & Skill Points */
+#tier,
+#totalSkillPoints {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+#tier::-webkit-outer-spin-button,
+#tier::-webkit-inner-spin-button,
+#totalSkillPoints::-webkit-outer-spin-button,
+#totalSkillPoints::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Inline "calculated from events" */
 
 .inline-input-with-note {
   display: flex;
@@ -117,281 +177,244 @@ label {
   white-space: nowrap;
 }
 
-
-input[type="text"],
-input[type="number"],
-input[type="date"],
-select,
-textarea {
-  padding: 6px 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: rgba(10, 15, 34, 0.85);
-  color: var(--text);
-  font-size: 13px;
-  outline: none;
-  width: 100%;
+.basic-tier-col input[type="number"] {
+  max-width: 70px;
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent-soft);
-}
-/* Hide number input arrows for Tier & Skill Points */
-#tier,
-#totalSkillPoints {
-  -moz-appearance: textfield; /* Firefox */
-  appearance: textfield;
+.sp-label {
+  margin-top: 10px;
 }
 
-/* Hide spin buttons in WebKit browsers (Chrome, Edge, etc.) */
-#tier::-webkit-outer-spin-button,
-#tier::-webkit-inner-spin-button,
-#totalSkillPoints::-webkit-outer-spin-button,
-#totalSkillPoints::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+/* Organizations */
 
-textarea {
-  resize: vertical;
-  min-height: 70px;
-  max-height: 160px;
-}
-
-.inline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pill {
-  padding: 3px 7px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.total-row {
-  text-align: right;
-  font-size: 12px;
-  margin-top: 6px;
-  color: var(--muted);
-}
-
-.total-row span {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.top-controls {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 10px;
-  max-width: 1200px;
-  margin: 0 auto 12px;
-  padding: 0 2px;
-}
-
-.save-load-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--accent);
-  background: linear-gradient(135deg, var(--accent), #f8983c);
-  color: #23120b;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.46);
-}
-
-.button:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
-}
-
-.button.secondary {
-  background: transparent;
-  color: var(--accent);
-  border-color: var(--border);
-  box-shadow: none;
-}
-
-.button.secondary:hover {
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: none;
-  transform: none;
-}
-
-.button.small {
-  padding: 3px 8px;
-  font-size: 11px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  margin-top: 6px;
-}
-
-th,
-td {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  padding: 6px 4px;
-  text-align: left;
-  vertical-align: middle;
-}
-
-th {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.015);
-}
-
-tbody tr:hover {
-  background: rgba(244, 199, 107, 0.06);
-}
-
-/* Cost / Free tags */
-.tag {
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--muted);
-}
-
-.tag.free {
-  color: var(--success);
-  border: 1px solid rgba(126, 217, 87, 0.6);
-  background: rgba(126, 217, 87, 0.08);
-}
-
-.tag.paid {
-  color: var(--accent);
-  border: 1px solid rgba(244, 199, 107, 0.6);
-  background: rgba(244, 199, 107, 0.08);
-}
-
-/* Skills row layout */
-.skills-row {
-  display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: end;
-  margin-bottom: 10px;
-}
-
-.select-path {
-  width: auto;
-  max-width: 220px;
-  white-space: nowrap;
-}
-
-.skill-free-field {
-  align-self: flex-end;
-}
-
-.skill-add-field {
-  align-items: flex-end;
-}
-
-/* Organizations grid */
 .org-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 4px 10px;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .org-item {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
 }
 
 .org-item input[type="checkbox"] {
-  margin: 0;
+  width: auto;
 }
 
-/* Basic info: Tier / Skill Points column and organizations */
-.basic-bottom-row {
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: flex-start;
+/* ---------- Buttons ---------- */
+
+.button {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s;
 }
 
-.basic-tier-col input[type="number"],
-#tier,
-#totalSkillPoints {
-  width: 60px; /* ~3 digits */
+.button.primary {
+  background: linear-gradient(135deg, #facc15, #eab308);
+  color: #1f2937;
 }
 
-/* Desktop layout for the event input row */
-.event-input-row {
+.button.primary:hover {
+  background: linear-gradient(135deg, #fde047, #facc15);
+  transform: translateY(-1px);
+}
+
+.button.secondary {
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.button.secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+.button.small {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+/* ---------- Skills Section ---------- */
+
+.skills-row {
   display: grid;
-  grid-template-columns:
-    minmax(0, 3fr)   /* Event Name */
-    130px           /* Date */
-    1.5fr           /* Type */
-    auto            /* NPC? */
-    auto            /* Merchant OT? */
-    70px            /* Bonus SP */
-    auto !important;/* Add Event */
+  grid-template-columns: 0.9fr auto 1.8fr;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: flex-end;
+}
+
+.field-skill-path select {
+  max-width: 180px;
+}
+
+.field-earned-free {
+  align-items: center;
+}
+
+.field-earned-free input[type="checkbox"] {
+  width: auto;
+  margin-top: 4px;
+}
+
+.earned-label {
+  text-align: center;
+}
+
+.field-skill-select {
+  width: 100%;
+}
+
+.skill-select-with-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skill-select-with-button select {
+  flex: 1 1 auto;
+}
+
+.skill-select-with-button button {
+  flex-shrink: 0;
+}
+
+.skills-summary {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------- Tables ---------- */
+
+.table-wrapper {
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table thead {
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.table th,
+.table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.8);
+  text-align: left;
+}
+
+.table th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.table tbody tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.65);
+}
+
+.table tbody tr:hover {
+  background: rgba(30, 64, 175, 0.35);
+}
+
+/* Tags in Skills table */
+
+.tag {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+}
+
+.tag.free {
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+}
+
+.tag.paid {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+/* ---------- Events Section ---------- */
+
+.events-form {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  align-items: end;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
-/* Date and Bonus SP sizing */
-.event-input-row #eventDateInput {
-  max-width: 130px;
+.events-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
 }
 
-.event-input-row #eventBonusInput {
+.events-row .field {
+  margin-bottom: 0;
+}
+
+.field-date {
+  max-width: 160px;
+}
+
+.field-bonus input[type="number"] {
   max-width: 60px;
 }
 
-@media (max-width: 900px) {
-  body {
-    padding: 16px;
-  }
-  .save-load-controls {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .skills-row {
-    grid-template-columns: 1fr 1fr;
-  }
-  .org-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.field-checkbox-inline {
+  flex: 0 0 auto;
+}
+
+.field-checkbox-inline label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 0;
+}
+
+.field-checkbox-inline input[type="checkbox"] {
+  width: auto;
+}
+
+.field-add-event {
+  margin-left: auto;
+}
+
+.events-summary {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.summary-separator {
+  opacity: 0.6;
 }
