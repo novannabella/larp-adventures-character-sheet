@@ -920,10 +920,12 @@ function exportCharacterPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: "pt", format: "letter" });
 
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 40;
-  const lineH = 14;
   let y = margin;
 
+  // --- Gather data ---
   const charName = characterNameInput.value || "";
   const playerName = playerNameInput.value || "";
   const path = pathDisplaySelect.value || "";
@@ -934,83 +936,168 @@ function exportCharacterPDF() {
   const remainingSP = totalSkillPointsInput.value || "0";
   const organizations = getOrganizations().join(", ");
 
+  // --- Title area ---
   doc.setFont("Helvetica", "bold");
-  doc.setFontSize(20);
-  doc.text("Larp Adventures Character Sheet", margin, y);
-  y += 26;
+  doc.setFontSize(22);
+  doc.setTextColor(20, 20, 30);
+  doc.text("Larp Adventures", margin, y);
 
-  doc.setFontSize(12);
-  doc.setFont("Helvetica", "normal");
-
-  const xL = margin;
-  const xR = 310;
-
-  doc.text(`Character: ${charName}`, xL, y);
-  doc.text(`Player: ${playerName}`, xR, y);
-  y += lineH;
-
-  doc.text(`Path: ${path}`, xL, y);
-  doc.text(`Faction: ${faction}`, xR, y);
-  y += lineH;
-
-  doc.text(`Secondary Paths: ${secondaryPaths}`, xL, y);
-  doc.text(`Professions: ${professions}`, xR, y);
-  y += lineH;
-
-  doc.text(`Organizations: ${organizations}`, xL, y);
-  y += lineH;
-
-  doc.text(`Tier: ${tier}`, xL, y);
-  doc.text(`Remaining Skill Points: ${remainingSP}`, xR, y);
-  y += lineH * 2;
-
-  doc.setFont("Helvetica", "bold");
   doc.setFontSize(14);
-  doc.text("Skills", margin, y);
+  doc.setFont("Helvetica", "normal");
+  doc.setTextColor(70, 70, 90);
+  doc.text("Character Sheet", margin, y + 18);
+
+  // subtle top-right label with player name (if present)
+  if (playerName) {
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 140);
+    const label = `Player: ${playerName}`;
+    const labelWidth = doc.getTextWidth(label);
+    doc.text(label, pageWidth - margin - labelWidth, y);
+  }
+
+  y += 32;
+  doc.setDrawColor(200, 200, 210);
+  doc.setLineWidth(0.7);
+  doc.line(margin, y, pageWidth - margin, y);
   y += 18;
 
-  doc.setFontSize(11);
-  doc.text("Tier", margin, y);
-  doc.text("Path / Profession", margin + 40, y);
-  doc.text("Skill Name", margin + 200, y);
+  // --- BASIC INFO PANEL ---
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(13);
+  doc.setTextColor(40, 40, 60);
+  doc.text("Basic Information", margin, y);
   y += 10;
-  doc.setLineWidth(0.5);
-  doc.line(margin, y, 570, y);
-  y += 8;
+
+  // Panel box
+  const basicBoxTop = y - 8;
+  const basicBoxHeight = 90;
+  const basicBoxWidth = pageWidth - margin * 2;
+  doc.setDrawColor(210, 210, 225);
+  doc.setLineWidth(0.8);
+  doc.roundedRect(margin - 4, basicBoxTop, basicBoxWidth + 8, basicBoxHeight, 6, 6);
+
+  // Left column
+  const colLeftX = margin;
+  const colRightX = margin + basicBoxWidth / 2 + 4;
+  let infoY = y + 6;
 
   doc.setFont("Helvetica", "normal");
+  doc.setFontSize(11);
+  doc.setTextColor(60, 60, 80);
+
+  function labelValue(label, value, x, yLine) {
+    doc.setFont("Helvetica", "bold");
+    doc.setTextColor(80, 80, 110);
+    doc.text(`${label}:`, x, yLine);
+    doc.setFont("Helvetica", "normal");
+    doc.setTextColor(20, 20, 30);
+    doc.text(value || "-", x + 70, yLine);
+  }
+
+  labelValue("Character", charName, colLeftX, infoY);
+  labelValue("Path", path, colLeftX, infoY + 16);
+  labelValue("Secondary", secondaryPaths, colLeftX, infoY + 32);
+  labelValue("Professions", professions, colLeftX, infoY + 48);
+
+  labelValue("Faction", faction, colRightX, infoY);
+  labelValue("Tier", tier, colRightX, infoY + 16);
+  labelValue("Skill Pts", remainingSP, colRightX, infoY + 32);
+  labelValue("Organizations", organizations, colRightX, infoY + 48);
+
+  y = basicBoxTop + basicBoxHeight + 24;
+
+  // --- SKILLS SECTION ---
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(13);
+  doc.setTextColor(40, 40, 60);
+  doc.text("Skills", margin, y);
+  y += 10;
+
+  // Header bar
+  const tableWidth = pageWidth - margin * 2;
+  const headerHeight = 18;
+
+  doc.setFillColor(32, 40, 70);
+  doc.setDrawColor(32, 40, 70);
+  doc.rect(margin, y, tableWidth, headerHeight, "F");
+
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(245, 245, 255);
+
+  const colTierX = margin + 6;
+  const colPathX = margin + 60;
+  const colSkillX = margin + 210;
+
+  doc.text("Tier", colTierX, y + 12);
+  doc.text("Path / Profession", colPathX, y + 12);
+  doc.text("Skill Name", colSkillX, y + 12);
+
+  y += headerHeight + 4;
+
+  doc.setFont("Helvetica", "normal");
+  doc.setTextColor(20, 20, 30);
+  doc.setLineWidth(0.25);
+  doc.setDrawColor(200, 200, 210);
 
   const sorted = getSortedSelectedSkills();
-  sorted.forEach((sk) => {
-    if (y > 740) {
+  const rowLineHeight = 14;
+
+  sorted.forEach((sk, index) => {
+    // Page break check
+    if (y > pageHeight - margin - 40) {
       doc.addPage();
       y = margin;
 
+      // Section title on new page
       doc.setFont("Helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text("Skills (cont.)", margin, y);
-      y += 18;
-
-      doc.setFontSize(11);
-      doc.text("Tier", margin, y);
-      doc.text("Path / Profession", margin + 40, y);
-      doc.text("Skill Name", margin + 200, y);
+      doc.setFontSize(13);
+      doc.setTextColor(40, 40, 60);
+      doc.text("Skills (continued)", margin, y);
       y += 10;
-      doc.setLineWidth(0.5);
-      doc.line(margin, y, 570, y);
-      y += 8;
+
+      // Header bar again
+      doc.setFillColor(32, 40, 70);
+      doc.setDrawColor(32, 40, 70);
+      doc.rect(margin, y, tableWidth, headerHeight, "F");
+
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(245, 245, 255);
+      doc.text("Tier", colTierX, y + 12);
+      doc.text("Path / Profession", colPathX, y + 12);
+      doc.text("Skill Name", colSkillX, y + 12);
+
+      y += headerHeight + 4;
       doc.setFont("Helvetica", "normal");
+      doc.setTextColor(20, 20, 30);
+      doc.setLineWidth(0.25);
+      doc.setDrawColor(200, 200, 210);
     }
 
-    doc.text(String(sk.tier), margin, y);
-    doc.text(sk.path, margin + 40, y);
+    // alternating row background
+    if (index % 2 === 0) {
+      doc.setFillColor(245, 246, 252);
+      doc.rect(margin, y - 2, tableWidth, rowLineHeight + 3, "F");
+    }
 
-    const maxWidth = 350;
-    const lines = doc.splitTextToSize(sk.name, maxWidth);
-    doc.text(lines, margin + 200, y);
-    y += lineH * lines.length;
+    // draw horizontal line under row
+    doc.line(margin, y + rowLineHeight, margin + tableWidth, y + rowLineHeight);
+
+    // text
+    doc.text(String(sk.tier), colTierX, y + 10);
+    doc.text(sk.path, colPathX, y + 10);
+
+    const maxSkillWidth = tableWidth - (colSkillX - margin) - 10;
+    const skillLines = doc.splitTextToSize(sk.name, maxSkillWidth);
+    doc.text(skillLines, colSkillX, y + 10);
+
+    // move Y based on wrapped text
+    y += rowLineHeight * skillLines.length;
   });
 
+  // --- Save dialog ---
   let suggestedName = charName ? charName : "larp_character";
   let baseName = prompt("Enter a name for the exported PDF:", suggestedName);
   if (!baseName) {
@@ -1020,6 +1107,7 @@ function exportCharacterPDF() {
 
   doc.save(baseName + "_sheet.pdf");
 }
+
 
 // ---------- CSV AUTO-LOAD ----------
 function tryAutoLoadCSV() {
