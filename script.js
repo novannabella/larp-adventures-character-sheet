@@ -653,12 +653,24 @@ function addEventFromInputs() {
 function renderEvents() {
   eventsBody.innerHTML = "";
 
+  const labels = [
+    "",
+    "Name",
+    "Date",
+    "Type",
+    "NPC?",
+    "Merchant OT?",
+    "Bonus SP",
+    "Skill Pts"
+  ];
+
   eventsData.forEach((ev) => {
     const tr = document.createElement("tr");
 
+    // Buttons cell
     const tdButtons = document.createElement("td");
+    tdButtons.dataset.label = labels[0];
 
-    // Remove button
     const minusBtn = document.createElement("button");
     minusBtn.textContent = "−";
     minusBtn.className = "button small secondary";
@@ -678,7 +690,6 @@ function renderEvents() {
       }
     });
 
-    // Edit button
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     editBtn.className = "button small secondary";
@@ -690,7 +701,6 @@ function renderEvents() {
       if (idx === -1) return;
       editingEventIndex = idx;
 
-      // Load event into input controls
       eventNameInput.value = ev.name || "";
       eventDateInput.value = ev.date || "";
       eventTypeSelect.value = ev.type || "";
@@ -701,7 +711,6 @@ function renderEvents() {
 
       addEventBtn.textContent = "Update Event";
 
-      // Scroll the editor into view and focus the first field
       try {
         eventNameInput.scrollIntoView({
           behavior: "smooth",
@@ -717,19 +726,23 @@ function renderEvents() {
     tdButtons.appendChild(editBtn);
     tr.appendChild(tdButtons);
 
-    function addCell(text) {
+    function addCell(text, labelIndex) {
       const td = document.createElement("td");
       td.textContent = text;
+      td.dataset.label = labels[labelIndex] || "";
       tr.appendChild(td);
     }
 
-    addCell(ev.name || "");
-    addCell(formatDateDisplay(ev.date || ""));
-    addCell(ev.type || "");
-    addCell(ev.npc ? "Yes" : "");
-    addCell(ev.merchantOT ? "Yes" : "");
-    addCell(ev.bonusSP != null && ev.bonusSP !== "" ? String(ev.bonusSP) : "");
-    addCell(ev.skillPoints != null ? String(ev.skillPoints) : "0");
+    addCell(ev.name || "", 1);
+    addCell(formatDateDisplay(ev.date || ""), 2);
+    addCell(ev.type || "", 3);
+    addCell(ev.npc ? "Yes" : "", 4);
+    addCell(ev.merchantOT ? "Yes" : "", 5);
+    addCell(
+      ev.bonusSP != null && ev.bonusSP !== "" ? String(ev.bonusSP) : "",
+      6
+    );
+    addCell(ev.skillPoints != null ? String(ev.skillPoints) : "0", 7);
 
     eventsBody.appendChild(tr);
   });
