@@ -216,25 +216,12 @@ textarea {
   font-size: 10px;
 }
 
-/* Tables (Skills + Events) */
+/* Tables (Skills + Events base) */
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
   margin-top: 4px;
-}
-
-/* Make tables scroll if wider than phone */
-.card table {
-  display: block;
-  width: 100%;
-  overflow-x: auto;
-}
-
-.card table thead,
-.card table tbody,
-.card table tr {
-  width: 100%;
 }
 
 th,
@@ -437,19 +424,62 @@ tbody tr:hover {
   width: auto;
 }
 
-/* --------- EVENTS: listing on mobile --------- */
-/* Use a normal table with headers and horizontal scroll for reliability. */
+/* --------- EVENTS: listing on mobile as stacked cards --------- */
 
 .events-table {
-  display: block;
   width: 100%;
-  overflow-x: auto;
+  border-collapse: collapse;
 }
 
-/* Slightly smaller cells to fit better */
-.events-table th,
-.events-table td {
-  white-space: nowrap;
-  padding: 4px 4px;
+/* Hide the header on mobile and rely on per-row labels */
+.events-table thead {
+  display: none;
+}
+
+/* Each event row as a "card" */
+.events-table tbody tr {
+  display: block;
+  background: rgba(8, 12, 30, 0.95);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+
+.events-table tbody td {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: none;
+  padding: 2px 0;
+  font-size: 11px;
+  white-space: normal;
+}
+
+/* Label before each value, except the first cell (buttons) */
+.events-table tbody td::before {
+  content: attr(data-label);
   font-size: 10px;
+  color: var(--muted);
+  margin-right: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* First cell contains just buttons, no label */
+.events-table tbody td:first-child::before {
+  content: "";
+  margin-right: 0;
+}
+
+/* Make the first cell (buttons) left-aligned with a bit of gap */
+.events-table tbody td:first-child {
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+/* Slight emphasis for the event name row */
+.events-table tbody td[data-label="Name"] span,
+.events-table tbody td[data-label="Name"] {
+  font-weight: 600;
 }
