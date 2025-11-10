@@ -915,17 +915,29 @@ function handleLoadCharacterFile(e) {
 
 // ---------- PDF EXPORT ----------
 function exportCharacterPDF() {
-  // Detect jsPDF whether it's exposed as window.jspdf.jsPDF or window.jsPDF
+  // Try multiple ways jsPDF might be exposed
   let jsPDFConstructor = null;
 
-  if (window.jspdf && window.jspdf.jsPDF) {
-    jsPDFConstructor = window.jspdf.jsPDF;
-  } else if (window.jsPDF) {
+  // UMD style (most common with jspdf.umd.min.js)
+  if (window.jspdf) {
+    if (typeof window.jspdf.jsPDF === "function") {
+      jsPDFConstructor = window.jspdf.jsPDF;
+    } else if (typeof window.jspdf.default === "function") {
+      // Some builds hang the constructor off .default
+      jsPDFConstructor = window.jspdf.default;
+    }
+  }
+
+  // Classic global style
+  if (!jsPDFConstructor && typeof window.jsPDF === "function") {
     jsPDFConstructor = window.jsPDF;
   }
 
+  // If we still don't see it, bail
   if (!jsPDFConstructor) {
-    alert("PDF library (jsPDF) not loaded. Check your internet connection.");
+    alert(
+      "PDF library (jsPDF) not loaded. Try a hard refresh (Ctrl+F5 or Cmd+Shift+R) and make sure the jsPDF <script> tag is still in index.html."
+    );
     return;
   }
 
@@ -958,7 +970,6 @@ function exportCharacterPDF() {
   doc.setTextColor(70, 70, 90);
   doc.text("Character Sheet", margin, y + 18);
 
-  // subtle top-right label with player name (if present)
   if (playerName) {
     doc.setFontSize(10);
     doc.setTextColor(120, 120, 140);
@@ -980,7 +991,6 @@ function exportCharacterPDF() {
   doc.text("Basic Information", margin, y);
   y += 10;
 
-  // Panel box
   const basicBoxTop = y - 8;
   const basicBoxHeight = 90;
   const basicBoxWidth = pageWidth - margin * 2;
@@ -995,7 +1005,6 @@ function exportCharacterPDF() {
     6
   );
 
-  // Left / right columns
   const colLeftX = margin;
   const colRightX = margin + basicBoxWidth / 2 + 4;
   let infoY = y + 6;
@@ -1032,7 +1041,6 @@ function exportCharacterPDF() {
   doc.text("Skills", margin, y);
   y += 10;
 
-  // Header bar
   const tableWidth = pageWidth - margin * 2;
   const headerHeight = 18;
 
@@ -1063,19 +1071,16 @@ function exportCharacterPDF() {
   const rowLineHeight = 14;
 
   sorted.forEach((sk, index) => {
-    // Page break check
     if (y > pageHeight - margin - 40) {
       doc.addPage();
       y = margin;
 
-      // Section title on new page
       doc.setFont("Helvetica", "bold");
       doc.setFontSize(13);
       doc.setTextColor(40, 40, 60);
       doc.text("Skills (continued)", margin, y);
       y += 10;
 
-      // Header bar again
       doc.setFillColor(32, 40, 70);
       doc.setDrawColor(32, 40, 70);
       doc.rect(margin, y, tableWidth, headerHeight, "F");
@@ -1094,16 +1099,13 @@ function exportCharacterPDF() {
       doc.setDrawColor(200, 200, 210);
     }
 
-    // alternating row background
     if (index % 2 === 0) {
       doc.setFillColor(245, 246, 252);
       doc.rect(margin, y - 2, tableWidth, rowLineHeight + 3, "F");
     }
 
-    // draw horizontal line under row
     doc.line(margin, y + rowLineHeight, margin + tableWidth, y + rowLineHeight);
 
-    // text
     doc.text(String(sk.tier), colTierX, y + 10);
     doc.text(sk.path, colPathX, y + 10);
 
@@ -1111,7 +1113,6 @@ function exportCharacterPDF() {
     const skillLines = doc.splitTextToSize(sk.name, maxSkillWidth);
     doc.text(skillLines, colSkillX, y + 10);
 
-    // move Y based on wrapped text
     y += rowLineHeight * skillLines.length;
   });
 
@@ -1124,6 +1125,7 @@ function exportCharacterPDF() {
 
   doc.save(baseName + "_sheet.pdf");
 }
+
 
 // ---------- CSV AUTO-LOAD ----------
 function tryAutoLoadCSV() {
