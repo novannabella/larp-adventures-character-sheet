@@ -119,6 +119,36 @@ label {
   color: var(--muted);
   white-space: nowrap;
 }
+.basic-milestones {
+  margin-top: 4px;
+}
+
+.milestone-block {
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  margin-bottom: 4px;
+}
+
+.milestone-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.milestone-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.milestone-checkbox input[type="checkbox"] {
+  width: auto;
+}
 
 
 /* Inputs */
