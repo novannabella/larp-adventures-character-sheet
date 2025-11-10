@@ -110,25 +110,54 @@
           </div>
 
           <!-- Tier / Skill Points (left) + Organizations (right) -->
+
           <div class="section-row basic-bottom-row">
 
-<div class="field basic-tier-col">
-  <label for="tier">Tier</label>
-  <div class="inline-input-with-note">
-    <input type="number" id="tier" readonly />
-    <span class="calc-note">(calculated from events)</span>
-  </div>
+            <!-- LEFT: Tier / Skill Points -->
+            <div class="field basic-tier-col">
+              <label for="tier">Tier</label>
+              <div class="inline-input-with-note">
+                <input type="number" id="tier" readonly />
+                <span class="calc-note">(calculated from events)</span>
+              </div>
 
-  <label for="totalSkillPoints" style="margin-top: 6px;">
-    Skill Points
-  </label>
-  <div class="inline-input-with-note">
-    <input type="number" id="totalSkillPoints" readonly />
-    <span class="calc-note">(calculated from events)</span>
-  </div>
-</div>
+              <label for="totalSkillPoints" style="margin-top: 6px;">
+                Skill Points
+              </label>
+              <div class="inline-input-with-note">
+                <input type="number" id="totalSkillPoints" readonly />
+                <span class="calc-note">(calculated from events)</span>
+              </div>
+            </div>
 
+            <!-- MIDDLE: Milestones -->
+            <div class="field basic-milestones">
+              <div class="milestone-block">
+                <div class="milestone-title">Artificer Milestone</div>
+                <label class="milestone-checkbox">
+                  <input type="checkbox" id="artificerMilestone2" />
+                  <span>Milestone 2</span>
+                </label>
+                <label class="milestone-checkbox">
+                  <input type="checkbox" id="artificerMilestone3" />
+                  <span>Milestone 3</span>
+                </label>
+              </div>
 
+              <div class="milestone-block">
+                <div class="milestone-title">Bard Milestone</div>
+                <label class="milestone-checkbox">
+                  <input type="checkbox" id="bardMilestone2" />
+                  <span>Milestone 2</span>
+                </label>
+                <label class="milestone-checkbox">
+                  <input type="checkbox" id="bardMilestone3" />
+                  <span>Milestone 3</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- RIGHT: Organizations -->
             <div class="field">
               <label>Organizations</label>
               <div id="organizationsContainer" class="org-grid">
@@ -164,7 +193,11 @@
                 </label>
               </div>
             </div>
+
           </div>
+
+
+          
         </div>
       </div>
 
@@ -313,5 +346,6 @@
     <script src="script.js"></script>
   </body>
 </html>
+
 
 
