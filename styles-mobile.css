@@ -224,7 +224,7 @@ table {
   margin-top: 4px;
 }
 
-/* Make tables scroll if they’re wider than the phone */
+/* Make tables scroll if wider than phone */
 .card table {
   display: block;
   width: 100%;
@@ -293,7 +293,7 @@ tbody tr:hover {
   margin-bottom: 8px;
 }
 
-.select-path is
+.select-path {
   width: 100%;
   max-width: 100%;
 }
@@ -375,76 +375,81 @@ tbody tr:hover {
   color: var(--muted);
 }
 
-/* --------- EVENTS: mobile listing in 2 lines --------- */
-
-/* Remove the events header on mobile to avoid clutter */
-.events-table thead {
-  display: none;
-}
-
-/* Make each event row act like a small two-line card */
-.events-table tbody tr {
-  display: block;
+/* --------- EVENTS: add-event editor (mobile) --------- */
+/* 3 lines:
+   Line 1: Event Name + Date
+   Line 2: Type, NPC?, Merchant OT?, Bonus SP
+   Line 3: Add Event button alone
+*/
+.event-input-row {
+  display: grid !important;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-areas:
+    "ename edate edate edate"
+    "etype enpc emot ebonus"
+    "eadd  eadd eadd eadd";
+  gap: 8px;
   margin-bottom: 8px;
 }
 
-/* Base TD style for events on mobile */
-.events-table tbody td {
-  float: left;
-  box-sizing: border-box;
-  border-bottom: none;
-  padding: 2px 3px;
-  font-size: 11px;
+.event-input-row .field:nth-child(1) {
+  grid-area: ename;
 }
 
-/* First line: [-] Edit | Event Name | Date */
-.events-table tbody td:nth-child(1) {
-  width: 18%;
-}
-.events-table tbody td:nth-child(2) {
-  width: 52%;
-}
-.events-table tbody td:nth-child(3) {
-  width: 30%;
-  text-align: right;
+.event-input-row .field:nth-child(2) {
+  grid-area: edate;
 }
 
-/* Force second line to start at Type */
-.events-table tbody td:nth-child(4) {
-  clear: both;
-  width: 40%;
+.event-input-row .field:nth-child(3) {
+  grid-area: etype;
 }
 
-/* Second line pieces: Type, NPC, Merchant OT, Bonus SP, Skill Pts */
-.events-table tbody td:nth-child(5) {
-  width: 13%;
-}
-.events-table tbody td:nth-child(6) {
-  width: 20%;
-}
-.events-table tbody td:nth-child(7) {
-  width: 12%;
-}
-.events-table tbody td:nth-child(8) {
-  width: 15%;
-  text-align: right;
+.event-input-row .field:nth-child(4) {
+  grid-area: ebonus;
 }
 
-/* Make sure long event names can wrap nicely */
-.events-table tbody td:nth-child(2) {
-  white-space: normal;
+.event-input-row .field:nth-child(5) {
+  grid-area: enpc;
+  align-self: center;
 }
 
-/* Clear floats after each table row */
-.events-table tbody tr::after {
-  content: "";
-  display: block;
-  clear: both;
+.event-input-row .field:nth-child(6) {
+  grid-area: emot;
+  align-self: center;
 }
 
-/* Ensure the whole table block doesn't squash */
+.event-input-row .field:nth-child(7) {
+  grid-area: eadd;
+  align-self: flex-end;
+  justify-self: flex-start;
+}
+
+/* Make event inputs fill their grid cells */
+.event-input-row input[type="text"],
+.event-input-row input[type="date"],
+.event-input-row select,
+.event-input-row input[type="number"] {
+  width: 100%;
+}
+
+/* Keep Add Event button from stretching too wide */
+.event-input-row #addEventBtn {
+  width: auto;
+}
+
+/* --------- EVENTS: listing on mobile --------- */
+/* Use a normal table with headers and horizontal scroll for reliability. */
+
 .events-table {
   display: block;
   width: 100%;
-  overflow: visible;
+  overflow-x: auto;
+}
+
+/* Slightly smaller cells to fit better */
+.events-table th,
+.events-table td {
+  white-space: nowrap;
+  padding: 4px 4px;
+  font-size: 10px;
 }
