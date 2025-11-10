@@ -145,6 +145,21 @@ textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent-soft);
 }
+/* Hide number input arrows for Tier & Skill Points */
+#tier,
+#totalSkillPoints {
+  -moz-appearance: textfield; /* Firefox */
+  appearance: textfield;
+}
+
+/* Hide spin buttons in WebKit browsers (Chrome, Edge, etc.) */
+#tier::-webkit-outer-spin-button,
+#tier::-webkit-inner-spin-button,
+#totalSkillPoints::-webkit-outer-spin-button,
+#totalSkillPoints::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
 textarea {
   resize: vertical;
