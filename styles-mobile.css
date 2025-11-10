@@ -1,128 +1,127 @@
-/* ---------- Root + Base (mobile) ---------- */
-
 :root {
-  --bg: #020617;
-  --card-bg: rgba(15, 23, 42, 0.96);
-  --card-border: rgba(148, 163, 184, 0.35);
-  --accent: #facc15;
-  --accent-soft: rgba(250, 204, 21, 0.35);
-  --accent-strong: #eab308;
-  --text: #e5e7eb;
-  --muted: #9ca3af;
-  --danger: #f97373;
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.9);
-  --border: rgba(148, 163, 184, 0.4);
+  --bg: #0b1020;
+  --bg-alt: #151b30;
+  --card: #1e2640;
+  --accent: #f4c76b;
+  --accent-soft: rgba(244, 199, 107, 0.2);
+  --text: #f2f4ff;
+  --muted: #b7bdd7;
+  --border: #2b3658;
+  --danger: #ff6b81;
+  --success: #7ed957;
+  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
 }
 
-/* Zelda font for title (make sure the file exists) */
-@font-face {
-  font-family: "ZeldaWild";
-  src: url("TheWildBreathOfZelda.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
+* {
+  box-sizing: border-box;
 }
 
-html,
+/* Basic layout */
 body {
   margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
+  padding: 16px;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
+  background: radial-gradient(circle at top, #151b30 0, #050813 55%);
+  color: var(--text);
 }
 
-/* ---------- Layout ---------- */
-
-.app {
-  max-width: 480px;
-  margin: 16px auto 32px;
-  padding: 0 10px;
-}
-
-.app-header {
+h1 {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 22px;
+  color: var(--accent);
 }
 
-.app-title {
-  margin: 0;
-  font-size: 24px;
-  letter-spacing: 1px;
-  text-shadow: 0 0 12px rgba(250, 204, 21, 0.45);
-}
-
-.app-subtitle {
-  margin: 2px 0 0;
-  font-size: 13px;
+.subtitle {
+  text-align: center;
+  margin-bottom: 16px;
   color: var(--muted);
-  letter-spacing: 0.14em;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.title-zelda {
-  font-family: "ZeldaWild", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+.app {
+  max-width: 100%;
+  margin: 0 auto 24px auto;
+  display: grid;
+  gap: 16px;
 }
 
-/* Toolbar */
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0 8px;
-}
-
-/* ---------- Cards ---------- */
-
+/* Card styling */
 .card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  border: 1px solid var(--card-border);
+  background: linear-gradient(145deg, var(--card), #141a2b);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px 14px;
   box-shadow: var(--shadow-soft);
-  padding: 12px 12px 14px;
-  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, var(--accent-soft), transparent 55%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.card-inner {
+  position: relative;
+  z-index: 1;
 }
 
 .card h2 {
-  margin: 0 0 8px;
-  font-size: 15px;
-  letter-spacing: 0.08em;
+  margin: 0 0 10px;
+  font-size: 14px;
   text-transform: uppercase;
-  color: var(--accent-strong);
+  letter-spacing: 0.14em;
+  color: var(--accent);
 }
 
-/* Basic Info */
-
-.basic-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* Layout helpers */
+.section-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px 12px;
+  margin-bottom: 8px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  margin-bottom: 8px;
+  gap: 3px;
+  font-size: 12px;
 }
 
 label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: var(--muted);
-  margin-bottom: 2px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-/* Inputs */
+.inline-input-with-note {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 
+.calc-note {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+
+/* Inputs */
 input[type="text"],
 input[type="number"],
 input[type="date"],
@@ -136,7 +135,6 @@ textarea {
   font-size: 12px;
   outline: none;
   width: 100%;
-  box-sizing: border-box;
 }
 
 input[type="text"]:focus,
@@ -147,15 +145,14 @@ textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent-soft);
 }
-
-/* Hide number arrows for Tier & Skill Points */
-
+/* Hide number input arrows for Tier & Skill Points */
 #tier,
 #totalSkillPoints {
-  -moz-appearance: textfield;
+  -moz-appearance: textfield; /* Firefox */
   appearance: textfield;
 }
 
+/* Hide spin buttons in WebKit browsers (Chrome, Edge, etc.) */
 #tier::-webkit-outer-spin-button,
 #tier::-webkit-inner-spin-button,
 #totalSkillPoints::-webkit-outer-spin-button,
@@ -164,39 +161,177 @@ textarea:focus {
   margin: 0;
 }
 
-/* Inline "calculated from events" */
+textarea {
+  resize: vertical;
+  min-height: 60px;
+  max-height: 140px;
+}
 
-.inline-input-with-note {
+.inline {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
-.calc-note {
-  font-size: 9px;
+.pill {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Totals under sections */
+.total-row {
+  text-align: right;
+  font-size: 11px;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.total-row span {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Top buttons */
+.top-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 100%;
+  margin: 0 auto 10px;
+  padding: 0 2px;
+}
+
+.save-load-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* Buttons */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: linear-gradient(135deg, var(--accent), #f8983c);
+  color: #23120b;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.button.small {
+  padding: 3px 8px;
+  font-size: 10px;
+}
+
+/* Tables (Skills + Events base) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+th,
+td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 5px 4px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+tbody tr:hover {
+  background: rgba(244, 199, 107, 0.06);
+}
+
+/* Cost tags */
+.tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
   color: var(--muted);
   white-space: nowrap;
+  display: inline-block;
 }
 
-.basic-tier-col input[type="number"] {
-  max-width: 70px;
+.tag.free {
+  color: var(--success);
+  border: 1px solid rgba(126, 217, 87, 0.6);
+  background: rgba(126, 217, 87, 0.08);
 }
 
-.sp-label {
-  margin-top: 6px;
+.tag.paid {
+  color: var(--accent);
+  border: 1px solid rgba(244, 199, 107, 0.6);
+  background: rgba(244, 199, 107, 0.08);
 }
 
-/* Organizations: 2 columns on mobile for more room */
-
-.org-grid {
+/* Skills row layout on mobile */
+.skills-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+.select-path {
+  width: 100%;
+  max-width: 100%;
+}
+
+.skill-free-field {
+  align-self: flex-end;
+}
+
+.skill-add-field {
+  align-items: flex-end;
+}
+
+/* Organizations: 2 columns, checkbox + label inline */
+.org-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px 8px;
   margin-top: 2px;
 }
 
 .org-item {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 4px;
   font-size: 11px;
@@ -204,225 +339,175 @@ textarea:focus {
 }
 
 .org-item input[type="checkbox"] {
-  width: auto;
+  margin: 0;
 }
 
-/* ---------- Buttons ---------- */
-
-.button {
-  border-radius: 999px;
-  border: 1px solid transparent;
-  padding: 5px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  transition: background 0.15s ease, border-color 0.15s ease,
-    transform 0.1s;
+/* Tier & Skill Points width (3 digits) on mobile too */
+#tier,
+#totalSkillPoints {
+  max-width: 60px;
 }
 
-.button.primary {
-  background: linear-gradient(135deg, #facc15, #eab308);
-  color: #1f2937;
+/* --------- SKILLS: spacing & shorter label text --------- */
+
+/* Right-align cost & add a bit of space from the skill name */
+#selectedSkillsBody td:last-child {
+  text-align: right;
+  padding-left: 10px;
 }
 
-.button.primary:hover {
-  background: linear-gradient(135deg, #fde047, #facc15);
-  transform: translateY(-1px);
-}
-
-.button.secondary {
-  background: rgba(15, 23, 42, 0.9);
-  color: var(--text);
-  border-color: var(--border);
-}
-
-.button.secondary:hover {
-  border-color: var(--accent);
-  color: var(--accent-strong);
-}
-
-.button.small {
-  padding: 4px 8px;
-  font-size: 11px;
-}
-
-/* ---------- Skills (mobile) ---------- */
-
-.skills-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.field-skill-path select {
-  max-width: 220px;
-}
-
-.field-earned-free {
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-}
-
-.field-earned-free input[type="checkbox"] {
-  width: auto;
-  margin-top: 0;
-}
-
-.earned-label {
-  text-align: left;
-}
-
-.field-skill-select {
-  width: 100%;
-}
-
-.skill-select-with-button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.skill-select-with-button select {
-  flex: 1 1 auto;
-}
-
-.skill-select-with-button button {
-  flex-shrink: 0;
-}
-
-.skills-summary {
+/* Shorten the text under the selected skills table to "Skill points spent" */
+#selectedSkillsBody + .total-row {
+  font-size: 0; /* hide original text visually */
+  text-align: right;
   margin-top: 4px;
+}
+
+#selectedSkillsBody + .total-row::before {
+  content: "Skill points spent: ";
   font-size: 11px;
   color: var(--muted);
 }
 
-/* ---------- Tables (mobile) ---------- */
-
-.table-wrapper {
-  margin-top: 8px;
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
+#selectedSkillsBody + .total-row span {
   font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
 }
 
-.table th,
-.table td {
-  padding: 5px 6px;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.8);
-  text-align: left;
+/* Make the Skills header's 3rd column show "Path / Profession" on two lines */
+#skillsTable thead tr th:nth-child(3) {
+  position: relative;
+  font-size: 0; /* hide original text */
 }
 
-.table th {
+#skillsTable thead tr th:nth-child(3)::after {
+  content: "Path /\A Profession";
+  white-space: pre;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--muted);
 }
 
-.table tbody tr:nth-child(even) {
-  background: rgba(15, 23, 42, 0.7);
-}
-
-/* Tags in Skills table */
-
-.tag {
-  display: inline-block;
-  border-radius: 999px;
-  padding: 2px 6px;
-  font-size: 10px;
-}
-
-.tag.free {
-  background: rgba(34, 197, 94, 0.1);
-  color: #4ade80;
-  border: 1px solid rgba(34, 197, 94, 0.5);
-}
-
-.tag.paid {
-  background: rgba(239, 68, 68, 0.1);
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.5);
-}
-
-/* ---------- Events (mobile) ---------- */
-
-.events-form {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* --------- EVENTS: add-event editor (mobile) --------- */
+/* 3 lines:
+   Line 1: Event Name + Date
+   Line 2: Type, NPC?, Merchant OT?, Bonus SP
+   Line 3: Add Event button alone
+*/
+.event-input-row {
+  display: grid !important;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-areas:
+    "ename edate edate edate"
+    "etype enpc emot ebonus"
+    "eadd  eadd eadd eadd";
+  gap: 8px;
   margin-bottom: 8px;
 }
 
-.events-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.event-input-row .field:nth-child(1) {
+  grid-area: ename;
 }
 
-.events-row .field {
-  flex: 1 1 0;
-  margin-bottom: 0;
+.event-input-row .field:nth-child(2) {
+  grid-area: edate;
 }
 
-/* Event Name + Date row */
-.field-date input[type="date"] {
+.event-input-row .field:nth-child(3) {
+  grid-area: etype;
+}
+
+.event-input-row .field:nth-child(4) {
+  grid-area: ebonus;
+}
+
+.event-input-row .field:nth-child(5) {
+  grid-area: enpc;
+  align-self: center;
+}
+
+.event-input-row .field:nth-child(6) {
+  grid-area: emot;
+  align-self: center;
+}
+
+.event-input-row .field:nth-child(7) {
+  grid-area: eadd;
+  align-self: flex-end;
+  justify-self: flex-start;
+}
+
+/* Make event inputs fill their grid cells */
+.event-input-row input[type="text"],
+.event-input-row input[type="date"],
+.event-input-row select,
+.event-input-row input[type="number"] {
   width: 100%;
 }
 
-/* Bonus SP narrower */
-.field-bonus input[type="number"] {
-  max-width: 70px;
-}
-
-/* NPC / Merchant / Add Event row */
-
-.field-checkbox-inline {
-  flex: 0 0 auto;
-}
-
-.field-checkbox-inline label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 0;
-}
-
-.field-checkbox-inline input[type="checkbox"] {
+/* Keep Add Event button from stretching too wide */
+.event-input-row #addEventBtn {
   width: auto;
 }
 
-.field-add-event {
-  margin-left: auto;
-  flex: 0 0 auto;
-}
-
-/* Events summary */
-
-.events-summary {
-  font-size: 11px;
-  color: var(--muted);
-  margin-bottom: 6px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.summary-separator {
-  opacity: 0.6;
-}
-
-/* Events table: keep headers, allow horizontal scroll if needed */
+/* --------- EVENTS: listing on mobile as stacked cards --------- */
 
 .events-table {
-  min-width: 580px; /* so portrait can scroll side-to-side */
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Hide the header on mobile and rely on per-row labels */
+.events-table thead {
+  display: none;
+}
+
+/* Each event row as a "card" */
+.events-table tbody tr {
+  display: block;
+  background: rgba(8, 12, 30, 0.95);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+
+.events-table tbody td {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: none;
+  padding: 2px 0;
+  font-size: 11px;
+  white-space: normal;
+}
+
+/* Label before each value, except the first cell (buttons) */
+.events-table tbody td::before {
+  content: attr(data-label);
+  font-size: 10px;
+  color: var(--muted);
+  margin-right: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* First cell contains just buttons, no label */
+.events-table tbody td:first-child::before {
+  content: "";
+  margin-right: 0;
+}
+
+/* Make the first cell (buttons) left-aligned with a bit of gap */
+.events-table tbody td:first-child {
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+/* Slight emphasis for the event name row */
+.events-table tbody td[data-label="Name"] span,
+.events-table tbody td[data-label="Name"] {
+  font-weight: 600;
 }
