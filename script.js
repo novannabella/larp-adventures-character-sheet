@@ -52,6 +52,16 @@ function parseCSV(text) {
   });
 }
 
+// ---------- DATE FORMAT HELPERS ----------
+function formatDateDisplay(isoStr) {
+  if (!isoStr) return "";
+  const parts = isoStr.split("-");
+  if (parts.length !== 3) return isoStr;
+  const [y, m, d] = parts;
+  if (!y || !m || !d) return isoStr;
+  return `${m}-${d}-${y}`;
+}
+
 // ---------- DATA ----------
 let skillsData = [];
 let skillsByPath = {};
@@ -659,7 +669,6 @@ function renderEvents() {
         const idx = eventsData.indexOf(ev);
         if (idx !== -1) {
           eventsData.splice(idx, 1);
-          // if we were editing this one, reset editing state
           if (editingEventIndex === idx) {
             editingEventIndex = null;
             addEventBtn.textContent = "Add Event";
@@ -699,7 +708,6 @@ function renderEvents() {
           block: "center"
         });
       } catch (e) {
-        // fallback
         eventNameInput.scrollIntoView();
       }
       eventNameInput.focus();
@@ -716,7 +724,7 @@ function renderEvents() {
     }
 
     addCell(ev.name || "");
-    addCell(ev.date || "");
+    addCell(formatDateDisplay(ev.date || ""));
     addCell(ev.type || "");
     addCell(ev.npc ? "Yes" : "");
     addCell(ev.merchantOT ? "Yes" : "");
