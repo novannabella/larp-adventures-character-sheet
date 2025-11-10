@@ -326,7 +326,7 @@ tbody tr:hover {
 /* Organizations grid */
 
 .org-block {
-  padding: 4px 6px;
+  padding: 6px 8px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: rgba(15, 23, 42, 0.8);
@@ -334,19 +334,20 @@ tbody tr:hover {
 }
 
 .org-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 8px; /* tighter grid horizontally */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* two equal columns */
+  gap: 6px 12px; /* row gap, column gap */
 }
 
 .org-item {
-  font-size: 11px;
-  color: var(--text);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text);
   white-space: nowrap;
 }
+
 
 .org-item input[type="checkbox"] {
   margin: 0;
