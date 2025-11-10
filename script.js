@@ -403,7 +403,9 @@ function addSelectedSkill() {
 
   const mainPath = pathDisplaySelect.value || "";
   if (!mainPath) {
-    alert("Please choose your main Path in Basic Information before selecting skills.");
+    alert(
+      "Please choose your main Path in Basic Information before selecting skills."
+    );
     return;
   }
 
@@ -913,12 +915,21 @@ function handleLoadCharacterFile(e) {
 
 // ---------- PDF EXPORT ----------
 function exportCharacterPDF() {
-  if (!window.jspdf || !window.jspdf.jsPDF) {
+  // Detect jsPDF whether it's exposed as window.jspdf.jsPDF or window.jsPDF
+  let jsPDFConstructor = null;
+
+  if (window.jspdf && window.jspdf.jsPDF) {
+    jsPDFConstructor = window.jspdf.jsPDF;
+  } else if (window.jsPDF) {
+    jsPDFConstructor = window.jsPDF;
+  }
+
+  if (!jsPDFConstructor) {
     alert("PDF library (jsPDF) not loaded. Check your internet connection.");
     return;
   }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: "pt", format: "letter" });
+
+  const doc = new jsPDFConstructor({ unit: "pt", format: "letter" });
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -975,9 +986,16 @@ function exportCharacterPDF() {
   const basicBoxWidth = pageWidth - margin * 2;
   doc.setDrawColor(210, 210, 225);
   doc.setLineWidth(0.8);
-  doc.roundedRect(margin - 4, basicBoxTop, basicBoxWidth + 8, basicBoxHeight, 6, 6);
+  doc.roundedRect(
+    margin - 4,
+    basicBoxTop,
+    basicBoxWidth + 8,
+    basicBoxHeight,
+    6,
+    6
+  );
 
-  // Left column
+  // Left / right columns
   const colLeftX = margin;
   const colRightX = margin + basicBoxWidth / 2 + 4;
   let infoY = y + 6;
@@ -1097,7 +1115,6 @@ function exportCharacterPDF() {
     y += rowLineHeight * skillLines.length;
   });
 
-  // --- Save dialog ---
   let suggestedName = charName ? charName : "larp_character";
   let baseName = prompt("Enter a name for the exported PDF:", suggestedName);
   if (!baseName) {
@@ -1107,7 +1124,6 @@ function exportCharacterPDF() {
 
   doc.save(baseName + "_sheet.pdf");
 }
-
 
 // ---------- CSV AUTO-LOAD ----------
 function tryAutoLoadCSV() {
