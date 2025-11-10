@@ -112,88 +112,61 @@
           <!-- Tier / Skill Points (left) + Organizations (right) -->
           <div class="section-row basic-bottom-row">
 
-<div class="basic-right">
-  <!-- LEFT: Tier & Skill Points -->
-  <div class="field basic-tier-col">
-    <label for="tier">Tier</label>
-    <div class="inline-input-with-note">
-      <input type="number" id="tier" readonly />
-      <span class="calc-note">(calculated from events)</span>
-    </div>
-
-    <label for="totalSkillPoints" class="sp-label">
-      Skill Points
-    </label>
-    <div class="inline-input-with-note">
-      <input type="number" id="totalSkillPoints" readonly />
-      <span class="calc-note">(calculated from events)</span>
-    </div>
+<div class="field basic-tier-col">
+  <label for="tier">Tier</label>
+  <div class="inline-input-with-note">
+    <input type="number" id="tier" readonly />
+    <span class="calc-note">(calculated from events)</span>
   </div>
 
-  <!-- MIDDLE: Milestones -->
-  <div class="field basic-milestones">
-    <div class="milestone-block">
-      <div class="milestone-title">Artificer Milestone</div>
-      <label class="milestone-checkbox">
-        <input type="checkbox" id="artificerMilestone2" />
-        <span>Milestone 2</span>
-      </label>
-      <label class="milestone-checkbox">
-        <input type="checkbox" id="artificerMilestone3" />
-        <span>Milestone 3</span>
-      </label>
-    </div>
-
-    <div class="milestone-block">
-      <div class="milestone-title">Bard Milestone</div>
-      <label class="milestone-checkbox">
-        <input type="checkbox" id="bardMilestone2" />
-        <span>Milestone 2</span>
-      </label>
-      <label class="milestone-checkbox">
-        <input type="checkbox" id="bardMilestone3" />
-        <span>Milestone 3</span>
-      </label>
-    </div>
-  </div>
-
-  <!-- RIGHT: Organizations -->
-  <div class="field basic-orgs">
-    <label>Organizations</label>
-    <div id="organizationsContainer" class="org-grid">
-      <!-- your existing org checkboxes stay the same here -->
-      <label class="org-item">
-        <input type="checkbox" value="Merchant Guild" />
-        <span>Merchant Guild</span>
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="The Sentinels" />
-        <span>The Sentinels</span>
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="The Shield" />
-        <span>The Shield</span>
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="Order of Light" />
-        <span>Order of Light</span>
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="Sanguine Order" />
-        <span>Sanguine Order</span>
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="THoTH" />
-        <span>THoTH</span>
-      </label>
-      <label class="org-item">
-        <input type="checkbox" value="Archivist Guild" />
-        <span>Archivist Guild</span>
-      </label>
-    </div>
+  <label for="totalSkillPoints" style="margin-top: 6px;">
+    Skill Points
+  </label>
+  <div class="inline-input-with-note">
+    <input type="number" id="totalSkillPoints" readonly />
+    <span class="calc-note">(calculated from events)</span>
   </div>
 </div>
 
+
+            <div class="field">
+              <label>Organizations</label>
+              <div id="organizationsContainer" class="org-grid">
+                <label class="org-item">
+                  <input type="checkbox" value="Merchant Guild" />Merchant Guild
+                </label>
+                <label class="org-item">
+                  <input type="checkbox" value="The Sentinels" />The Sentinels
+                </label>
+                <label class="org-item">
+                  <input type="checkbox" value="The Shield" />The Shield
+                </label>
+                <label class="org-item">
+                  <input
+                    type="checkbox"
+                    value="Order of Light"
+                  />Order of Light
+                </label>
+                <label class="org-item">
+                  <input
+                    type="checkbox"
+                    value="Sanguine Order"
+                  />Sanguine Order
+                </label>
+                <label class="org-item">
+                  <input type="checkbox" value="THoTH" />THoTH
+                </label>
+                <label class="org-item">
+                  <input
+                    type="checkbox"
+                    value="Archivist Guild"
+                  />Archivist Guild
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- SKILLS -->
       <div class="card">
@@ -340,7 +313,5 @@
     <script src="script.js"></script>
   </body>
 </html>
-
-
 
 
