@@ -68,8 +68,8 @@ let skillsByPath = {};
 let selectedSkills = [];
 let skillNameSet = new Set(); // normalized skill names
 
-let eventsData = []; // all events stored here
-let editingEventIndex = null; // index of event being edited, or null
+let eventsData = [];
+let editingEventIndex = null;
 
 const EVENT_BASE_POINTS = {
   "Day Event": 1,
@@ -132,6 +132,16 @@ const factionSelect = document.getElementById("faction");
 
 const secondaryPathsDisplay = document.getElementById("secondaryPathsDisplay");
 const professionsDisplay = document.getElementById("professionsDisplay");
+
+// NEW: Milestone checkboxes
+const artificerMilestone2Checkbox = document.getElementById(
+  "artificerMilestone2"
+);
+const artificerMilestone3Checkbox = document.getElementById(
+  "artificerMilestone3"
+);
+const bardMilestone2Checkbox = document.getElementById("bardMilestone2");
+const bardMilestone3Checkbox = document.getElementById("bardMilestone3");
 
 // ---------- HELPERS ----------
 function getOrganizations() {
@@ -197,6 +207,72 @@ function computeSkillCost(record) {
     if (tier === 0) return 1;
     return tier * 2;
   }
+}
+
+// NEW: compute uses per skill using CSV usage columns + milestones
+function computeSkillUses(skill) {
+  if (!skill) return null;
+
+  const periodicity = (skill.periodicity || "").trim();
+  const base = skill.usesBasePerDay || 0;
+  const perExtra = skill.usesPerExtraTier || 0;
+  const startTier = skill.usesScaleStartTier || 0;
+  const perMilestone = !!skill.perMilestone;
+
+  // Unlimited if explicitly says so, or no numeric fields + no periodicity
+  if (
+    periodicity.toLowerCase().includes("unlimited") ||
+    (!base && !perExtra && !startTier && !periodicity)
+  ) {
+    const label = periodicity || "Unlimited";
+    return { display: "∞", numeric: Infinity, periodicity: label };
+  }
+
+  const currentTier = getCurrentTier();
+
+  // Milestone-based (Bard / Artificer)
+  if (perMilestone) {
+    const path = skill.path || "";
+    let milestones = 1; // Milestone 1 baseline
+
+    if (path === "Bard") {
+      if (bardMilestone2Checkbox && bardMilestone2Checkbox.checked)
+        milestones++;
+      if (bardMilestone3Checkbox && bardMilestone3Checkbox.checked)
+        milestones++;
+    } else if (path === "Artificer") {
+      if (artificerMilestone2Checkbox && artificerMilestone2Checkbox.checked)
+        milestones++;
+      if (artificerMilestone3Checkbox && artificerMilestone3Checkbox.checked)
+        milestones++;
+    }
+
+    const perMilestoneBase = base || 1;
+    const total = perMilestoneBase * milestones;
+    const label = periodicity || "Per Event Day";
+
+    return {
+      display: `${total} × ${label}`,
+      numeric: total,
+      periodicity: label
+    };
+  }
+
+  // Normal tier scaling (e.g. Fireball: 1 base, +1 per tier above 5)
+  let total = base;
+  if (currentTier > startTier && perExtra) {
+    total += (currentTier - startTier) * perExtra;
+  }
+
+  if (!periodicity) {
+    return { display: String(total), numeric: total, periodicity: "" };
+  }
+
+  return {
+    display: `${total} × ${periodicity}`,
+    numeric: total,
+    periodicity
+  };
 }
 
 function extractPrereqSkillNames(prereqRaw) {
@@ -301,7 +377,20 @@ function buildSkillsStructures(rows) {
       tier: parseInt(r["Tier"], 10) || 0,
       limitations: r["Limitations"] || "",
       phys: r["Phys Rep"] || "",
-      prereq: r["Prerequisite"] || ""
+      prereq: r["Prerequisite"] || "",
+      // NEW: usage columns
+      usesBasePerDay: r["Uses Base Per Day"]
+        ? parseInt(r["Uses Base Per Day"], 10) || 0
+        : 0,
+      usesPerExtraTier: r["Uses Per Extra Tier"]
+        ? parseInt(r["Uses Per Extra Tier"], 10) || 0
+        : 0,
+      usesScaleStartTier: r["Uses Scale Start Tier"]
+        ? parseInt(r["Uses Scale Start Tier"], 10) || 0
+        : 0,
+      periodicity: r["Periodicity"] || "",
+      perMilestone:
+        (r["Per Milestone"] || "").trim().toUpperCase() === "Y" || false
     };
 
     skillsData.push(skill);
@@ -368,6 +457,13 @@ function updateSkillDescriptionFromSelect() {
   if (skill.prereq) desc += `\n\nPrerequisite: ${skill.prereq}`;
   if (skill.limitations) desc += `\n\nLimitations: ${skill.limitations}`;
   if (skill.phys) desc += `\n\nPhys Rep: ${skill.phys}`;
+
+  // NEW: usage info
+  const usesInfo = computeSkillUses(skill);
+  if (usesInfo && usesInfo.display) {
+    desc += `\n\nUsage: ${usesInfo.display}`;
+  }
+
   skillDescription.value = desc.trim();
 }
 
@@ -630,18 +726,14 @@ function addEventFromInputs() {
     editingEventIndex >= 0 &&
     editingEventIndex < eventsData.length
   ) {
-    // Update existing event
     eventsData[editingEventIndex] = ev;
   } else {
-    // Add new event
     eventsData.push(ev);
   }
 
-  // Reset editing state
   editingEventIndex = null;
   addEventBtn.textContent = "Add Event";
 
-  // Clear inputs
   eventNameInput.value = "";
   eventDateInput.value = "";
   eventTypeSelect.value = "";
@@ -669,7 +761,6 @@ function renderEvents() {
   eventsData.forEach((ev) => {
     const tr = document.createElement("tr");
 
-    // Buttons cell
     const tdButtons = document.createElement("td");
     tdButtons.dataset.label = labels[0];
 
@@ -822,7 +913,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 7,
+    version: 8,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -830,7 +921,16 @@ function collectCharacterState() {
     professions,
     organizations,
     selectedSkills: selectedSkills.slice(),
-    events
+    events,
+    // NEW: milestone checkboxes
+    artificerMilestone2: !!(
+      artificerMilestone2Checkbox && artificerMilestone2Checkbox.checked
+    ),
+    artificerMilestone3: !!(
+      artificerMilestone3Checkbox && artificerMilestone3Checkbox.checked
+    ),
+    bardMilestone2: !!(bardMilestone2Checkbox && bardMilestone2Checkbox.checked),
+    bardMilestone3: !!(bardMilestone3Checkbox && bardMilestone3Checkbox.checked)
   };
 }
 
@@ -845,6 +945,20 @@ function applyCharacterState(state) {
   const orgs = state.organizations;
   if (Array.isArray(orgs)) {
     setOrganizations(orgs);
+  }
+
+  // NEW: restore milestone checkboxes
+  if (artificerMilestone2Checkbox) {
+    artificerMilestone2Checkbox.checked = !!state.artificerMilestone2;
+  }
+  if (artificerMilestone3Checkbox) {
+    artificerMilestone3Checkbox.checked = !!state.artificerMilestone3;
+  }
+  if (bardMilestone2Checkbox) {
+    bardMilestone2Checkbox.checked = !!state.bardMilestone2;
+  }
+  if (bardMilestone3Checkbox) {
+    bardMilestone3Checkbox.checked = !!state.bardMilestone3;
   }
 
   selectedSkills = Array.isArray(state.selectedSkills)
@@ -918,7 +1032,7 @@ function exportCharacterPDF() {
   // Try multiple ways jsPDF might be exposed
   let jsPDFConstructor = null;
 
-  // UMD style (most common with jspdf.umd.min.js)
+  // UMD style
   if (window.jspdf) {
     if (typeof window.jspdf.jsPDF === "function") {
       jsPDFConstructor = window.jspdf.jsPDF;
@@ -927,7 +1041,7 @@ function exportCharacterPDF() {
     }
   }
 
-  // Classic global style
+  // Classic global
   if (!jsPDFConstructor && typeof window.jsPDF === "function") {
     jsPDFConstructor = window.jsPDF;
   }
@@ -944,14 +1058,14 @@ function exportCharacterPDF() {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  // --- Parchment-style background (flat color) ---
-  doc.setFillColor(245, 233, 210); // light parchment tan
+  // Light parchment-style fill
+  doc.setFillColor(245, 233, 210);
   doc.rect(0, 0, pageWidth, pageHeight, "F");
 
   const margin = 40;
   let y = margin;
 
-  // --- Gather data ---
+  // Gather data
   const charName = characterNameInput.value || "";
   const playerName = playerNameInput.value || "";
   const path = pathDisplaySelect.value || "";
@@ -962,7 +1076,7 @@ function exportCharacterPDF() {
   const remainingSP = totalSkillPointsInput.value || "0";
   const organizations = getOrganizations().join(", ");
 
-  // --- Title area ---
+  // Title area
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(20, 20, 30);
@@ -987,7 +1101,7 @@ function exportCharacterPDF() {
   doc.line(margin, y, pageWidth - margin, y);
   y += 18;
 
-  // --- BASIC INFO PANEL ---
+  // Basic info panel
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(13);
   doc.setTextColor(40, 40, 60);
@@ -1016,20 +1130,16 @@ function exportCharacterPDF() {
   doc.setFontSize(11);
   doc.setTextColor(60, 60, 80);
 
-  // dynamic label/value helper (fixes "Organizations" overlap)
   function labelValue(label, value, x, yLine) {
     const labelText = `${label}:`;
 
-    // label
     doc.setFont("Helvetica", "bold");
     doc.setTextColor(80, 80, 110);
     doc.text(labelText, x, yLine);
 
-    // measure label & offset value
     const labelWidth = doc.getTextWidth(labelText);
-    const valueX = x + labelWidth + 6; // 6pt gap
+    const valueX = x + labelWidth + 6;
 
-    // value
     doc.setFont("Helvetica", "normal");
     doc.setTextColor(20, 20, 30);
     doc.text(value || "-", valueX, yLine);
@@ -1047,7 +1157,7 @@ function exportCharacterPDF() {
 
   y = basicBoxTop + basicBoxHeight + 24;
 
-  // --- SKILLS SECTION ---
+  // Skills section
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(13);
   doc.setTextColor(40, 40, 60);
@@ -1084,11 +1194,9 @@ function exportCharacterPDF() {
   const rowLineHeight = 14;
 
   sorted.forEach((sk, index) => {
-    // Page break
     if (y > pageHeight - margin - 40) {
       doc.addPage();
 
-      // Re-apply parchment background on new page
       const pw = doc.internal.pageSize.getWidth();
       const ph = doc.internal.pageSize.getHeight();
       doc.setFillColor(245, 233, 210);
@@ -1130,8 +1238,24 @@ function exportCharacterPDF() {
     doc.text(String(sk.tier), colTierX, y + 10);
     doc.text(sk.path, colPathX, y + 10);
 
+    // NEW: include usage inline with the skill name if available
+    let skillLine = sk.name;
+    const metaSkill = (skillsByPath[sk.path] || []).find(
+      (s) => s.name === sk.name
+    );
+    if (metaSkill) {
+      const usesInfo = computeSkillUses(metaSkill);
+      if (usesInfo && usesInfo.display) {
+        if (usesInfo.display === "∞") {
+          skillLine = `${sk.name}  [Unlimited]`;
+        } else {
+          skillLine = `${sk.name}  [${usesInfo.display}]`;
+        }
+      }
+    }
+
     const maxSkillWidth = tableWidth - (colSkillX - margin) - 10;
-    const skillLines = doc.splitTextToSize(sk.name, maxSkillWidth);
+    const skillLines = doc.splitTextToSize(skillLine, maxSkillWidth);
     doc.text(skillLines, colSkillX, y + 10);
 
     y += rowLineHeight * skillLines.length;
@@ -1197,6 +1321,19 @@ window.addEventListener("DOMContentLoaded", () => {
     recomputeTotals();
     updatePathAndProfessionDisplays();
   });
+
+  // When milestones change, refresh the skill description (for usage display)
+  function onMilestoneChange() {
+    updateSkillDescriptionFromSelect();
+  }
+  if (artificerMilestone2Checkbox)
+    artificerMilestone2Checkbox.addEventListener("change", onMilestoneChange);
+  if (artificerMilestone3Checkbox)
+    artificerMilestone3Checkbox.addEventListener("change", onMilestoneChange);
+  if (bardMilestone2Checkbox)
+    bardMilestone2Checkbox.addEventListener("change", onMilestoneChange);
+  if (bardMilestone3Checkbox)
+    bardMilestone3Checkbox.addEventListener("change", onMilestoneChange);
 
   recomputeTotals();
   updatePathAndProfessionDisplays();
