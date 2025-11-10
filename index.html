@@ -111,14 +111,23 @@
 
           <!-- Tier / Skill Points (left) + Organizations (right) -->
           <div class="section-row basic-bottom-row">
-            <div class="field basic-tier-col">
-  <label for="tier">Tier (calculated from events)</label>
-  <input type="number" id="tier" readonly />
+
+<div class="field basic-tier-col">
+  <label for="tier">Tier</label>
+  <div class="inline-input-with-note">
+    <input type="number" id="tier" readonly />
+    <span class="calc-note">(calculated from events)</span>
+  </div>
+
   <label for="totalSkillPoints" style="margin-top: 6px;">
-    Skill Points (calculated from events)
+    Skill Points
   </label>
-  <input type="number" id="totalSkillPoints" readonly />
+  <div class="inline-input-with-note">
+    <input type="number" id="totalSkillPoints" readonly />
+    <span class="calc-note">(calculated from events)</span>
+  </div>
 </div>
+
 
             <div class="field">
               <label>Organizations</label>
@@ -307,4 +316,5 @@
     <script src="script.js"></script>
   </body>
 </html>
+
 
