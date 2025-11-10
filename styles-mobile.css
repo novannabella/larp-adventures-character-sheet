@@ -121,6 +121,9 @@ label {
 }
 .basic-milestones {
   margin-top: 4px;
+  display: flex;
+  flex-direction: column;  /* stack on mobile */
+  gap: 6px;
 }
 
 .milestone-block {
@@ -148,6 +151,13 @@ label {
 
 .milestone-checkbox input[type="checkbox"] {
   width: auto;
+}
+.org-block {
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  margin-top: 4px;
 }
 
 
