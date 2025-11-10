@@ -382,7 +382,7 @@ table thead tr th:nth-child(3)::after {
 
 .event-input-row {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2fr 1fr !important; /* override inline grid */
   grid-template-areas:
     "ename edate"
     "etype ebonus"
