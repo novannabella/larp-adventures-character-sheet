@@ -141,6 +141,8 @@ const artificerMilestone3Checkbox = document.getElementById(
 );
 const bardMilestone2Checkbox = document.getElementById("bardMilestone2");
 const bardMilestone3Checkbox = document.getElementById("bardMilestone3");
+const scholarMilestone2Checkbox = document.getElementById("scholarMilestone2");
+const scholarMilestone3Checkbox = document.getElementById("scholarMilestone3");
 
 // ---------- HELPERS ----------
 function getOrganizations() {
@@ -208,7 +210,7 @@ function computeSkillCost(record) {
   }
 }
 
-// Milestone counts per path
+// Milestone counts per path (Artificer, Bard, Scholar)
 function getMilestonesForPath(path) {
   let milestones = 1; // baseline milestone 1
 
@@ -224,6 +226,13 @@ function getMilestonesForPath(path) {
       milestones++;
     }
     if (artificerMilestone3Checkbox && artificerMilestone3Checkbox.checked) {
+      milestones++;
+    }
+  } else if (path === "Scholar") {
+    if (scholarMilestone2Checkbox && scholarMilestone2Checkbox.checked) {
+      milestones++;
+    }
+    if (scholarMilestone3Checkbox && scholarMilestone3Checkbox.checked) {
       milestones++;
     }
   }
@@ -260,8 +269,11 @@ function computeSkillUses(skill) {
 
   const path = skill.path || "";
 
-  // Milestone-based variants for Bard/Artificer
-  if ((perMilestone1 || perMilestone2) && (path === "Bard" || path === "Artificer")) {
+  // Milestone-based variants for Bard/Artificer/Scholar
+  if (
+    (perMilestone1 || perMilestone2) &&
+    (path === "Bard" || path === "Artificer" || path === "Scholar")
+  ) {
     const milestones = getMilestonesForPath(path);
     const label = periodicity || "Per Event Day";
 
@@ -995,7 +1007,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 9,
+    version: 10,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -1011,7 +1023,13 @@ function collectCharacterState() {
       artificerMilestone3Checkbox && artificerMilestone3Checkbox.checked
     ),
     bardMilestone2: !!(bardMilestone2Checkbox && bardMilestone2Checkbox.checked),
-    bardMilestone3: !!(bardMilestone3Checkbox && bardMilestone3Checkbox.checked)
+    bardMilestone3: !!(bardMilestone3Checkbox && bardMilestone3Checkbox.checked),
+    scholarMilestone2: !!(
+      scholarMilestone2Checkbox && scholarMilestone2Checkbox.checked
+    ),
+    scholarMilestone3: !!(
+      scholarMilestone3Checkbox && scholarMilestone3Checkbox.checked
+    )
   };
 }
 
@@ -1039,6 +1057,12 @@ function applyCharacterState(state) {
   }
   if (bardMilestone3Checkbox) {
     bardMilestone3Checkbox.checked = !!state.bardMilestone3;
+  }
+  if (scholarMilestone2Checkbox) {
+    scholarMilestone2Checkbox.checked = !!state.scholarMilestone2;
+  }
+  if (scholarMilestone3Checkbox) {
+    scholarMilestone3Checkbox.checked = !!state.scholarMilestone3;
   }
 
   selectedSkills = Array.isArray(state.selectedSkills)
@@ -1440,6 +1464,10 @@ window.addEventListener("DOMContentLoaded", () => {
     bardMilestone2Checkbox.addEventListener("change", onMilestoneChange);
   if (bardMilestone3Checkbox)
     bardMilestone3Checkbox.addEventListener("change", onMilestoneChange);
+  if (scholarMilestone2Checkbox)
+    scholarMilestone2Checkbox.addEventListener("change", onMilestoneChange);
+  if (scholarMilestone3Checkbox)
+    scholarMilestone3Checkbox.addEventListener("change", onMilestoneChange);
 
   recomputeTotals();
   updatePathAndProfessionDisplays();
