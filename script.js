@@ -1130,6 +1130,24 @@ function handleLoadCharacterFile(e) {
   };
   reader.readAsText(file);
 }
+// add parchment background
+
+let parchmentImg = null;
+const parchmentImgUrl = "parchment.jpg"; // your local image path
+
+// Preload parchment image
+const parchment = new Image();
+parchment.crossOrigin = "anonymous";
+parchment.src = parchmentImgUrl;
+parchment.onload = () => {
+  const canvas = document.createElement("canvas");
+  canvas.width = parchment.width;
+  canvas.height = parchment.height;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(parchment, 0, 0);
+  parchmentImg = canvas.toDataURL("image/jpeg");
+};
+
 
 // ---------- PDF EXPORT ----------
 function exportCharacterPDF() {
@@ -1268,9 +1286,14 @@ function exportCharacterPDF() {
   const headerHeight = 22;
 
   // Table header background
-  doc.setFillColor(32, 40, 70);
-  doc.setDrawColor(32, 40, 70);
-  doc.rect(margin, y, tableWidth, headerHeight, "F");
+if (parchmentImg) {
+  doc.addImage(parchmentImg, "JPEG", 0, 0, pageWidth, pageHeight);
+} else {
+  // fallback in case image hasn't loaded yet
+  doc.setFillColor(245, 233, 210);
+  doc.rect(0, 0, pageWidth, pageHeight, "F");
+}
+
 
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(11);
