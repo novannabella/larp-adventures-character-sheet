@@ -246,6 +246,7 @@ function exportCharacterPDF() {
     const labelWidth = doc.getTextWidth(labelText);
     const valueX = x + labelWidth + 6;
 
+    doc.setFont("Times", "normal");
     doc.setFontSize(11);
     doc.text(value || "-", valueX, yLine);
   }
@@ -258,15 +259,36 @@ function exportCharacterPDF() {
   labelValue("Faction", faction, colLeftX, infoY + 16);
   labelValue("Professions", professions, colRightX, infoY + 16);
 
-  // Row 3: Path only (left)
+  // Row 3: Path (left) and Tier / Skill Pts (right)
   labelValue("Path", path, colLeftX, infoY + 32);
 
-  // Row 4: Tier | Skill Pts (Tier next to Skill Pts)
-  labelValue("Tier", tier, colLeftX, infoY + 48);
-  labelValue("Skill Pts", remainingSP, colRightX, infoY + 48);
+  // On the right side, put Tier and Skill Pts on the same line
+  const row3Y = infoY + 32;
+  const tierLabelText = "Tier:";
+  doc.setFont("Times", "bold");
+  doc.setFontSize(13);
+  doc.text(tierLabelText, colRightX, row3Y);
+  let tempWidth = doc.getTextWidth(tierLabelText);
+  let valueX = colRightX + tempWidth + 6;
+
+  doc.setFont("Times", "normal");
+  doc.setFontSize(11);
+  doc.text(tier || "0", valueX, row3Y);
+
+  const skillLabelText = "Skill Pts:";
+  doc.setFont("Times", "bold");
+  doc.setFontSize(13);
+  const skillLabelX = valueX + 24;
+  doc.text(skillLabelText, skillLabelX, row3Y);
+  tempWidth = doc.getTextWidth(skillLabelText);
+  const skillValueX = skillLabelX + tempWidth + 6;
+
+  doc.setFont("Times", "normal");
+  doc.setFontSize(11);
+  doc.text(remainingSP || "0", skillValueX, row3Y);
 
   // Organizations on their own row, spanning the width of the box
-  const orgLabelY = infoY + 64;
+  const orgLabelY = infoY + 48;
   const orgLabelText = "Organizations:";
   doc.setFont("Times", "bold");
   doc.setFontSize(13);
@@ -554,7 +576,7 @@ function exportCharacterPDF() {
 
       const detailMaxWidth = cardWidth - cardPadding * 2;
 
-      // Bold label headers (Description, Limitations, Phys Rep, Prerequisite, # of uses)
+      // Bold label headers (Description, Augment, Special, Limitations, Phys Rep, Prerequisite, # of uses)
       function addLabeledBlock(label, text) {
         if (!text) return;
 
@@ -572,14 +594,7 @@ function exportCharacterPDF() {
         currentY += lines.length * 12 + 3;
       }
 
-      if (metaSkill) {
-        addLabeledBlock("Description", metaSkill.description);
-        addLabeledBlock("Limitations", metaSkill.limitations);
-        addLabeledBlock("Phys Rep", metaSkill.phys);
-        addLabeledBlock("Prerequisite", metaSkill.prereq);
-      }
-
-      // Bold Path + Tier line under the description blocks
+      // Bold Path + Tier line directly under the skill name
       doc.setFont("Times", "bold");
       doc.setFontSize(11);
       const jobText = sk.path || "";
@@ -592,6 +607,16 @@ function exportCharacterPDF() {
       doc.text(tierText, cardX + cardPadding + jobWidth + gap, lineY);
 
       currentY = lineY + 14;
+
+      // Then show detailed fields from the CSV
+      if (metaSkill) {
+        addLabeledBlock("Description", metaSkill.description);
+        addLabeledBlock("Augment", metaSkill.augment);
+        addLabeledBlock("Special", metaSkill.special);
+        addLabeledBlock("Limitations", metaSkill.limitations);
+        addLabeledBlock("Phys Rep", metaSkill.phys);
+        addLabeledBlock("Prerequisite", metaSkill.prereq);
+      }
 
       // # of uses (label bold via addLabeledBlock)
       const usesDisplay = getUsesDisplayForSkill(sk);
