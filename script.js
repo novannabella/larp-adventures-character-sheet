@@ -775,6 +775,7 @@ function renderSelectedSkills() {
     tdName.textContent = sk.name;
     tr.appendChild(tdName);
 
+    // Uses & Periodicity based on current tier / milestones
     let usesDisplay = "—";
     let periodicityText = "—";
     const metaSkillList = skillsByPath[sk.path] || [];
@@ -782,10 +783,20 @@ function renderSelectedSkills() {
     if (metaSkill) {
       const usesInfo = computeSkillUses(metaSkill);
       if (usesInfo) {
-        if (usesInfo.display) usesDisplay = usesInfo.display;
-        if (usesInfo.periodicity) periodicityText = usesInfo.periodicity;
-        if (usesInfo.display === "∞" && !usesInfo.periodicity) {
-          periodicityText = "Unlimited";
+        if (usesInfo.numeric === Infinity) {
+          usesDisplay = "∞";
+          if (!usesInfo.periodicity) {
+            periodicityText = "Unlimited";
+          } else {
+            periodicityText = usesInfo.periodicity;
+          }
+        } else if (Number.isFinite(usesInfo.numeric)) {
+          usesDisplay = String(usesInfo.numeric);
+          periodicityText = usesInfo.periodicity || periodicityText;
+        } else if (usesInfo.display) {
+          // fallback
+          usesDisplay = usesInfo.display;
+          periodicityText = usesInfo.periodicity || periodicityText;
         }
       }
     }
@@ -1014,6 +1025,8 @@ function recomputeTotals() {
   totalSkillPointsInput.value = available;
 
   renderEvents();
+  // IMPORTANT: also re-render skills so Uses updates with new Tier
+  renderSelectedSkills();
 }
 
 // ---------- SAVE / LOAD CHARACTER ----------
@@ -1039,7 +1052,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 12,
+    version: 13,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -1218,11 +1231,11 @@ function exportCharacterPDF() {
     y += titleHeight + 10;
   } else {
     doc.setFont("Times", "bold");
-    doc.setFontSize(24); // was 22
+    doc.setFontSize(24);
     doc.setTextColor(0, 0, 0);
     doc.text("Larp Adventures", margin, y);
 
-    doc.setFontSize(16); // was 14
+    doc.setFontSize(16);
     doc.setFont("Times", "bold");
     doc.text("Character Sheet", margin, y + 18);
     y += 32;
@@ -1236,7 +1249,7 @@ function exportCharacterPDF() {
 
   // BASIC INFO HEADER: left "Basic Information", right "Player: ... "
   doc.setFont("Times", "bold");
-  doc.setFontSize(15); // was 13
+  doc.setFontSize(15);
   doc.setTextColor(0, 0, 0);
   const basicHeaderY = y;
 
@@ -1280,14 +1293,13 @@ function exportCharacterPDF() {
   const colRightX = basicBoxX + basicBoxWidth / 2 + 4;
   let infoY = y + 6;
 
-  doc.setFont("Times", "bold"); // all text bold now
+  doc.setFont("Times", "bold");
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
 
   function labelValue(label, value, x, yLine) {
     const labelText = `${label}:`;
 
-    // label: bold + larger
     doc.setFont("Times", "bold");
     doc.setFontSize(13);
     doc.setTextColor(0, 0, 0);
@@ -1296,17 +1308,11 @@ function exportCharacterPDF() {
     const labelWidth = doc.getTextWidth(labelText);
     const valueX = x + labelWidth + 6;
 
-    // value: bold, normal size
     doc.setFontSize(11);
     doc.setFont("Times", "bold");
     doc.text(value || "-", valueX, yLine);
   }
 
-  // Inside the basic box, rows:
-  // Character: (L) / Secondary: (R)
-  // Faction:   (L) / Professions: (R)
-  // Path:      (L) / Organizations: (R)
-  // Tier:      (L) / Skill Pts: (R)
   labelValue("Character", charName, colLeftX, infoY);
   labelValue("Secondary", secondaryPaths, colRightX, infoY);
 
@@ -1331,7 +1337,7 @@ function exportCharacterPDF() {
 
   // Title "Milestones:"
   doc.setFont("Times", "bold");
-  doc.setFontSize(13); // was 11
+  doc.setFontSize(13);
   doc.setTextColor(0, 0, 0);
   const milestonesTitleY = milestonesBoxTop + 14;
   doc.text("Milestones:", milestonesBoxX + 6, milestonesTitleY);
@@ -1375,17 +1381,15 @@ function exportCharacterPDF() {
   const milestonePaths = ["Artificer", "Bard", "Scholar"];
 
   doc.setFont("Times", "bold");
-  doc.setFontSize(12); // was 10
+  doc.setFontSize(12);
   doc.setTextColor(0, 0, 0);
 
   milestonePaths.forEach((p, idx) => {
     const startX = innerX + idx * colWidth;
     const labelY = innerTopY + 12;
 
-    // Path label with colon
     doc.text(`${p}:`, startX, labelY);
 
-    // Milestone 2
     const box2Y = labelY + rowOffset;
     const box2X = startX;
     doc.rect(box2X, box2Y, squareSize, squareSize);
@@ -1395,7 +1399,6 @@ function exportCharacterPDF() {
     doc.setFontSize(11);
     doc.text("2", box2X + squareSize + 4, box2Y + 8);
 
-    // Milestone 3
     const box3Y = box2Y + squareSize + 4;
     const box3X = startX;
     doc.rect(box3X, box3Y, squareSize, squareSize);
@@ -1404,16 +1407,15 @@ function exportCharacterPDF() {
     }
     doc.text("3", box3X + squareSize + 4, box3Y + 8);
 
-    doc.setFontSize(12); // reset for next label
+    doc.setFontSize(12);
   });
 
-  // Move y below both boxes
   const boxesBottom = basicBoxTop + basicBoxHeight;
   y = boxesBottom + 24;
 
   // Skills header
   doc.setFont("Times", "bold");
-  doc.setFontSize(15); // was 13
+  doc.setFontSize(15);
   doc.setTextColor(0, 0, 0);
   doc.text("Skills", margin, y);
   y += 10;
@@ -1427,14 +1429,13 @@ function exportCharacterPDF() {
   doc.rect(margin, y, tableWidth, headerHeight, "F");
 
   doc.setFont("Times", "bold");
-  doc.setFontSize(13); // was 11
+  doc.setFontSize(13);
   doc.setTextColor(255, 255, 255);
 
-  // Column positions: Tier | Path/Profession | Skill Name | Uses
   const colTierX = margin + 6;
   const colPathX = margin + 60;
   const colSkillX = margin + 140;
-  const colUsesX = margin + tableWidth * 0.65; // moved left toward center
+  const colUsesX = margin + tableWidth * 0.65;
 
   doc.text("Tier", colTierX, y + 12);
   doc.text("Path /", colPathX, y + 9);
@@ -1444,7 +1445,6 @@ function exportCharacterPDF() {
 
   y += headerHeight + 4;
 
-  // Body text: bold as well (but normal size)
   doc.setFont("Times", "bold");
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
@@ -1462,7 +1462,7 @@ function exportCharacterPDF() {
       y = margin;
 
       doc.setFont("Times", "bold");
-      doc.setFontSize(15); // was 13
+      doc.setFontSize(15);
       doc.setTextColor(0, 0, 0);
       doc.text("Skills (continued)", margin, y);
       y += 10;
@@ -1472,7 +1472,7 @@ function exportCharacterPDF() {
       doc.rect(margin, y, tableWidth, headerHeight, "F");
 
       doc.setFont("Times", "bold");
-      doc.setFontSize(13); // was 11
+      doc.setFontSize(13);
       doc.setTextColor(255, 255, 255);
       doc.text("Tier", colTierX, y + 12);
       doc.text("Path /", colPathX, y + 9);
@@ -1489,9 +1489,8 @@ function exportCharacterPDF() {
     }
 
     const rowTop = y;
-    const textBaseline = rowTop + 12; // more padding from line above
+    const textBaseline = rowTop + 12;
 
-    // Tier & Path
     doc.text(String(sk.tier), colTierX, textBaseline);
     doc.text(sk.path, colPathX, textBaseline);
 
@@ -1501,8 +1500,10 @@ function exportCharacterPDF() {
     if (metaSkill) {
       const usesInfo = computeSkillUses(metaSkill);
       if (usesInfo) {
-        if (usesInfo.display === "∞") {
+        if (usesInfo.numeric === Infinity) {
           usesDisplay = "Unlimited";
+        } else if (Number.isFinite(usesInfo.numeric)) {
+          usesDisplay = `${usesInfo.display}`;
         } else if (usesInfo.display) {
           usesDisplay = usesInfo.display;
         }
@@ -1510,7 +1511,6 @@ function exportCharacterPDF() {
     }
 
     const skillLine = sk.name;
-
     const maxSkillWidth = colUsesX - colSkillX - 10;
     const skillLines = doc.splitTextToSize(skillLine, maxSkillWidth);
 
@@ -1526,7 +1526,7 @@ function exportCharacterPDF() {
     const lineY = rowTop + rowTextHeight + 4;
     doc.line(margin, lineY, margin + tableWidth, lineY);
 
-    y = lineY + 6; // extra space between rows
+    y = lineY + 6;
   });
 
   let suggestedName = charName ? charName : "larp_character";
