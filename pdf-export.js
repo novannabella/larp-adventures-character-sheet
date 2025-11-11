@@ -258,12 +258,12 @@ function exportCharacterPDF() {
   labelValue("Faction", faction, colLeftX, infoY + 16);
   labelValue("Professions", professions, colRightX, infoY + 16);
 
-  // Row 3: Path | Skill Pts  (pulled Skill Pts up to this line)
+  // Row 3: Path only (left)
   labelValue("Path", path, colLeftX, infoY + 32);
-  labelValue("Skill Pts", remainingSP, colRightX, infoY + 32);
 
-  // Row 4: Tier (left only)
+  // Row 4: Tier | Skill Pts (Tier next to Skill Pts)
   labelValue("Tier", tier, colLeftX, infoY + 48);
+  labelValue("Skill Pts", remainingSP, colRightX, infoY + 48);
 
   // Organizations on their own row, spanning the width of the box
   const orgLabelY = infoY + 64;
@@ -427,7 +427,7 @@ function exportCharacterPDF() {
   let cardCurrentY = y;
   const cardWidthFull = pageWidth - margin * 2;
   const cardPadding = 10;
-  const cardMinHeight = 80;
+  const cardMinHeight = 220; // larger to avoid cutting long skills
 
   sorted.forEach((sk) => {
     if (!fullSkillInfo) {
@@ -531,9 +531,7 @@ function exportCharacterPDF() {
 
       let currentY = cardTop + cardPadding + 12;
 
-      // Top of card:
-      // Line 1: Skill Name
-      // Line 2: Job Tier (e.g. "Mage Tier 5")
+      // Top of card: Skill Name
       doc.setFont("Times", "bold");
       doc.setFontSize(12);
 
@@ -543,13 +541,6 @@ function exportCharacterPDF() {
       doc.text(skillNameLines, cardX + cardPadding, currentY);
 
       currentY += rowLineHeight * skillNameLines.length;
-
-      const jobTierText = `${sk.path} Tier ${sk.tier}`;
-      doc.setFont("Times", "normal");
-      doc.setFontSize(11);
-      doc.text(jobTierText, cardX + cardPadding, currentY);
-
-      currentY += rowLineHeight;
 
       // Find meta-skill for details
       let metaSkill = null;
@@ -563,11 +554,21 @@ function exportCharacterPDF() {
 
       const detailMaxWidth = cardWidth - cardPadding * 2;
 
+      // Bold label headers (Description, Limitations, Phys Rep, Prerequisite, # of uses)
       function addLabeledBlock(label, text) {
         if (!text) return;
-        const labelLine = `${label}: ${text}`;
-        const lines = doc.splitTextToSize(labelLine, detailMaxWidth);
-        doc.text(lines, cardX + cardPadding, currentY);
+
+        // Label line, bold
+        doc.setFont("Times", "bold");
+        doc.setFontSize(10);
+        doc.text(`${label}:`, cardX + cardPadding, currentY);
+
+        // Value text, normal, slightly indented & below label
+        doc.setFont("Times", "normal");
+        doc.setFontSize(10);
+        currentY += 11;
+        const lines = doc.splitTextToSize(text, detailMaxWidth - 10);
+        doc.text(lines, cardX + cardPadding + 10, currentY);
         currentY += lines.length * 12 + 3;
       }
 
@@ -578,6 +579,21 @@ function exportCharacterPDF() {
         addLabeledBlock("Prerequisite", metaSkill.prereq);
       }
 
+      // Bold Path + Tier line under the description blocks
+      doc.setFont("Times", "bold");
+      doc.setFontSize(11);
+      const jobText = sk.path || "";
+      const tierText = `Tier ${sk.tier}`;
+      const jobWidth = doc.getTextWidth(jobText);
+      const gap = 16; // space between Path and Tier
+      const lineY = currentY + 4;
+
+      doc.text(jobText, cardX + cardPadding, lineY);
+      doc.text(tierText, cardX + cardPadding + jobWidth + gap, lineY);
+
+      currentY = lineY + 14;
+
+      // # of uses (label bold via addLabeledBlock)
       const usesDisplay = getUsesDisplayForSkill(sk);
       addLabeledBlock("# of uses", usesDisplay);
 
