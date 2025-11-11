@@ -783,13 +783,10 @@ function renderSelectedSkills() {
       const usesInfo = computeSkillUses(metaSkill);
       if (usesInfo) {
         if (usesInfo.numeric === Infinity) {
-          // match PDF behavior: Unlimited
           usesDisplay = "Unlimited";
         } else if (usesInfo.display) {
-          // e.g. "10 × Per Event Day"
           usesDisplay = usesInfo.display;
         } else if (usesInfo.periodicity) {
-          // fallback: just show periodicity
           usesDisplay = usesInfo.periodicity;
         }
       }
@@ -1041,7 +1038,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 14,
+    version: 15,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -1208,7 +1205,7 @@ function exportCharacterPDF() {
   const remainingSP = totalSkillPointsInput.value || "0";
   const organizations = getOrganizations().join(", ");
 
-  // HEADER
+  // HEADER: title image left at margin
   if (titleImg) {
     const imgRatio = 158 / 684;
     const maxWidth = Math.min(400, pageWidth - margin * 2);
@@ -1230,12 +1227,13 @@ function exportCharacterPDF() {
     y += 32;
   }
 
+  // Separator under title
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.7);
   doc.line(margin, y, pageWidth - margin, y);
   y += 18;
 
-  // BASIC INFO HEADER
+  // BASIC INFO HEADER: left "Basic Information", right "Player: ... "
   doc.setFont("Times", "bold");
   doc.setFontSize(15);
   doc.setTextColor(0, 0, 0);
@@ -1252,9 +1250,10 @@ function exportCharacterPDF() {
 
   y = basicHeaderY + 10;
 
+  // BASIC BOX + MILESTONES IN SAME ROW
   const totalInfoWidth = pageWidth - margin * 2;
-  const basicBoxWidth = totalInfoWidth * 0.6;
-  const milestonesWidth = totalInfoWidth - basicBoxWidth - 16;
+  const basicBoxWidth = totalInfoWidth * 0.7; // widened from 0.6 to 0.7
+  const milestonesWidth = totalInfoWidth - basicBoxWidth - 16; // gap of 16
 
   const basicBoxTop = y - 8;
   const basicBoxHeight = 90;
@@ -1264,6 +1263,7 @@ function exportCharacterPDF() {
   const milestonesBoxTop = basicBoxTop;
   const milestonesBoxHeight = basicBoxHeight;
 
+  // Basic box border
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.8);
   doc.roundedRect(
@@ -1283,19 +1283,37 @@ function exportCharacterPDF() {
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
 
+  // Helper that can wrap Organizations
   function labelValue(label, value, x, yLine) {
     const labelText = `${label}:`;
 
+    // Special-case Organizations so it can wrap inside the box
+    if (label === "Organizations") {
+      doc.setFont("Times", "bold");
+      doc.setFontSize(13);
+      doc.text(labelText, x, yLine);
+
+      const labelWidth = doc.getTextWidth(labelText);
+      const valueX = x + labelWidth + 6;
+
+      // compute max space to right edge of the basic box
+      const maxValueWidth = basicBoxX + basicBoxWidth - valueX - 8;
+
+      doc.setFontSize(11);
+      const lines = doc.splitTextToSize(value || "-", maxValueWidth);
+      doc.text(lines, valueX, yLine);
+      return;
+    }
+
+    // Default single-line behavior
     doc.setFont("Times", "bold");
     doc.setFontSize(13);
-    doc.setTextColor(0, 0, 0);
     doc.text(labelText, x, yLine);
 
     const labelWidth = doc.getTextWidth(labelText);
     const valueX = x + labelWidth + 6;
 
     doc.setFontSize(11);
-    doc.setFont("Times", "bold");
     doc.text(value || "-", valueX, yLine);
   }
 
@@ -1311,7 +1329,7 @@ function exportCharacterPDF() {
   labelValue("Tier", tier, colLeftX, infoY + 48);
   labelValue("Skill Pts", remainingSP, colRightX, infoY + 48);
 
-  // Milestones box
+  // Milestones box to the right
   doc.roundedRect(
     milestonesBoxX,
     milestonesBoxTop,
@@ -1321,12 +1339,14 @@ function exportCharacterPDF() {
     6
   );
 
+  // Title "Milestones:"
   doc.setFont("Times", "bold");
   doc.setFontSize(13);
   doc.setTextColor(0, 0, 0);
   const milestonesTitleY = milestonesBoxTop + 14;
   doc.text("Milestones:", milestonesBoxX + 6, milestonesTitleY);
 
+  // Three narrow columns: Artificer:, Bard:, Scholar:
   const innerX = milestonesBoxX + 6;
   const innerTopY = milestonesTitleY + 4;
   const colCount = 3;
@@ -1407,6 +1427,7 @@ function exportCharacterPDF() {
   const tableWidth = pageWidth - margin * 2;
   const headerHeight = 22;
 
+  // Table header background
   doc.setFillColor(60, 40, 20);
   doc.setDrawColor(60, 40, 20);
   doc.rect(margin, y, tableWidth, headerHeight, "F");
