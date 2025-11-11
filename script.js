@@ -87,7 +87,20 @@ const QUALIFYING_FOR_TIER = new Set([
   "Virtual Event"
 ]);
 
+// Paths considered professions (for cost + display)
 const PROFESSION_NAMES = new Set(["Artificer", "Bard", "Merchant", "Scholar"]);
+
+// Per-path / profession tiers inferred from skills + main tier
+let pathTierMap = {}; // { Mage: 7, Healer: 3, Artificer: 2, ... }
+
+// Selected-skills sort state
+let skillSortState = {
+  column: "default", // "default" | "tier" | "path" | "skill"
+  direction: "asc"   // "asc" | "desc"
+};
+
+// Dirty flag for unsaved changes
+let isDirty = false;
 
 // ---------- DOM REFS ----------
 const skillPathSelect = document.getElementById("skillPath");
@@ -144,6 +157,21 @@ const bardMilestone3Checkbox = document.getElementById("bardMilestone3");
 const scholarMilestone2Checkbox = document.getElementById("scholarMilestone2");
 const scholarMilestone3Checkbox = document.getElementById("scholarMilestone3");
 
+// ---------- DIRTY HELPERS ----------
+function markDirty() {
+  isDirty = true;
+}
+
+function markClean() {
+  isDirty = false;
+}
+
+window.addEventListener("beforeunload", function (e) {
+  if (!isDirty) return;
+  e.preventDefault();
+  e.returnValue = "";
+});
+
 // ---------- HELPERS ----------
 function getOrganizations() {
   return Array.from(
@@ -171,23 +199,47 @@ function normalizeSkillName(name) {
     .trim();
 }
 
+// Recompute per-path tiers and update Secondary/Profession fields
 function updatePathAndProfessionDisplays() {
   const mainPath = pathDisplaySelect.value || "";
-  const secondaryPaths = new Set();
-  const professionPaths = new Set();
+  const charTier = getCurrentTier();
 
+  const tiers = {};
+
+  // Derive tier from highest-tier skill per path
   selectedSkills.forEach((sk) => {
     if (!sk.path) return;
-    if (sk.path === mainPath) return;
-    if (PROFESSION_NAMES.has(sk.path)) {
-      professionPaths.add(sk.path);
-    } else {
-      secondaryPaths.add(sk.path);
+    const t = parseInt(sk.tier || 0, 10) || 0;
+    if (!tiers[sk.path] || t > tiers[sk.path]) {
+      tiers[sk.path] = t;
     }
   });
 
-  secondaryPathsDisplay.value = Array.from(secondaryPaths).join(", ");
-  professionsDisplay.value = Array.from(professionPaths).join(", ");
+  // Override main path with character tier from events
+  if (mainPath) {
+    tiers[mainPath] = charTier;
+  }
+
+  pathTierMap = tiers;
+  window.pathTierMap = tiers; // used by pdf-export.js if needed
+
+  const secondaryParts = [];
+  const professionParts = [];
+
+  Object.keys(tiers).forEach((path) => {
+    const t = tiers[path];
+    const label = `${path} ${t}`;
+    if (path === mainPath) return;
+
+    if (PROFESSION_NAMES.has(path)) {
+      professionParts.push(label);
+    } else {
+      secondaryParts.push(label);
+    }
+  });
+
+  secondaryPathsDisplay.value = secondaryParts.join(", ");
+  professionsDisplay.value = professionParts.join(", ");
 }
 
 function computeSkillCost(record) {
@@ -239,6 +291,7 @@ function getMilestonesForPath(path) {
   return milestones;
 }
 
+// Uses now depend on the tier of the specific path/profession, not always main tier
 function computeSkillUses(skill) {
   if (!skill) return null;
 
@@ -256,6 +309,13 @@ function computeSkillUses(skill) {
   const perMilestone1 = !!skill.perMilestone1;
   const perMilestone2 = !!skill.perMilestone2;
 
+  const path = skill.path || "";
+
+  // Resolve effective tier for this path/profession
+  const map = window.pathTierMap || {};
+  let effectiveTier =
+    typeof map[path] === "number" ? map[path] : getCurrentTier();
+
   if (
     periodicity.toLowerCase().includes("unlimited") ||
     (!base && !perExtra && !startTier && !perMilestone1 && !perMilestone2)
@@ -264,8 +324,7 @@ function computeSkillUses(skill) {
     return { display: "∞", numeric: Infinity, periodicity: label };
   }
 
-  const path = skill.path || "";
-
+  // Milestone-based logic (Bard/Artificer/Scholar)
   if (
     (perMilestone1 || perMilestone2) &&
     (path === "Bard" || path === "Artificer" || path === "Scholar")
@@ -274,6 +333,7 @@ function computeSkillUses(skill) {
     const label = periodicity || "Per Event Day";
 
     if (perMilestone1 && perMilestone2) {
+      // per milestone (1,2,3...) with extra at milestone 2
       const perMilestoneBase = base || 1;
       const total = perMilestoneBase * milestones;
       return {
@@ -284,6 +344,7 @@ function computeSkillUses(skill) {
     }
 
     if (!perMilestone1 && perMilestone2) {
+      // base uses +1 at milestone 2+
       const baseUses = base || 1;
       const hasSecondOrMore = milestones > 1;
       const total = baseUses + (hasSecondOrMore ? 1 : 0);
@@ -305,11 +366,11 @@ function computeSkillUses(skill) {
     }
   }
 
-  const currentTier = getCurrentTier();
+  // Linear scaling: depends on effectiveTier (per path/profession)
   let total = base;
 
-  if (currentTier > startTier && perExtra) {
-    const delta = currentTier - startTier;
+  if (effectiveTier > startTier && perExtra) {
+    const delta = effectiveTier - startTier;
     total += delta * perExtra;
   }
 
@@ -472,6 +533,7 @@ function buildSkillsStructures(rows) {
   });
 
   populateSkillSelect();
+  updatePathAndProfessionDisplays();
 }
 
 function populateSkillSelect() {
@@ -528,14 +590,14 @@ function updateSkillDescriptionFromSelect() {
   skillDescription.value = desc.trim();
 }
 
-function getSortedSelectedSkills() {
+// ---------- SORTED SKILLS ----------
+function defaultSkillSort(arr) {
   const mainPath = pathDisplaySelect.value || "";
-  return selectedSkills.slice().sort((a, b) => {
-    const aMain = a.path === mainPath;
-    const bMain = b.path === mainPath;
 
-    if (aMain && !bMain) return -1;
-    if (bMain && !aMain) return 1;
+  return arr.slice().sort((a, b) => {
+    const aMain = a.path === mainPath ? 0 : 1;
+    const bMain = b.path === mainPath ? 0 : 1;
+    if (aMain !== bMain) return aMain - bMain;
 
     if (!aMain && !bMain) {
       const pathCmp = a.path.localeCompare(b.path, undefined, {
@@ -551,6 +613,150 @@ function getSortedSelectedSkills() {
   });
 }
 
+function getSortedSelectedSkills() {
+  const arr = selectedSkills || [];
+
+  if (skillSortState.column === "default") {
+    return defaultSkillSort(arr);
+  }
+
+  const dir = skillSortState.direction === "desc" ? -1 : 1;
+
+  return arr.slice().sort((a, b) => {
+    let va, vb;
+
+    if (skillSortState.column === "tier") {
+      va = parseInt(a.tier || 0, 10);
+      vb = parseInt(b.tier || 0, 10);
+      if (va < vb) return -1 * dir;
+      if (va > vb) return 1 * dir;
+      return (
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase()) * dir
+      );
+    }
+
+    if (skillSortState.column === "path") {
+      va = a.path.toLowerCase();
+      vb = b.path.toLowerCase();
+      const cmp = va.localeCompare(vb);
+      if (cmp !== 0) return cmp * dir;
+      const ta = parseInt(a.tier || 0, 10);
+      const tb = parseInt(b.tier || 0, 10);
+      if (ta !== tb) return (ta - tb) * dir;
+      return (
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase()) * dir
+      );
+    }
+
+    if (skillSortState.column === "skill") {
+      va = a.name.toLowerCase();
+      vb = b.name.toLowerCase();
+      const cmp = va.localeCompare(vb);
+      if (cmp !== 0) return cmp * dir;
+      const ta = parseInt(a.tier || 0, 10);
+      const tb = parseInt(b.tier || 0, 10);
+      if (ta !== tb) return (ta - tb) * dir;
+      return (
+        a.path.toLowerCase().localeCompare(b.path.toLowerCase()) * dir
+      );
+    }
+
+    return 0;
+  });
+}
+
+function updateSkillSortHeaderIndicators() {
+  const thTier = document.getElementById("thTier");
+  const thPath = document.getElementById("thPath");
+  const thSkill = document.getElementById("thSkill");
+
+  const all = [thTier, thPath, thSkill];
+  all.forEach((th) => {
+    if (!th) return;
+    const baseLabel =
+      th.id === "thTier"
+        ? "Tier"
+        : th.id === "thPath"
+        ? "Path/Profession"
+        : "Skill";
+    th.textContent = baseLabel;
+  });
+
+  const dirSymbol = skillSortState.direction === "desc" ? "▼" : "▲";
+
+  if (skillSortState.column === "tier" && thTier) {
+    thTier.textContent = `Tier ${dirSymbol}`;
+  }
+  if (skillSortState.column === "path" && thPath) {
+    thPath.textContent = `Path/Profession ${dirSymbol}`;
+  }
+  if (skillSortState.column === "skill" && thSkill) {
+    thSkill.textContent = `Skill ${dirSymbol}`;
+  }
+}
+
+function attachSkillSortHandlers() {
+  const thTier = document.getElementById("thTier");
+  const thPath = document.getElementById("thPath");
+  const thSkill = document.getElementById("thSkill");
+  const resetBtn = document.getElementById("resetSkillSortBtn");
+
+  if (thTier) {
+    thTier.addEventListener("click", () => {
+      if (skillSortState.column === "tier") {
+        skillSortState.direction =
+          skillSortState.direction === "asc" ? "desc" : "asc";
+      } else {
+        skillSortState.column = "tier";
+        skillSortState.direction = "asc";
+      }
+      renderSelectedSkills();
+      updateSkillSortHeaderIndicators();
+      markDirty();
+    });
+  }
+
+  if (thPath) {
+    thPath.addEventListener("click", () => {
+      if (skillSortState.column === "path") {
+        skillSortState.direction =
+          skillSortState.direction === "asc" ? "desc" : "asc";
+      } else {
+        skillSortState.column = "path";
+        skillSortState.direction = "asc";
+      }
+      renderSelectedSkills();
+      updateSkillSortHeaderIndicators();
+      markDirty();
+    });
+  }
+
+  if (thSkill) {
+    thSkill.addEventListener("click", () => {
+      if (skillSortState.column === "skill") {
+        skillSortState.direction =
+          skillSortState.direction === "asc" ? "desc" : "asc";
+      } else {
+        skillSortState.column = "skill";
+        skillSortState.direction = "asc";
+      }
+      renderSelectedSkills();
+      updateSkillSortHeaderIndicators();
+      markDirty();
+    });
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      skillSortState = { column: "default", direction: "asc" };
+      renderSelectedSkills();
+      updateSkillSortHeaderIndicators();
+      markDirty();
+    });
+  }
+}
+
+// ---------- ADD / RENDER SELECTED SKILLS ----------
 function addSelectedSkill() {
   const val = skillSelect.value;
   if (!val) {
@@ -677,12 +883,11 @@ function addSelectedSkill() {
   }
 
   selectedSkills.push(candidateRecord);
+  markDirty();
 
   skillFreeFlag.checked = false;
   populateSkillSelect();
-  renderSelectedSkills();
   recomputeTotals();
-  updatePathAndProfessionDisplays();
 }
 
 function renderSelectedSkills() {
@@ -710,10 +915,9 @@ function renderSelectedSkills() {
       if (originalIndex !== -1) {
         if (confirm("Are you sure you want to remove this skill?")) {
           selectedSkills.splice(originalIndex, 1);
+          markDirty();
           populateSkillSelect();
-          renderSelectedSkills();
           recomputeTotals();
-          updatePathAndProfessionDisplays();
         }
       }
     });
@@ -722,6 +926,7 @@ function renderSelectedSkills() {
 
     const tdTier = document.createElement("td");
     tdTier.textContent = sk.tier;
+    tdTier.classList.add("tier-cell");
     tr.appendChild(tdTier);
 
     const tdPath = document.createElement("td");
@@ -821,6 +1026,7 @@ function addEventFromInputs() {
   eventMotInput.checked = false;
   eventBonusInput.value = "0";
 
+  markDirty();
   recomputeTotals();
 }
 
@@ -854,6 +1060,7 @@ function renderEvents() {
         const idx = eventsData.indexOf(ev);
         if (idx !== -1) {
           eventsData.splice(idx, 1);
+          markDirty();
           if (editingEventIndex === idx) {
             editingEventIndex = null;
             addEventBtn.textContent = "Add Event";
@@ -967,8 +1174,10 @@ function recomputeTotals() {
   const available = Math.max(0, totalEventPoints - totalSkillCost);
   totalSkillPointsInput.value = available;
 
+  // Rebuild per-path tiers + displays, then re-render
+  updatePathAndProfessionDisplays();
   renderEvents();
-  renderSelectedSkills(); // refresh Uses when tier changes
+  renderSelectedSkills();
 }
 
 // ---------- SAVE / LOAD CHARACTER ----------
@@ -994,7 +1203,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 15,
+    version: 16,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -1016,7 +1225,8 @@ function collectCharacterState() {
     ),
     scholarMilestone3: !!(
       scholarMilestone3Checkbox && scholarMilestone3Checkbox.checked
-    )
+    ),
+    skillSortState: skillSortState
   };
 }
 
@@ -1055,7 +1265,13 @@ function applyCharacterState(state) {
   selectedSkills = Array.isArray(state.selectedSkills)
     ? state.selectedSkills.slice()
     : [];
-  renderSelectedSkills();
+
+  // Load sort state if present
+  if (state.skillSortState) {
+    skillSortState = state.skillSortState;
+  } else {
+    skillSortState = { column: "default", direction: "asc" };
+  }
 
   eventsData = Array.isArray(state.events)
     ? state.events.map((ev) => ({
@@ -1073,7 +1289,8 @@ function applyCharacterState(state) {
   addEventBtn.textContent = "Add Event";
 
   recomputeTotals();
-  updatePathAndProfessionDisplays();
+  updateSkillSortHeaderIndicators();
+  markClean();
 }
 
 function saveCharacter() {
@@ -1101,6 +1318,7 @@ function saveCharacter() {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+  markClean();
 }
 
 function handleLoadCharacterFile(e) {
@@ -1141,7 +1359,9 @@ function tryAutoLoadCSV() {
 window.addEventListener("DOMContentLoaded", () => {
   tryAutoLoadCSV();
 
-  addEventBtn.addEventListener("click", addEventFromInputs);
+  addEventBtn.addEventListener("click", () => {
+    addEventFromInputs();
+  });
 
   addSkillBtn.addEventListener("click", () => {
     addSelectedSkill();
@@ -1171,14 +1391,24 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   pathDisplaySelect.addEventListener("change", () => {
-    renderSelectedSkills();
+    markDirty();
     recomputeTotals();
-    updatePathAndProfessionDisplays();
   });
 
+  characterNameInput.addEventListener("input", markDirty);
+  playerNameInput.addEventListener("input", markDirty);
+  factionSelect.addEventListener("change", markDirty);
+
+  organizationsContainer
+    .querySelectorAll('input[type="checkbox"]')
+    .forEach((cb) => {
+      cb.addEventListener("change", markDirty);
+    });
+
   function onMilestoneChange() {
+    markDirty();
     updateSkillDescriptionFromSelect();
-    renderSelectedSkills();
+    recomputeTotals();
   }
   if (artificerMilestone2Checkbox)
     artificerMilestone2Checkbox.addEventListener("change", onMilestoneChange);
@@ -1193,6 +1423,9 @@ window.addEventListener("DOMContentLoaded", () => {
   if (scholarMilestone3Checkbox)
     scholarMilestone3Checkbox.addEventListener("change", onMilestoneChange);
 
+  attachSkillSortHandlers();
+  updateSkillSortHeaderIndicators();
+
   recomputeTotals();
-  updatePathAndProfessionDisplays();
+  markClean();
 });
