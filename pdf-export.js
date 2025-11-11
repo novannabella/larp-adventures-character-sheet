@@ -206,15 +206,15 @@ function exportCharacterPDF() {
   doc.setFontSize(15);
   doc.setTextColor(0, 0, 0);
   doc.text("Basic Information", basicBoxX, labelsY);
-  doc.text("Milestones:", milestonesBoxX, labelsY);
+  // Milestones label will be drawn INSIDE the box instead of here
 
   // Now place the boxes a bit below the headings
   y = labelsY + 10;
 
   const basicBoxTop = y;
-  const basicBoxHeight = 85; // tightened from 100
+  const basicBoxHeight = 85; // tightened
   const milestonesBoxTop = y;
-  const milestonesBoxHeight = 85; // tightened from 100
+  const milestonesBoxHeight = 85; // tightened
 
   // Basic box border
   doc.setDrawColor(0, 0, 0);
@@ -349,15 +349,21 @@ function exportCharacterPDF() {
   doc.setFontSize(10);
 
   const innerX = milestonesBoxX + 6;
-  const innerTopY = milestonesBoxTop + 6; // padding inside box
+  const innerTopY = milestonesBoxTop + 6;
+
+  // Draw "Milestones:" INSIDE the box
+  doc.text("Milestones:", innerX, innerTopY + 8);
+
   const colCount = 3;
   const colWidth = (milestonesWidth - 12) / colCount;
   const squareSize = 10;
   const rowOffset = 8;
 
+  const labelBaseY = innerTopY + 24; // move path labels down slightly
+
   milestonePaths.forEach((p, idx) => {
     const startX = innerX + idx * colWidth;
-    const labelY = innerTopY + 10;
+    const labelY = labelBaseY;
 
     doc.text(`${p}:`, startX, labelY);
 
@@ -448,8 +454,8 @@ function exportCharacterPDF() {
   // For full-skill cards in single-column layout
   let cardCurrentY = y;
   const cardWidthFull = pageWidth - margin * 2;
-  const cardPadding = 10;
-  const cardMinHeight = 220; // larger to avoid cutting long skills
+  const cardPadding = 6;            // tighter padding
+  const cardMinHeight = 220;        // still enough for tall skills
 
   sorted.forEach((sk) => {
     if (!fullSkillInfo) {
@@ -551,7 +557,8 @@ function exportCharacterPDF() {
       const cardX = margin;
       const cardTop = cardCurrentY;
 
-      let currentY = cardTop + cardPadding + 12;
+      // Tighter space between top border and skill name
+      let currentY = cardTop + cardPadding + 8;
 
       // Top of card: Skill Name
       doc.setFont("Times", "bold");
@@ -622,6 +629,7 @@ function exportCharacterPDF() {
       const usesDisplay = getUsesDisplayForSkill(sk);
       addLabeledBlock("# of uses", usesDisplay);
 
+      // Tighter bottom padding
       const cardBottom = currentY + cardPadding;
       const cardHeight = cardBottom - cardTop;
 
