@@ -178,15 +178,25 @@ label {
   align-items: center;
 }
 
-/* Make each label+input pair stay in its own column */
-.basic-tier-col label[for="tier"],
-.basic-tier-col .inline-input-with-note:nth-of-type(1) {
+/* Tier pair in column 1, Skill Points pair in column 2 */
+.basic-tier-col label[for="tier"] {
   grid-column: 1;
+  grid-row: 1;
 }
 
-.basic-tier-col label[for="totalSkillPoints"],
+.basic-tier-col .inline-input-with-note:nth-of-type(1) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.basic-tier-col label[for="totalSkillPoints"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
 .basic-tier-col .inline-input-with-note:nth-of-type(2) {
   grid-column: 2;
+  grid-row: 2;
 }
 
 .basic-tier-col label {
@@ -271,7 +281,7 @@ textarea {
   font-weight: 600;
 }
 
-/* Top buttons */
+/* Top controls */
 .top-controls {
   display: flex;
   justify-content: flex-start;
@@ -282,12 +292,17 @@ textarea {
   padding: 0 2px;
 }
 
-/* Stack everything in save-load-controls so export + checkboxes go vertical */
+/* Buttons and checkboxes layout at top */
 .save-load-controls {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
+}
+
+/* Force labels (Full Skill Info / Event Summary) onto their own lines */
+.save-load-controls label {
+  flex-basis: 100%;
 }
 
 /* Buttons */
@@ -384,6 +399,30 @@ tbody tr:hover {
   gap: 8px;
   align-items: end;
   margin-bottom: 8px;
+}
+
+/* Re-map skill fields into a 2x2 grid:
+   Row 1: Path | Skill
+   Row 2: Earned for Free? | Add Skill
+*/
+.skills-row .field:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.skills-row .field:nth-child(3) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.skills-row .field:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.skills-row .field:nth-child(4) {
+  grid-column: 2;
+  grid-row: 2;
 }
 
 .select-path {
@@ -517,11 +556,16 @@ tbody tr:hover {
 
 .event-input-row .field:nth-child(5) {
   grid-area: enpc;
-  /* let label + checkbox align naturally to left */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .event-input-row .field:nth-child(6) {
   grid-area: emot;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .event-input-row .field:nth-child(7) {
@@ -548,8 +592,13 @@ tbody tr:hover {
   width: auto;
 }
 
-/* "Merchant OT?" label on one line, shorter text */
+/* Change "Merchant OT?" label text to "Merch OT?" */
 .event-input-row label[for="eventMotInput"] {
+  font-size: 0;
+}
+
+.event-input-row label[for="eventMotInput"]::after {
+  content: "Merch OT?";
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
