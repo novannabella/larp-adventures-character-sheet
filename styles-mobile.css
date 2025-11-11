@@ -729,3 +729,33 @@ tbody tr:hover {
   text-align: center;
   padding-inline: 4px;
 }
+/* Skills header with Unspent SP */
+.skills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.unspent-sp-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.unspent-sp-box {
+  display: inline-block;
+  min-width: 2.2em;
+  padding: 2px 6px;
+  margin-left: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+/* Prevent the -4 SP pill from wrapping on mobile */
+.tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
