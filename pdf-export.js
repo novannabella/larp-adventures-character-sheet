@@ -79,6 +79,12 @@ function exportCharacterPDF() {
   const margin = 40;
   let y = margin;
 
+  // Export options
+  const fullSkillInfo =
+    document.getElementById("fullSkillInfoCheckbox")?.checked || false;
+  const includeEvents =
+    document.getElementById("eventSummaryCheckbox")?.checked || false;
+
   // Grab everything directly from the DOM
   const charName =
     document.getElementById("characterName")?.value.trim() || "";
@@ -112,10 +118,10 @@ function exportCharacterPDF() {
   let titleBottomY;
 
   if (titleImg) {
-    // Image title
+    // Image title (scaled to ~80% of previous)
     const imgRatio = 158 / 684;
     const maxWidth = Math.min(400, pageWidth - margin * 2);
-    const titleWidth = maxWidth;
+    const titleWidth = maxWidth * 0.8; // 80% of old width
     const titleHeight = titleWidth * imgRatio;
     const x = margin;
 
@@ -131,7 +137,7 @@ function exportCharacterPDF() {
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 0);
     const playerLabelWidth = doc.getTextWidth(playerLabel);
-    const playerY = titleBottomY - 8; // a bit above the bottom of the image
+    const playerY = titleBottomY - 8;
 
     doc.text(playerLabel, pageWidth - margin - playerLabelWidth, playerY);
 
@@ -168,7 +174,6 @@ function exportCharacterPDF() {
   y += 18;
 
   // ---------- BASIC INFO + MILESTONES LAYOUT ----------
-  // Precompute widths so we can place headings *above* the boxes
   const totalInfoWidth = pageWidth - margin * 2;
   const basicBoxWidth = totalInfoWidth * 0.7; // 70% for basic info
   const milestonesWidth = totalInfoWidth - basicBoxWidth - 16; // gap of 16
@@ -187,7 +192,7 @@ function exportCharacterPDF() {
   y = labelsY + 10;
 
   const basicBoxTop = y;
-  const basicBoxHeight = 78; // tightened a bit vs previous 90
+  const basicBoxHeight = 78; // tightened
   const milestonesBoxTop = y;
   const milestonesBoxHeight = basicBoxHeight;
 
@@ -351,12 +356,15 @@ function exportCharacterPDF() {
   doc.setFontSize(13);
   doc.setTextColor(255, 255, 255);
 
-  const colTierX = margin + 6;
+  const colTierCenterX = margin + 30; // center of Tier column
   const colPathX = margin + 60;
   const colSkillX = margin + 140;
   const colUsesX = margin + tableWidth * 0.65;
 
-  doc.text("Tier", colTierX, y + 16);
+  // Center "Tier" label
+  const tierLabel = "Tier";
+  const tierLabelWidth = doc.getTextWidth(tierLabel);
+  doc.text(tierLabel, colTierCenterX - tierLabelWidth / 2, y + 16);
 
   // More spacing between "Path /" and "Profession"
   doc.text("Path /", colPathX, y + 12);
@@ -380,7 +388,9 @@ function exportCharacterPDF() {
   const rowLineHeight = 14;
 
   sorted.forEach((sk) => {
-    if (y > pageHeight - margin - 60) {
+    // Leave more space for full-skill mode
+    const bottomMargin = fullSkillInfo ? 100 : 60;
+    if (y > pageHeight - margin - bottomMargin) {
       doc.addPage();
       drawParchmentBackground(doc);
 
@@ -399,7 +409,13 @@ function exportCharacterPDF() {
       doc.setFont("Times", "bold");
       doc.setFontSize(13);
       doc.setTextColor(255, 255, 255);
-      doc.text("Tier", colTierX, y + 16);
+
+      const tierLabelWidth2 = doc.getTextWidth("Tier");
+      doc.text(
+        "Tier",
+        colTierCenterX - tierLabelWidth2 / 2,
+        y + 16
+      );
       doc.text("Path /", colPathX, y + 12);
       doc.text("Profession", colPathX, y + 26);
       doc.text("Skill Name", colSkillX, y + 16);
@@ -416,8 +432,14 @@ function exportCharacterPDF() {
     const rowTop = y;
     const textBaseline = rowTop + 12;
 
-    // Tier
-    doc.text(String(sk.tier), colTierX, textBaseline);
+    // Tier (centered)
+    const tierStr = String(sk.tier);
+    const tierStrWidth = doc.getTextWidth(tierStr);
+    doc.text(
+      tierStr,
+      colTierCenterX - tierStrWidth / 2,
+      textBaseline
+    );
 
     // Path
     doc.text(sk.path, colPathX, textBaseline);
@@ -454,15 +476,180 @@ function exportCharacterPDF() {
     doc.text(skillLines, colSkillX, textBaseline);
     doc.text(usesLines, colUsesX, textBaseline);
 
-    const rowLines = Math.max(skillLines.length, usesLines.length);
-    const rowTextHeight = rowLineHeight * rowLines;
+    let rowHeight = rowLineHeight * Math.max(skillLines.length, usesLines.length);
 
-    const lineY = rowTop + rowTextHeight + 4;
+    // Optional "full skill information" block under each row
+    if (
+      fullSkillInfo &&
+      typeof skillsByPath !== "undefined" &&
+      typeof computeSkillUses === "function"
+    ) {
+      const metaSkillList = skillsByPath[sk.path] || [];
+      const metaSkill = metaSkillList.find((s) => s.name === sk.name);
+      if (metaSkill) {
+        const detailParts = [];
+        if (metaSkill.description) detailParts.push(metaSkill.description);
+        if (metaSkill.prereq)
+          detailParts.push("Prerequisite: " + metaSkill.prereq);
+        if (metaSkill.limitations)
+          detailParts.push("Limitations: " + metaSkill.limitations);
+        if (metaSkill.phys) detailParts.push("Phys Rep: " + metaSkill.phys);
+
+        if (detailParts.length) {
+          const detailText = detailParts.join("\n\n");
+          doc.setFont("Times", "normal");
+          doc.setFontSize(10);
+
+          const detailMaxWidth = pageWidth - margin * 2 - 20;
+          const detailLines = doc.splitTextToSize(
+            detailText,
+            detailMaxWidth
+          );
+          const detailY =
+            rowTop + rowLineHeight * Math.max(skillLines.length, usesLines.length) + 4;
+
+          doc.text(detailLines, margin + 10, detailY);
+
+          const detailHeight = detailLines.length * 12;
+          rowHeight = Math.max(
+            rowHeight,
+            rowLineHeight * Math.max(skillLines.length, usesLines.length) +
+              4 +
+              detailHeight
+          );
+
+          // restore for next row
+          doc.setFont("Times", "bold");
+          doc.setFontSize(11);
+        }
+      }
+    }
+
+    const lineY = rowTop + rowHeight + 4;
     doc.line(margin, lineY, margin + tableWidth, lineY);
 
     y = lineY + 6;
   });
 
+  // ---------- EVENT SUMMARY (optional) ----------
+  if (includeEvents) {
+    // new page for clarity
+    doc.addPage();
+    drawParchmentBackground(doc);
+
+    y = margin;
+
+    doc.setFont("Times", "bold");
+    doc.setFontSize(15);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Event Summary", margin, y);
+    y += 10;
+
+    const eventTableWidth = pageWidth - margin * 2;
+    const eventHeaderHeight = 24;
+
+    // header bar
+    doc.setFillColor(60, 40, 20);
+    doc.setDrawColor(60, 40, 20);
+    doc.rect(margin, y, eventTableWidth, eventHeaderHeight, "F");
+
+    doc.setFont("Times", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(255, 255, 255);
+
+    const colNameX = margin + 6;
+    const colDateX = margin + 200;
+    const colTypeX = margin + 280;
+    const colNpcX = margin + 380;
+    const colMotX = margin + 420;
+    const colBonusX = margin + 490;
+    const colPtsX = margin + 540;
+
+    doc.text("Event Name", colNameX, y + 15);
+    doc.text("Date", colDateX, y + 15);
+    doc.text("Type", colTypeX, y + 15);
+    doc.text("NPC?", colNpcX, y + 15);
+    doc.text("Merchant OT?", colMotX, y + 15);
+    doc.text("Bonus SP", colBonusX, y + 15);
+    doc.text("Skill Pts", colPtsX, y + 15);
+
+    y += eventHeaderHeight + 4;
+
+    doc.setFont("Times", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+
+    const rowHeight = 14;
+
+    const events = typeof eventsData !== "undefined" ? eventsData : [];
+
+    if (!events || !events.length) {
+      doc.text("(No events recorded)", margin, y + 10);
+    } else {
+      events.forEach((ev) => {
+        if (y > pageHeight - margin - 40) {
+          doc.addPage();
+          drawParchmentBackground(doc);
+
+          y = margin + 10;
+          doc.setFont("Times", "bold");
+          doc.setFontSize(15);
+          doc.text("Event Summary (continued)", margin, y);
+          y += 10;
+
+          doc.setFillColor(60, 40, 20);
+          doc.setDrawColor(60, 40, 20);
+          doc.rect(margin, y, eventTableWidth, eventHeaderHeight, "F");
+
+          doc.setFont("Times", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(255, 255, 255);
+          doc.text("Event Name", colNameX, y + 15);
+          doc.text("Date", colDateX, y + 15);
+          doc.text("Type", colTypeX, y + 15);
+          doc.text("NPC?", colNpcX, y + 15);
+          doc.text("Merchant OT?", colMotX, y + 15);
+          doc.text("Bonus SP", colBonusX, y + 15);
+          doc.text("Skill Pts", colPtsX, y + 15);
+
+          y += eventHeaderHeight + 4;
+          doc.setFont("Times", "bold");
+          doc.setFontSize(10);
+          doc.setTextColor(0, 0, 0);
+        }
+
+        const dateStr =
+          typeof formatDateDisplay === "function"
+            ? formatDateDisplay(ev.date || "")
+            : ev.date || "";
+
+        doc.text(ev.name || "", colNameX, y + 10);
+        doc.text(dateStr || "", colDateX, y + 10);
+        doc.text(ev.type || "", colTypeX, y + 10);
+        doc.text(ev.npc ? "Yes" : "", colNpcX, y + 10);
+        doc.text(ev.merchantOT ? "Yes" : "", colMotX, y + 10);
+        doc.text(
+          ev.bonusSP != null && ev.bonusSP !== "" ? String(ev.bonusSP) : "",
+          colBonusX,
+          y + 10
+        );
+        doc.text(
+          ev.skillPoints != null ? String(ev.skillPoints) : "0",
+          colPtsX,
+          y + 10
+        );
+
+        const lineY = y + rowHeight;
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.5);
+        doc.line(margin, lineY, margin + eventTableWidth, lineY);
+
+        y = lineY + 4;
+      });
+    }
+  }
+
+  // ---------- SAVE ----------
   let suggestedName = charName ? charName : "larp_character";
   let baseName = prompt("Enter a name for the exported PDF:", suggestedName);
   if (!baseName) {
