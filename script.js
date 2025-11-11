@@ -430,6 +430,8 @@ function buildSkillsStructures(rows) {
       name,
       path,
       description: r["Description"] || "",
+      augment: r["Augment"] || "",
+      special: r["Special"] || "",
       tier: parseInt(r["Tier"], 10) || 0,
       limitations: r["Limitations"] || "",
       phys: r["Phys Rep"] || "",
@@ -510,10 +512,13 @@ function updateSkillDescriptionFromSelect() {
     skillDescription.value = "";
     return;
   }
+
   let desc = skill.description || "";
-  if (skill.prereq) desc += `\n\nPrerequisite: ${skill.prereq}`;
+  if (skill.augment) desc += `\n\nAugment: ${skill.augment}`;
+  if (skill.special) desc += `\n\nSpecial: ${skill.special}`;
   if (skill.limitations) desc += `\n\nLimitations: ${skill.limitations}`;
   if (skill.phys) desc += `\n\nPhys Rep: ${skill.phys}`;
+  if (skill.prereq) desc += `\n\nPrerequisite: ${skill.prereq}`;
 
   const usesInfo = computeSkillUses(skill);
   if (usesInfo && usesInfo.display) {
