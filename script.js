@@ -132,7 +132,7 @@ const factionSelect = document.getElementById("faction");
 const secondaryPathsDisplay = document.getElementById("secondaryPathsDisplay");
 const professionsDisplay = document.getElementById("professionsDisplay");
 
-// Milestone checkboxes (UI-side)
+// Milestone checkboxes
 const artificerMilestone2Checkbox = document.getElementById(
   "artificerMilestone2"
 );
@@ -259,7 +259,7 @@ function computeSkillCost(record) {
 }
 
 function getMilestonesForPath(path) {
-  let milestones = 1; // baseline milestone 1
+  let milestones = 1;
 
   if (path === "Bard") {
     if (bardMilestone2Checkbox && bardMilestone2Checkbox.checked) {
@@ -1039,7 +1039,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 11,
+    version: 12,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -1218,11 +1218,11 @@ function exportCharacterPDF() {
     y += titleHeight + 10;
   } else {
     doc.setFont("Times", "bold");
-    doc.setFontSize(22);
+    doc.setFontSize(24); // was 22
     doc.setTextColor(0, 0, 0);
     doc.text("Larp Adventures", margin, y);
 
-    doc.setFontSize(14);
+    doc.setFontSize(16); // was 14
     doc.setFont("Times", "bold");
     doc.text("Character Sheet", margin, y + 18);
     y += 32;
@@ -1236,7 +1236,7 @@ function exportCharacterPDF() {
 
   // BASIC INFO HEADER: left "Basic Information", right "Player: ... "
   doc.setFont("Times", "bold");
-  doc.setFontSize(13);
+  doc.setFontSize(15); // was 13
   doc.setTextColor(0, 0, 0);
   const basicHeaderY = y;
 
@@ -1280,22 +1280,25 @@ function exportCharacterPDF() {
   const colRightX = basicBoxX + basicBoxWidth / 2 + 4;
   let infoY = y + 6;
 
-  doc.setFont("Times", "normal");
+  doc.setFont("Times", "bold"); // all text bold now
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
 
   function labelValue(label, value, x, yLine) {
     const labelText = `${label}:`;
 
+    // label: bold + larger
     doc.setFont("Times", "bold");
+    doc.setFontSize(13);
     doc.setTextColor(0, 0, 0);
     doc.text(labelText, x, yLine);
 
     const labelWidth = doc.getTextWidth(labelText);
     const valueX = x + labelWidth + 6;
 
-    doc.setFont("Times", "normal");
-    doc.setTextColor(0, 0, 0);
+    // value: bold, normal size
+    doc.setFontSize(11);
+    doc.setFont("Times", "bold");
     doc.text(value || "-", valueX, yLine);
   }
 
@@ -1326,14 +1329,14 @@ function exportCharacterPDF() {
     6
   );
 
-  // Title "Milestones"
+  // Title "Milestones:"
   doc.setFont("Times", "bold");
-  doc.setFontSize(11);
+  doc.setFontSize(13); // was 11
   doc.setTextColor(0, 0, 0);
   const milestonesTitleY = milestonesBoxTop + 14;
-  doc.text("Milestones", milestonesBoxX + 6, milestonesTitleY);
+  doc.text("Milestones:", milestonesBoxX + 6, milestonesTitleY);
 
-  // Three narrow columns: Artificer, Bard, Scholar
+  // Three narrow columns: Artificer:, Bard:, Scholar:
   const innerX = milestonesBoxX + 6;
   const innerTopY = milestonesTitleY + 4;
   const colCount = 3;
@@ -1343,33 +1346,44 @@ function exportCharacterPDF() {
 
   function isMilestoneChecked(path, level) {
     if (path === "Artificer") {
-      if (level === 2) return !!(artificerMilestone2Checkbox && artificerMilestone2Checkbox.checked);
-      if (level === 3) return !!(artificerMilestone3Checkbox && artificerMilestone3Checkbox.checked);
+      if (level === 2)
+        return !!(
+          artificerMilestone2Checkbox && artificerMilestone2Checkbox.checked
+        );
+      if (level === 3)
+        return !!(
+          artificerMilestone3Checkbox && artificerMilestone3Checkbox.checked
+        );
     } else if (path === "Bard") {
-      if (level === 2) return !!(bardMilestone2Checkbox && bardMilestone2Checkbox.checked);
-      if (level === 3) return !!(bardMilestone3Checkbox && bardMilestone3Checkbox.checked);
+      if (level === 2)
+        return !!(bardMilestone2Checkbox && bardMilestone2Checkbox.checked);
+      if (level === 3)
+        return !!(bardMilestone3Checkbox && bardMilestone3Checkbox.checked);
     } else if (path === "Scholar") {
-      if (level === 2) return !!(scholarMilestone2Checkbox && scholarMilestone2Checkbox.checked);
-      if (level === 3) return !!(scholarMilestone3Checkbox && scholarMilestone3Checkbox.checked);
+      if (level === 2)
+        return !!(
+          scholarMilestone2Checkbox && scholarMilestone2Checkbox.checked
+        );
+      if (level === 3)
+        return !!(
+          scholarMilestone3Checkbox && scholarMilestone3Checkbox.checked
+        );
     }
     return false;
   }
 
   const milestonePaths = ["Artificer", "Bard", "Scholar"];
 
-  doc.setFont("Times", "normal");
-  doc.setFontSize(10);
+  doc.setFont("Times", "bold");
+  doc.setFontSize(12); // was 10
   doc.setTextColor(0, 0, 0);
 
   milestonePaths.forEach((p, idx) => {
     const startX = innerX + idx * colWidth;
     const labelY = innerTopY + 12;
 
-    // Path label
-    doc.setFont("Times", "bold");
-    doc.text(p, startX, labelY);
-
-    doc.setFont("Times", "normal");
+    // Path label with colon
+    doc.text(`${p}:`, startX, labelY);
 
     // Milestone 2
     const box2Y = labelY + rowOffset;
@@ -1378,6 +1392,7 @@ function exportCharacterPDF() {
     if (isMilestoneChecked(p, 2)) {
       doc.text("X", box2X + 3, box2Y + 8);
     }
+    doc.setFontSize(11);
     doc.text("2", box2X + squareSize + 4, box2Y + 8);
 
     // Milestone 3
@@ -1388,6 +1403,8 @@ function exportCharacterPDF() {
       doc.text("X", box3X + 3, box3Y + 8);
     }
     doc.text("3", box3X + squareSize + 4, box3Y + 8);
+
+    doc.setFontSize(12); // reset for next label
   });
 
   // Move y below both boxes
@@ -1396,7 +1413,7 @@ function exportCharacterPDF() {
 
   // Skills header
   doc.setFont("Times", "bold");
-  doc.setFontSize(13);
+  doc.setFontSize(15); // was 13
   doc.setTextColor(0, 0, 0);
   doc.text("Skills", margin, y);
   y += 10;
@@ -1410,14 +1427,14 @@ function exportCharacterPDF() {
   doc.rect(margin, y, tableWidth, headerHeight, "F");
 
   doc.setFont("Times", "bold");
-  doc.setFontSize(11);
+  doc.setFontSize(13); // was 11
   doc.setTextColor(255, 255, 255);
 
   // Column positions: Tier | Path/Profession | Skill Name | Uses
   const colTierX = margin + 6;
   const colPathX = margin + 60;
-  const colSkillX = margin + 140;              // slightly more left
-  const colUsesX = margin + tableWidth - 100;  // further right, more room
+  const colSkillX = margin + 140;
+  const colUsesX = margin + tableWidth * 0.65; // moved left toward center
 
   doc.text("Tier", colTierX, y + 12);
   doc.text("Path /", colPathX, y + 9);
@@ -1427,7 +1444,9 @@ function exportCharacterPDF() {
 
   y += headerHeight + 4;
 
-  doc.setFont("Times", "normal");
+  // Body text: bold as well (but normal size)
+  doc.setFont("Times", "bold");
+  doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
   doc.setLineWidth(0.5);
   doc.setDrawColor(0, 0, 0);
@@ -1443,7 +1462,7 @@ function exportCharacterPDF() {
       y = margin;
 
       doc.setFont("Times", "bold");
-      doc.setFontSize(13);
+      doc.setFontSize(15); // was 13
       doc.setTextColor(0, 0, 0);
       doc.text("Skills (continued)", margin, y);
       y += 10;
@@ -1453,7 +1472,7 @@ function exportCharacterPDF() {
       doc.rect(margin, y, tableWidth, headerHeight, "F");
 
       doc.setFont("Times", "bold");
-      doc.setFontSize(11);
+      doc.setFontSize(13); // was 11
       doc.setTextColor(255, 255, 255);
       doc.text("Tier", colTierX, y + 12);
       doc.text("Path /", colPathX, y + 9);
@@ -1462,20 +1481,20 @@ function exportCharacterPDF() {
       doc.text("Uses", colUsesX, y + 12);
 
       y += headerHeight + 4;
-      doc.setFont("Times", "normal");
+      doc.setFont("Times", "bold");
+      doc.setFontSize(11);
       doc.setTextColor(0, 0, 0);
       doc.setLineWidth(0.5);
       doc.setDrawColor(0, 0, 0);
     }
 
     const rowTop = y;
-    const textBaseline = rowTop + 12; // slightly more padding from line above
+    const textBaseline = rowTop + 12; // more padding from line above
 
     // Tier & Path
     doc.text(String(sk.tier), colTierX, textBaseline);
     doc.text(sk.path, colPathX, textBaseline);
 
-    // Uses & skill name
     let usesDisplay = "—";
     const metaSkillList = skillsByPath[sk.path] || [];
     const metaSkill = metaSkillList.find((s) => s.name === sk.name);
@@ -1507,7 +1526,7 @@ function exportCharacterPDF() {
     const lineY = rowTop + rowTextHeight + 4;
     doc.line(margin, lineY, margin + tableWidth, lineY);
 
-    y = lineY + 6; // a bit more padding before next row
+    y = lineY + 6; // extra space between rows
   });
 
   let suggestedName = charName ? charName : "larp_character";
