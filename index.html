@@ -69,13 +69,16 @@
           <div class="section-row">
             <div class="field">
               <label for="pathDisplay">Path</label>
-              <select id="pathDisplay">
-                <option value="">-- Select Path --</option>
-                <option value="Healer">Healer</option>
-                <option value="Mage">Mage</option>
-                <option value="Rogue">Rogue</option>
-                <option value="Warrior">Warrior</option>
-              </select>
+              <div class="path-with-tier">
+                <select id="pathDisplay">
+                  <option value="">-- Select Path --</option>
+                  <option value="Healer">Healer</option>
+                  <option value="Mage">Mage</option>
+                  <option value="Rogue">Rogue</option>
+                  <option value="Warrior">Warrior</option>
+                </select>
+                <span id="mainPathTierDisplay" class="path-tier-display"></span>
+              </div>
             </div>
             <div class="field">
               <label for="faction">Faction</label>
@@ -119,22 +122,15 @@
             </div>
           </div>
 
-          <!-- Tier / Skill Points (left) + Milestones (middle) + Organizations (right) -->
-
+          <!-- Tier/Skill Points (left) + Milestones (middle) + Organizations (right) -->
           <div class="section-row basic-bottom-row">
-            <!-- LEFT: Tier / Skill Points -->
+            <!-- LEFT: Unspent Skill Points (Tier kept hidden) -->
             <div class="field basic-tier-col">
-              <label for="tier">Tier</label>
-              <div class="inline-input-with-note">
-                <input
-                  type="number"
-                  id="tier"
-                  readonly
-                  title="Calculated from events"
-                />
-              </div>
+              <!-- Hidden Tier value (still used by logic & PDF) -->
+              <input type="hidden" id="tier" />
 
-              <label for="totalSkillPoints" style="margin-top: 6px;">
+              <label>Unspent</label>
+              <label for="totalSkillPoints" style="margin-top: 2px;">
                 Skill Points
               </label>
               <div class="inline-input-with-note">
@@ -311,7 +307,7 @@
         </div>
       </div>
 
-      <!-- EVENTS (with add + edit) -->
+      <!-- EVENTS -->
       <div class="card">
         <div class="card-inner">
           <h2>Events</h2>
