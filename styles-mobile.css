@@ -120,21 +120,22 @@ label {
   white-space: nowrap;
 }
 
-/* Milestones on mobile: stack vertically, full width */
+/* Milestones on mobile: side-by-side like desktop */
 .basic-milestones {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: nowrap;
   gap: 6px;
 }
 
 .milestone-block {
-  width: 100%;
+  flex: 1 1 0;
+  min-width: 0;
   padding: 6px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: rgba(15, 23, 42, 0.9);
 }
-
 
 .milestone-title {
   font-size: 10px;
@@ -154,6 +155,7 @@ label {
 .milestone-checkbox input[type="checkbox"] {
   width: auto;
 }
+
 .org-block {
   padding: 6px 8px;
   border-radius: var(--radius-sm);
@@ -161,7 +163,6 @@ label {
   background: rgba(15, 23, 42, 0.9);
   margin-top: 4px;
 }
-
 
 /* Inputs */
 input[type="text"],
@@ -187,6 +188,7 @@ textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent-soft);
 }
+
 /* Hide number input arrows for Tier & Skill Points */
 #tier,
 #totalSkillPoints {
@@ -417,19 +419,25 @@ tbody tr:hover {
   font-weight: 600;
 }
 
-/* Make the Skills header's 3rd column show "Path / Profession" on two lines */
+/* Make the Skills header's 3rd column show "Path / Prof." on two lines */
 #skillsTable thead tr th:nth-child(3) {
   position: relative;
   font-size: 0; /* hide original text */
 }
 
 #skillsTable thead tr th:nth-child(3)::after {
-  content: "Path /\A Profession";
+  content: "Path /\A Prof.";
   white-space: pre;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--muted);
+}
+
+/* Center Tier column in Selected Skills table */
+.skills-table th:nth-child(2),
+.skills-table td:nth-child(2) {
+  text-align: center;
 }
 
 /* --------- EVENTS: add-event editor (mobile) --------- */
@@ -494,7 +502,7 @@ tbody tr:hover {
   width: auto;
 }
 
-/* --------- EVENTS: listing on mobile as stacked cards --------- */
+/* --------- EVENTS: listing on mobile as stacked cards (two abreast) --------- */
 
 .events-table {
   width: 100%;
@@ -506,14 +514,22 @@ tbody tr:hover {
   display: none;
 }
 
+/* Two cards per row */
+.events-table tbody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 /* Each event row as a "card" */
 .events-table tbody tr {
   display: block;
+  width: calc(50% - 8px);
   background: rgba(8, 12, 30, 0.95);
   border-radius: var(--radius-sm);
   border: 1px solid rgba(255, 255, 255, 0.06);
   padding: 6px 8px;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .events-table tbody td {
