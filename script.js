@@ -66,7 +66,7 @@ function formatDateDisplay(isoStr) {
 let skillsData = [];
 let skillsByPath = {};
 let selectedSkills = [];
-let skillNameSet = new Set(); // normalized skill names
+let skillNameSet = new Set();
 
 let eventsData = [];
 let editingEventIndex = null;
@@ -105,7 +105,6 @@ const qualifyingEventsCountSpan = document.getElementById(
   "qualifyingEventsCount"
 );
 
-// event input controls
 const eventNameInput = document.getElementById("eventNameInput");
 const eventDateInput = document.getElementById("eventDateInput");
 const eventTypeSelect = document.getElementById("eventTypeSelect");
@@ -133,7 +132,7 @@ const factionSelect = document.getElementById("faction");
 const secondaryPathsDisplay = document.getElementById("secondaryPathsDisplay");
 const professionsDisplay = document.getElementById("professionsDisplay");
 
-// NEW: Milestone checkboxes
+// Milestone checkboxes
 const artificerMilestone2Checkbox = document.getElementById(
   "artificerMilestone2"
 );
@@ -209,59 +208,112 @@ function computeSkillCost(record) {
   }
 }
 
-// NEW: compute uses per skill using CSV usage columns + milestones
+// Milestone counts per path
+function getMilestonesForPath(path) {
+  let milestones = 1; // baseline milestone 1
+
+  if (path === "Bard") {
+    if (bardMilestone2Checkbox && bardMilestone2Checkbox.checked) {
+      milestones++;
+    }
+    if (bardMilestone3Checkbox && bardMilestone3Checkbox.checked) {
+      milestones++;
+    }
+  } else if (path === "Artificer") {
+    if (artificerMilestone2Checkbox && artificerMilestone2Checkbox.checked) {
+      milestones++;
+    }
+    if (artificerMilestone3Checkbox && artificerMilestone3Checkbox.checked) {
+      milestones++;
+    }
+  }
+
+  return milestones;
+}
+
+// Compute Uses, including:
+// - Tier scaling
+// - Milestone-based behavior via Per Milestone 1 & Per Milestone 2
 function computeSkillUses(skill) {
   if (!skill) return null;
 
   const periodicity = (skill.periodicity || "").trim();
-  const base = skill.usesBasePerDay || 0;
-  const perExtra = skill.usesPerExtraTier || 0;
-  const startTier = skill.usesScaleStartTier || 0;
-  const perMilestone = !!skill.perMilestone;
+  const base = typeof skill.usesBasePerDay === "number"
+    ? skill.usesBasePerDay
+    : parseFloat(skill.usesBasePerDay || "0") || 0;
+  const perExtra = typeof skill.usesPerExtraTier === "number"
+    ? skill.usesPerExtraTier
+    : parseFloat(skill.usesPerExtraTier || "0") || 0;
+  const startTier = parseInt(skill.usesScaleStartTier || "0", 10) || 0;
 
-  // Unlimited if explicitly says so, or no numeric fields + no periodicity
+  const perMilestone1 = !!skill.perMilestone1;
+  const perMilestone2 = !!skill.perMilestone2;
+
+  // Unlimited if explicitly indicated or no numeric usage info at all
   if (
     periodicity.toLowerCase().includes("unlimited") ||
-    (!base && !perExtra && !startTier && !periodicity)
+    (!base && !perExtra && !startTier && !perMilestone1 && !perMilestone2)
   ) {
     const label = periodicity || "Unlimited";
     return { display: "∞", numeric: Infinity, periodicity: label };
   }
 
-  const currentTier = getCurrentTier();
+  const path = skill.path || "";
 
-  // Milestone-based (Bard / Artificer)
-  if (perMilestone) {
-    const path = skill.path || "";
-    let milestones = 1; // Milestone 1 baseline
-
-    if (path === "Bard") {
-      if (bardMilestone2Checkbox && bardMilestone2Checkbox.checked)
-        milestones++;
-      if (bardMilestone3Checkbox && bardMilestone3Checkbox.checked)
-        milestones++;
-    } else if (path === "Artificer") {
-      if (artificerMilestone2Checkbox && artificerMilestone2Checkbox.checked)
-        milestones++;
-      if (artificerMilestone3Checkbox && artificerMilestone3Checkbox.checked)
-        milestones++;
-    }
-
-    const perMilestoneBase = base || 1;
-    const total = perMilestoneBase * milestones;
+  // Milestone-based variants for Bard/Artificer
+  if ((perMilestone1 || perMilestone2) && (path === "Bard" || path === "Artificer")) {
+    const milestones = getMilestonesForPath(path);
     const label = periodicity || "Per Event Day";
 
-    return {
-      display: `${total} × ${label}`,
-      numeric: total,
-      periodicity: label
-    };
+    // Case 1: Per Milestone 1 AND Per Milestone 2 => fully per milestone
+    if (perMilestone1 && perMilestone2) {
+      const perMilestoneBase = base || 1;
+      const total = perMilestoneBase * milestones;
+      return {
+        display: `${total} × ${label}`,
+        numeric: total,
+        periodicity: label
+      };
+    }
+
+    // Case 2: Only Per Milestone 2 => extra use once at milestone 2+
+    if (!perMilestone1 && perMilestone2) {
+      const baseUses = base || 1;
+      const hasSecondOrMore = milestones > 1;
+      const total = baseUses + (hasSecondOrMore ? 1 : 0);
+      return {
+        display: `${total} × ${label}`,
+        numeric: total,
+        periodicity: label
+      };
+    }
+
+    // If somehow only Per Milestone 1 is set, treat like per-milestone
+    if (perMilestone1 && !perMilestone2) {
+      const perMilestoneBase = base || 1;
+      const total = perMilestoneBase * milestones;
+      return {
+        display: `${total} × ${label}`,
+        numeric: total,
+        periodicity: label
+      };
+    }
   }
 
-  // Normal tier scaling (e.g. Fireball: 1 base, +1 per tier above 5)
+  // Normal tier-based scaling
+  const currentTier = getCurrentTier();
   let total = base;
+
   if (currentTier > startTier && perExtra) {
-    total += (currentTier - startTier) * perExtra;
+    const delta = currentTier - startTier;
+    total += delta * perExtra;
+  }
+
+  if (Number.isFinite(total) && total > 0) {
+    // For fractional perExtra (e.g. 0.5 / tier), floor to integer uses
+    total = Math.floor(total + 1e-6);
+  } else {
+    total = 0;
   }
 
   if (!periodicity) {
@@ -275,6 +327,7 @@ function computeSkillUses(skill) {
   };
 }
 
+// ----- Prereq parsing -----
 function extractPrereqSkillNames(prereqRaw) {
   const names = new Set();
   if (!prereqRaw) return [];
@@ -378,19 +431,20 @@ function buildSkillsStructures(rows) {
       limitations: r["Limitations"] || "",
       phys: r["Phys Rep"] || "",
       prereq: r["Prerequisite"] || "",
-      // NEW: usage columns
       usesBasePerDay: r["Uses Base Per Day"]
-        ? parseInt(r["Uses Base Per Day"], 10) || 0
+        ? parseFloat(r["Uses Base Per Day"]) || 0
         : 0,
       usesPerExtraTier: r["Uses Per Extra Tier"]
-        ? parseInt(r["Uses Per Extra Tier"], 10) || 0
+        ? parseFloat(r["Uses Per Extra Tier"]) || 0
         : 0,
       usesScaleStartTier: r["Uses Scale Start Tier"]
         ? parseInt(r["Uses Scale Start Tier"], 10) || 0
         : 0,
       periodicity: r["Periodicity"] || "",
-      perMilestone:
-        (r["Per Milestone"] || "").trim().toUpperCase() === "Y" || false
+      perMilestone1:
+        (r["Per Milestone 1"] || "").trim().toUpperCase() === "Y",
+      perMilestone2:
+        (r["Per Milestone 2"] || "").trim().toUpperCase() === "Y"
     };
 
     skillsData.push(skill);
@@ -458,7 +512,6 @@ function updateSkillDescriptionFromSelect() {
   if (skill.limitations) desc += `\n\nLimitations: ${skill.limitations}`;
   if (skill.phys) desc += `\n\nPhys Rep: ${skill.phys}`;
 
-  // NEW: usage info
   const usesInfo = computeSkillUses(skill);
   if (usesInfo && usesInfo.display) {
     desc += `\n\nUsage: ${usesInfo.display}`;
@@ -594,7 +647,7 @@ function addSelectedSkill() {
 
   const free = skillFreeFlag.checked;
 
-  // Recompute totals first so we know how many SP we have
+  // Recompute totals first so we know current SP
   recomputeTotals();
   const available =
     parseInt(totalSkillPointsInput.value, 10) >= 0
@@ -633,6 +686,7 @@ function renderSelectedSkills() {
   sorted.forEach((sk) => {
     const tr = document.createElement("tr");
 
+    // Remove button (left-most)
     const tdMinus = document.createElement("td");
     const minusBtn = document.createElement("button");
     minusBtn.textContent = "−";
@@ -660,18 +714,46 @@ function renderSelectedSkills() {
     tdMinus.appendChild(minusBtn);
     tr.appendChild(tdMinus);
 
+    // Tier
     const tdTier = document.createElement("td");
     tdTier.textContent = sk.tier;
     tr.appendChild(tdTier);
 
+    // Path
     const tdPath = document.createElement("td");
     tdPath.textContent = sk.path;
     tr.appendChild(tdPath);
 
+    // Name
     const tdName = document.createElement("td");
     tdName.textContent = sk.name;
     tr.appendChild(tdName);
 
+    // Uses & Periodicity
+    let usesDisplay = "—";
+    let periodicityText = "—";
+    const metaSkillList = skillsByPath[sk.path] || [];
+    const metaSkill = metaSkillList.find((s) => s.name === sk.name);
+    if (metaSkill) {
+      const usesInfo = computeSkillUses(metaSkill);
+      if (usesInfo) {
+        if (usesInfo.display) usesDisplay = usesInfo.display;
+        if (usesInfo.periodicity) periodicityText = usesInfo.periodicity;
+        if (usesInfo.display === "∞" && !usesInfo.periodicity) {
+          periodicityText = "Unlimited";
+        }
+      }
+    }
+
+    const tdUses = document.createElement("td");
+    tdUses.textContent = usesDisplay;
+    tr.appendChild(tdUses);
+
+    const tdPeriod = document.createElement("td");
+    tdPeriod.textContent = periodicityText;
+    tr.appendChild(tdPeriod);
+
+    // Cost
     const tdCost = document.createElement("td");
     const tag = document.createElement("span");
     const cost = computeSkillCost(sk);
@@ -697,7 +779,7 @@ function renderSelectedSkills() {
   updatePathAndProfessionDisplays();
 }
 
-// ---------- EVENTS (add + edit) ----------
+// ---------- EVENTS ----------
 function addEventFromInputs() {
   const name = eventNameInput.value.trim();
   const date = eventDateInput.value;
@@ -913,7 +995,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 8,
+    version: 9,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -922,7 +1004,6 @@ function collectCharacterState() {
     organizations,
     selectedSkills: selectedSkills.slice(),
     events,
-    // NEW: milestone checkboxes
     artificerMilestone2: !!(
       artificerMilestone2Checkbox && artificerMilestone2Checkbox.checked
     ),
@@ -947,7 +1028,6 @@ function applyCharacterState(state) {
     setOrganizations(orgs);
   }
 
-  // NEW: restore milestone checkboxes
   if (artificerMilestone2Checkbox) {
     artificerMilestone2Checkbox.checked = !!state.artificerMilestone2;
   }
@@ -1029,10 +1109,8 @@ function handleLoadCharacterFile(e) {
 
 // ---------- PDF EXPORT ----------
 function exportCharacterPDF() {
-  // Try multiple ways jsPDF might be exposed
   let jsPDFConstructor = null;
 
-  // UMD style
   if (window.jspdf) {
     if (typeof window.jspdf.jsPDF === "function") {
       jsPDFConstructor = window.jspdf.jsPDF;
@@ -1041,7 +1119,6 @@ function exportCharacterPDF() {
     }
   }
 
-  // Classic global
   if (!jsPDFConstructor && typeof window.jsPDF === "function") {
     jsPDFConstructor = window.jsPDF;
   }
@@ -1058,14 +1135,12 @@ function exportCharacterPDF() {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  // Light parchment-style fill
   doc.setFillColor(245, 233, 210);
   doc.rect(0, 0, pageWidth, pageHeight, "F");
 
   const margin = 40;
   let y = margin;
 
-  // Gather data
   const charName = characterNameInput.value || "";
   const playerName = playerNameInput.value || "";
   const path = pathDisplaySelect.value || "";
@@ -1076,7 +1151,6 @@ function exportCharacterPDF() {
   const remainingSP = totalSkillPointsInput.value || "0";
   const organizations = getOrganizations().join(", ");
 
-  // Title area
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(20, 20, 30);
@@ -1101,7 +1175,6 @@ function exportCharacterPDF() {
   doc.line(margin, y, pageWidth - margin, y);
   y += 18;
 
-  // Basic info panel
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(13);
   doc.setTextColor(40, 40, 60);
@@ -1157,7 +1230,6 @@ function exportCharacterPDF() {
 
   y = basicBoxTop + basicBoxHeight + 24;
 
-  // Skills section
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(13);
   doc.setTextColor(40, 40, 60);
@@ -1238,7 +1310,6 @@ function exportCharacterPDF() {
     doc.text(String(sk.tier), colTierX, y + 10);
     doc.text(sk.path, colPathX, y + 10);
 
-    // NEW: include usage inline with the skill name if available
     let skillLine = sk.name;
     const metaSkill = (skillsByPath[sk.path] || []).find(
       (s) => s.name === sk.name
@@ -1322,9 +1393,9 @@ window.addEventListener("DOMContentLoaded", () => {
     updatePathAndProfessionDisplays();
   });
 
-  // When milestones change, refresh the skill description (for usage display)
   function onMilestoneChange() {
     updateSkillDescriptionFromSelect();
+    renderSelectedSkills();
   }
   if (artificerMilestone2Checkbox)
     artificerMilestone2Checkbox.addEventListener("change", onMilestoneChange);
