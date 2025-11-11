@@ -94,6 +94,11 @@ h1 {
   margin-bottom: 8px;
 }
 
+/* Basic info (first card only): keep 2 columns on mobile */
+.card:first-of-type .section-row:not(.basic-bottom-row) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -162,6 +167,18 @@ label {
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: rgba(15, 23, 42, 0.9);
   margin-top: 4px;
+}
+
+/* Tier & Skill Points side by side on mobile */
+.basic-tier-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 8px;
+}
+
+.basic-tier-col label,
+.basic-tier-col .inline-input-with-note {
+  width: 100%;
 }
 
 /* Inputs */
@@ -442,17 +459,17 @@ tbody tr:hover {
 
 /* --------- EVENTS: add-event editor (mobile) --------- */
 /* 3 lines:
-   Line 1: Event Name + Date
-   Line 2: Type, NPC?, Merchant OT?, Bonus SP
-   Line 3: Add Event button alone
+   Line 1: Event Name + Date (name wider)
+   Line 2: Type full width
+   Line 3: NPC, Merch OT?, Bonus SP, Add Event
 */
 .event-input-row {
   display: grid !important;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 3fr 1fr 1fr 1fr;
   grid-template-areas:
-    "ename edate edate edate"
-    "etype enpc emot ebonus"
-    "eadd  eadd eadd eadd";
+    "ename ename ename edate"
+    "etype etype etype etype"
+    "enpc  emot  ebonus eadd";
   gap: 8px;
   margin-bottom: 8px;
 }
@@ -489,6 +506,11 @@ tbody tr:hover {
   justify-self: flex-start;
 }
 
+/* Labels in the add-event row */
+.event-input-row .field label {
+  display: block;
+}
+
 /* Make event inputs fill their grid cells */
 .event-input-row input[type="text"],
 .event-input-row input[type="date"],
@@ -500,6 +522,39 @@ tbody tr:hover {
 /* Keep Add Event button from stretching too wide */
 .event-input-row #addEventBtn {
   width: auto;
+}
+
+/* Shorten "Merchant OT?" label to "Merch" / "OT?" stacked */
+.event-input-row label[for="eventMotInput"] {
+  font-size: 0;
+}
+
+.event-input-row label[for="eventMotInput"]::after {
+  content: "Merch\AOT?";
+  white-space: pre;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Shorten "Bonus SP" label to "Bonus" / "SP" stacked */
+.event-input-row label[for="eventBonusInput"] {
+  font-size: 0;
+}
+
+.event-input-row label[for="eventBonusInput"]::after {
+  content: "Bonus\ASP";
+  white-space: pre;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Make Bonus SP box narrower (3 digits) */
+#eventBonusInput {
+  max-width: 60px;
 }
 
 /* --------- EVENTS: listing on mobile as stacked cards (two abreast) --------- */
