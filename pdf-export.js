@@ -212,9 +212,9 @@ function exportCharacterPDF() {
   y = labelsY + 10;
 
   const basicBoxTop = y;
-  const basicBoxHeight = 100; // allows extra orgs line
+  const basicBoxHeight = 85; // tightened from 100
   const milestonesBoxTop = y;
-  const milestonesBoxHeight = basicBoxHeight;
+  const milestonesBoxHeight = 85; // tightened from 100
 
   // Basic box border
   doc.setDrawColor(0, 0, 0);
@@ -594,19 +594,19 @@ function exportCharacterPDF() {
         currentY += lines.length * 12 + 3;
       }
 
-      // Bold Path + Tier line directly under the skill name
+      // Path / Profession directly under the skill name
       doc.setFont("Times", "bold");
       doc.setFontSize(11);
       const jobText = sk.path || "";
+      const linePathY = currentY + 4;
+      doc.text(jobText, cardX + cardPadding, linePathY);
+
+      // Tier under Path / Profession
       const tierText = `Tier ${sk.tier}`;
-      const jobWidth = doc.getTextWidth(jobText);
-      const gap = 16; // space between Path and Tier
-      const lineY = currentY + 4;
+      const lineTierY = linePathY + 12;
+      doc.text(tierText, cardX + cardPadding, lineTierY);
 
-      doc.text(jobText, cardX + cardPadding, lineY);
-      doc.text(tierText, cardX + cardPadding + jobWidth + gap, lineY);
-
-      currentY = lineY + 14;
+      currentY = lineTierY + 14;
 
       // Then show detailed fields from the CSV
       if (metaSkill) {
