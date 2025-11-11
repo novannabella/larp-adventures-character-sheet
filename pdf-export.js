@@ -79,7 +79,7 @@ function exportCharacterPDF() {
   const margin = 40;
   let y = margin;
 
-  // Grab everything directly from the DOM so we don't depend on window.*
+  // Grab everything directly from the DOM
   const charName =
     document.getElementById("characterName")?.value.trim() || "";
   const playerName =
@@ -108,8 +108,11 @@ function exportCharacterPDF() {
     }
   }
 
-  // HEADER: title image left at margin
+  // ---------- HEADER: TITLE + PLAYER ----------
+  let titleBottomY;
+
   if (titleImg) {
+    // Image title
     const imgRatio = 158 / 684;
     const maxWidth = Math.min(400, pageWidth - margin * 2);
     const titleWidth = maxWidth;
@@ -117,53 +120,75 @@ function exportCharacterPDF() {
     const x = margin;
 
     doc.addImage(titleImg, "PNG", x, y, titleWidth, titleHeight);
-    y += titleHeight + 10;
+    titleBottomY = y + titleHeight;
+
+    // Player on the right, aligned near the bottom of the image
+    const playerLabel =
+      playerName && playerName.trim().length > 0
+        ? `Player: ${playerName}`
+        : "Player:";
+    doc.setFont("Times", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    const playerLabelWidth = doc.getTextWidth(playerLabel);
+    const playerY = titleBottomY - 8; // a bit above the bottom of the image
+
+    doc.text(playerLabel, pageWidth - margin - playerLabelWidth, playerY);
+
+    y = titleBottomY + 10;
   } else {
+    // Text title fallback
     doc.setFont("Times", "bold");
     doc.setFontSize(24);
     doc.setTextColor(0, 0, 0);
     doc.text("Larp Adventures", margin, y);
 
+    const sheetY = y + 18;
     doc.setFontSize(16);
     doc.setFont("Times", "bold");
-    doc.text("Character Sheet", margin, y + 18);
-    y += 32;
+    doc.text("Character Sheet", margin, sheetY);
+
+    // Player to the right on the same baseline as "Character Sheet"
+    const playerLabel =
+      playerName && playerName.trim().length > 0
+        ? `Player: ${playerName}`
+        : "Player:";
+    doc.setFontSize(14);
+    const playerLabelWidth = doc.getTextWidth(playerLabel);
+    doc.text(playerLabel, pageWidth - margin - playerLabelWidth, sheetY);
+
+    titleBottomY = sheetY;
+    y = sheetY + 20;
   }
 
-  // Separator under title
+  // Separator under title/player line
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.7);
   doc.line(margin, y, pageWidth - margin, y);
   y += 18;
 
-  // BASIC INFO HEADER: left "Basic Information", right "Player: ... "
-  doc.setFont("Times", "bold");
-  doc.setFontSize(15);
-  doc.setTextColor(0, 0, 0);
-  const basicHeaderY = y;
-
-  doc.text("Basic Information", margin, basicHeaderY);
-
-  const playerLabel =
-    playerName && playerName.trim().length > 0
-      ? `Player: ${playerName}`
-      : "Player:";
-  const playerLabelWidth = doc.getTextWidth(playerLabel);
-  doc.text(playerLabel, pageWidth - margin - playerLabelWidth, basicHeaderY);
-
-  y = basicHeaderY + 10;
-
-  // BASIC BOX + MILESTONES IN SAME ROW
+  // ---------- BASIC INFO + MILESTONES LAYOUT ----------
+  // Precompute widths so we can place headings *above* the boxes
   const totalInfoWidth = pageWidth - margin * 2;
   const basicBoxWidth = totalInfoWidth * 0.7; // 70% for basic info
   const milestonesWidth = totalInfoWidth - basicBoxWidth - 16; // gap of 16
-
-  const basicBoxTop = y - 8;
-  const basicBoxHeight = 90;
   const basicBoxX = margin;
-
   const milestonesBoxX = basicBoxX + basicBoxWidth + 16;
-  const milestonesBoxTop = basicBoxTop;
+
+  // Headings above boxes
+  const labelsY = y;
+  doc.setFont("Times", "bold");
+  doc.setFontSize(15);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Basic Information", basicBoxX, labelsY);
+  doc.text("Milestones:", milestonesBoxX, labelsY);
+
+  // Now place the boxes a bit below the headings
+  y = labelsY + 10;
+
+  const basicBoxTop = y;
+  const basicBoxHeight = 78; // tightened a bit vs previous 90
+  const milestonesBoxTop = y;
   const milestonesBoxHeight = basicBoxHeight;
 
   // Basic box border
@@ -180,7 +205,7 @@ function exportCharacterPDF() {
 
   const colLeftX = basicBoxX;
   const colRightX = basicBoxX + basicBoxWidth / 2 + 4;
-  let infoY = y + 6;
+  let infoY = basicBoxTop + 14; // top padding inside box
 
   doc.setFont("Times", "bold");
   doc.setFontSize(11);
@@ -239,21 +264,7 @@ function exportCharacterPDF() {
     6
   );
 
-  // Title "Milestones:" (font reduced by 2)
-  doc.setFont("Times", "bold");
-  doc.setFontSize(11); // was 13
-  doc.setTextColor(0, 0, 0);
-  const milestonesTitleY = milestonesBoxTop + 14;
-  doc.text("Milestones:", milestonesBoxX + 6, milestonesTitleY);
-
-  // Three narrow columns: Artificer:, Bard:, Scholar:
-  const innerX = milestonesBoxX + 6;
-  const innerTopY = milestonesTitleY + 4;
-  const colCount = 3;
-  const colWidth = (milestonesWidth - 12) / colCount;
-  const squareSize = 10;
-  const rowOffset = 8;
-
+  // Milestone checkboxes
   const artificerMilestone2Checkbox = document.getElementById(
     "artificerMilestone2"
   );
@@ -285,9 +296,16 @@ function exportCharacterPDF() {
   doc.setFont("Times", "bold");
   doc.setFontSize(10); // was 12
 
+  const innerX = milestonesBoxX + 6;
+  const innerTopY = milestonesBoxTop + 6; // padding inside box
+  const colCount = 3;
+  const colWidth = (milestonesWidth - 12) / colCount;
+  const squareSize = 10;
+  const rowOffset = 8;
+
   milestonePaths.forEach((p, idx) => {
     const startX = innerX + idx * colWidth;
-    const labelY = innerTopY + 12;
+    const labelY = innerTopY + 10;
 
     doc.text(`${p}:`, startX, labelY);
 
@@ -314,7 +332,7 @@ function exportCharacterPDF() {
   const boxesBottom = basicBoxTop + basicBoxHeight;
   y = boxesBottom + 24;
 
-  // Skills header
+  // ---------- SKILLS TABLE ----------
   doc.setFont("Times", "bold");
   doc.setFontSize(15);
   doc.setTextColor(0, 0, 0);
@@ -406,7 +424,10 @@ function exportCharacterPDF() {
 
     // Uses (computed from CSV meta)
     let usesDisplay = "—";
-    if (typeof computeSkillUses === "function" && typeof skillsByPath !== "undefined") {
+    if (
+      typeof computeSkillUses === "function" &&
+      typeof skillsByPath !== "undefined"
+    ) {
       const metaSkillList = skillsByPath[sk.path] || [];
       const metaSkill = metaSkillList.find((s) => s.name === sk.name);
       if (metaSkill) {
