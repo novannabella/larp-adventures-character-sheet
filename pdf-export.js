@@ -206,7 +206,7 @@ function exportCharacterPDF() {
   doc.setFontSize(15);
   doc.setTextColor(0, 0, 0);
   doc.text("Basic Information", basicBoxX, labelsY);
-  // Milestones label will be drawn INSIDE the box instead of here
+  // Milestones label is inside the box now
 
   // Now place the boxes a bit below the headings
   y = labelsY + 10;
@@ -351,7 +351,7 @@ function exportCharacterPDF() {
   const innerX = milestonesBoxX + 6;
   const innerTopY = milestonesBoxTop + 6;
 
-  // Draw "Milestones:" INSIDE the box
+  // "Milestones:" INSIDE the box
   doc.text("Milestones:", innerX, innerTopY + 8);
 
   const colCount = 3;
@@ -454,8 +454,51 @@ function exportCharacterPDF() {
   // For full-skill cards in single-column layout
   let cardCurrentY = y;
   const cardWidthFull = pageWidth - margin * 2;
-  const cardPadding = 6;            // tighter padding
-  const cardMinHeight = 220;        // still enough for tall skills
+  const cardPadding = 6; // tighter padding
+
+  // helper to compute card height BEFORE drawing, so we don't run off the page
+  function computeCardHeightForSkill(sk, metaSkill) {
+    const rowLH = rowLineHeight;
+    const nameMaxWidth = cardWidthFull - cardPadding * 2;
+    const skillName = sk.name || "";
+    const skillNameLines = doc.splitTextToSize(skillName, nameMaxWidth);
+
+    let current = 0;
+
+    // Top padding + offset for first line
+    current += cardPadding + 8;
+    // Skill name block
+    current += rowLH * skillNameLines.length;
+
+    // Space for Path line (baseline + some gap below)
+    current += 20; // matches linePathY + 16 pattern
+
+    // Now all the labeled blocks
+    function measureBlock(text) {
+      if (!text) return 0;
+      const maxW = cardWidthFull - cardPadding * 2 - 10;
+      const lines = doc.splitTextToSize(text, maxW);
+      // label (11) + lines*12 + 3
+      return 11 + lines.length * 12 + 3;
+    }
+
+    if (metaSkill) {
+      current += measureBlock(metaSkill.description);
+      current += measureBlock(metaSkill.augment);
+      current += measureBlock(metaSkill.special);
+      current += measureBlock(metaSkill.limitations);
+      current += measureBlock(metaSkill.phys);
+      current += measureBlock(metaSkill.prereq);
+    }
+
+    const usesDisplay = getUsesDisplayForSkill(sk);
+    current += measureBlock(usesDisplay);
+
+    // bottom padding
+    current += cardPadding;
+
+    return current;
+  }
 
   sorted.forEach((sk) => {
     if (!fullSkillInfo) {
@@ -534,8 +577,19 @@ function exportCharacterPDF() {
       y = lineY + 6;
     } else {
       // ---------- FULL SKILL CARD MODE (SINGLE COLUMN) ----------
-      // New page if not enough vertical space for another card
-      if (cardCurrentY > pageHeight - margin - cardMinHeight) {
+
+      // find meta-skill once
+      let metaSkill = null;
+      if (typeof skillsByPath !== "undefined") {
+        const metaSkillList = skillsByPath[sk.path] || [];
+        metaSkill = metaSkillList.find((s) => s.name === sk.name) || null;
+      }
+
+      // compute how tall this card needs to be
+      const neededHeight = computeCardHeightForSkill(sk, metaSkill);
+
+      // if not enough room on this page, go to next page first
+      if (cardCurrentY + neededHeight > pageHeight - margin) {
         doc.addPage();
         drawParchmentBackground(doc);
 
@@ -560,23 +614,26 @@ function exportCharacterPDF() {
       // Tighter space between top border and skill name
       let currentY = cardTop + cardPadding + 8;
 
-      // Top of card: Skill Name
+      // Top of card: Skill Name (left) and Tier (right, same line)
       doc.setFont("Times", "bold");
       doc.setFontSize(12);
 
       const skillName = sk.name || "";
       const nameMaxWidth = cardWidth - cardPadding * 2;
       const skillNameLines = doc.splitTextToSize(skillName, nameMaxWidth);
-      doc.text(skillNameLines, cardX + cardPadding, currentY);
 
+      // baseline for first line
+      const nameBaselineY = currentY;
+      doc.text(skillNameLines, cardX + cardPadding, nameBaselineY);
+
+      // Tier text on same line, right-justified
+      const tierText = `Tier ${sk.tier}`;
+      const tierWidth = doc.getTextWidth(tierText);
+      const tierX = cardX + cardWidth - cardPadding - tierWidth;
+      doc.text(tierText, tierX, nameBaselineY);
+
+      // move currentY down by height of name block
       currentY += rowLineHeight * skillNameLines.length;
-
-      // Find meta-skill for details
-      let metaSkill = null;
-      if (typeof skillsByPath !== "undefined") {
-        const metaSkillList = skillsByPath[sk.path] || [];
-        metaSkill = metaSkillList.find((s) => s.name === sk.name) || null;
-      }
 
       doc.setFont("Times", "normal");
       doc.setFontSize(10);
@@ -601,19 +658,14 @@ function exportCharacterPDF() {
         currentY += lines.length * 12 + 3;
       }
 
-      // Path / Profession directly under the skill name
+      // Path / Profession directly under the skill name block
       doc.setFont("Times", "bold");
       doc.setFontSize(11);
       const jobText = sk.path || "";
       const linePathY = currentY + 4;
       doc.text(jobText, cardX + cardPadding, linePathY);
 
-      // Tier under Path / Profession
-      const tierText = `Tier ${sk.tier}`;
-      const lineTierY = linePathY + 12;
-      doc.text(tierText, cardX + cardPadding, lineTierY);
-
-      currentY = lineTierY + 14;
+      currentY = linePathY + 16;
 
       // Then show detailed fields from the CSV
       if (metaSkill) {
@@ -629,7 +681,7 @@ function exportCharacterPDF() {
       const usesDisplay = getUsesDisplayForSkill(sk);
       addLabeledBlock("# of uses", usesDisplay);
 
-      // Tighter bottom padding
+      // Tighter, symmetric bottom padding
       const cardBottom = currentY + cardPadding;
       const cardHeight = cardBottom - cardTop;
 
