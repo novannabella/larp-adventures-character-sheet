@@ -139,7 +139,7 @@ function exportCharacterPDF() {
   let titleBottomY;
 
   if (titleImg) {
-    // Image title (scaled to ~80% of previous)
+    // Image title
     const imgRatio = 158 / 684;
     const maxWidth = Math.min(400, pageWidth - margin * 2);
     const titleWidth = maxWidth * 0.8; // 80%
@@ -212,7 +212,7 @@ function exportCharacterPDF() {
   y = labelsY + 10;
 
   const basicBoxTop = y;
-  const basicBoxHeight = 100; // increased to allow orgs row
+  const basicBoxHeight = 100; // allows extra orgs line
   const milestonesBoxTop = y;
   const milestonesBoxHeight = basicBoxHeight;
 
@@ -250,16 +250,20 @@ function exportCharacterPDF() {
     doc.text(value || "-", valueX, yLine);
   }
 
+  // Row 1: Character | Secondary
   labelValue("Character", charName, colLeftX, infoY);
   labelValue("Secondary", secondaryPaths, colRightX, infoY);
 
+  // Row 2: Faction | Professions
   labelValue("Faction", faction, colLeftX, infoY + 16);
   labelValue("Professions", professions, colRightX, infoY + 16);
 
+  // Row 3: Path | Skill Pts  (pulled Skill Pts up to this line)
   labelValue("Path", path, colLeftX, infoY + 32);
+  labelValue("Skill Pts", remainingSP, colRightX, infoY + 32);
 
+  // Row 4: Tier (left only)
   labelValue("Tier", tier, colLeftX, infoY + 48);
-  labelValue("Skill Pts", remainingSP, colRightX, infoY + 48);
 
   // Organizations on their own row, spanning the width of the box
   const orgLabelY = infoY + 64;
@@ -318,9 +322,9 @@ function exportCharacterPDF() {
 
   const milestonePaths = ["Artificer", "Bard", "Scholar"];
 
-  // reduce fonts inside milestone box by 2 points
+  // slightly smaller fonts inside milestone box
   doc.setFont("Times", "bold");
-  doc.setFontSize(10); // was 12
+  doc.setFontSize(10);
 
   const innerX = milestonesBoxX + 6;
   const innerTopY = milestonesBoxTop + 6; // padding inside box
@@ -419,16 +423,13 @@ function exportCharacterPDF() {
 
   const rowLineHeight = 14;
 
-  // For full-skill cards we track a separate column layout
-  let cardColumn = 0; // 0 = left, 1 = right
+  // For full-skill cards in single-column layout
   let cardCurrentY = y;
-  const cardColumnGap = 12;
   const cardWidthFull = pageWidth - margin * 2;
-  const cardWidthTwoCol = (pageWidth - margin * 2 - cardColumnGap) / 2;
   const cardPadding = 10;
   const cardMinHeight = 80;
 
-  sorted.forEach((sk, index) => {
+  sorted.forEach((sk) => {
     if (!fullSkillInfo) {
       // ---------- COMPACT TABLE MODE ----------
       const bottomMargin = 60;
@@ -504,8 +505,8 @@ function exportCharacterPDF() {
 
       y = lineY + 6;
     } else {
-      // ---------- FULL SKILL CARD MODE (TWO COLUMNS) ----------
-      // New page if not enough vertical space for another card row
+      // ---------- FULL SKILL CARD MODE (SINGLE COLUMN) ----------
+      // New page if not enough vertical space for another card
       if (cardCurrentY > pageHeight - margin - cardMinHeight) {
         doc.addPage();
         drawParchmentBackground(doc);
@@ -522,14 +523,10 @@ function exportCharacterPDF() {
         doc.setTextColor(0, 0, 0);
 
         cardCurrentY = newY + 4;
-        cardColumn = 0;
       }
 
-      const cardWidth = cardWidthTwoCol;
-      const cardX =
-        cardColumn === 0
-          ? margin
-          : margin + cardWidthTwoCol + cardColumnGap;
+      const cardWidth = cardWidthFull;
+      const cardX = margin;
       const cardTop = cardCurrentY;
 
       let currentY = cardTop + cardPadding + 12;
@@ -591,15 +588,8 @@ function exportCharacterPDF() {
       doc.setLineWidth(0.7);
       doc.roundedRect(cardX, cardTop, cardWidth, cardHeight, 5, 5);
 
-      // Advance column/row for next card
-      if (cardColumn === 0) {
-        // move to right column, same row
-        cardColumn = 1;
-      } else {
-        // move to next row, reset to left column
-        cardColumn = 0;
-        cardCurrentY = cardTop + cardHeight + 8;
-      }
+      // Advance vertical position for next card
+      cardCurrentY = cardTop + cardHeight + 8;
     }
   });
 
