@@ -359,21 +359,26 @@ tbody tr:hover {
   align-items: flex-start;
 }
 
+/* Milestones row in Basic Info (desktop) */
 .basic-milestones {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  gap: 8px;
+  align-items: flex-start;
+  justify-content: flex-start;   /* no stretching */
+  gap: 8px;                      /* small gap between boxes */
 }
 
+/* Make each box only as wide as its content (Artificer is longest) */
 .milestone-block {
-  flex: 1 1 0;
-  min-width: 0; /* allow them to shrink so 3 fit in a row */
-  padding: 8px 10px;
+  flex: 0 0 auto;                /* do NOT stretch to fill row */
+  min-width: auto;
+  padding: 6px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: rgba(15, 23, 42, 0.8);
+  white-space: nowrap;           /* keep "Artificer" on one line */
 }
+
 
 .milestone-title {
   font-size: 11px;
