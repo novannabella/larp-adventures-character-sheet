@@ -804,6 +804,14 @@ function addSelectedSkill() {
   const isProfessionSkill = isExplicitProfession;
   const isSecondaryPathSkill = !isMainPathSkill && !isProfessionSkill;
 
+  // Recompute totals (and pathTierMap) before checks
+  recomputeTotals();
+  const available =
+    parseInt(totalSkillPointsInput.value, 10) >= 0
+      ? parseInt(totalSkillPointsInput.value, 10)
+      : 0;
+
+  // Profession gating
   if (isProfessionSkill) {
     if (currentTier < 3) {
       alert("You must be at least Tier 3 to purchase profession skills.");
@@ -827,8 +835,54 @@ function addSelectedSkill() {
         return;
       }
     }
+
+    // --- Artificer-specific "Appraise" rules ---
+    if (path === "Artificer") {
+      const isAppraise = /^Appraise\b/i.test(skill.name);
+
+      const hasAnyArtificer = selectedSkills.some(
+        (sk) => sk.path === "Artificer"
+      );
+
+      // 1) First Artificer skill must be an Appraise
+      if (!hasAnyArtificer && !isAppraise) {
+        alert(
+          "Your first Artificer skill must be an Appraise (e.g., 'Appraise Armor'). Take one Appraise before any other Artificer skills."
+        );
+        return;
+      }
+
+      // 2) You can only have a number of Appraise skills equal to your Artificer tier
+      if (isAppraise) {
+        const existingAppraises = selectedSkills.filter(
+          (sk) => sk.path === "Artificer" && /^Appraise\b/i.test(sk.name)
+        ).length;
+
+        // current Artificer tier from pathTierMap; fallback 0
+        const map = window.pathTierMap || {};
+        const currentArtificerTier =
+          typeof map["Artificer"] === "number" ? map["Artificer"] : 0;
+
+        // After buying this skill, Artificer tier would be at least its tier
+        const newArtificerTier = Math.max(
+          currentArtificerTier,
+          skill.tier || 0
+        );
+
+        // You can have at most (Artificer tier) Appraise skills
+        if (existingAppraises >= newArtificerTier) {
+          alert(
+            `You can only have a number of Appraise skills equal to your Artificer tier.\n\n` +
+              `Current Artificer tier (including this purchase): ${newArtificerTier}\n` +
+              `Existing Appraise skills: ${existingAppraises}`
+          );
+          return;
+        }
+      }
+    }
   }
 
+  // Main path gating
   if (isMainPathSkill && skill.tier > currentTier) {
     alert(
       `You are Tier ${currentTier}. You cannot take a Tier ${skill.tier} skill on your main path yet.`
@@ -836,6 +890,7 @@ function addSelectedSkill() {
     return;
   }
 
+  // Secondary path gating
   if (isSecondaryPathSkill) {
     let allowedSecondaryTier = 0;
     if (currentTier >= 6) {
@@ -871,12 +926,6 @@ function addSelectedSkill() {
   }
 
   const free = skillFreeFlag.checked;
-
-  recomputeTotals();
-  const available =
-    parseInt(totalSkillPointsInput.value, 10) >= 0
-      ? parseInt(totalSkillPointsInput.value, 10)
-      : 0;
 
   const candidateRecord = {
     name,
