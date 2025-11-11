@@ -610,25 +610,31 @@ function exportCharacterPDF() {
     doc.setFontSize(11);
     doc.setTextColor(255, 255, 255);
 
-    const colNameX = margin + 6;
-    const colDateX = margin + 190;
-    const colTypeX = margin + 260;
-    const colNpcX = margin + 340;
-    const colMotX = margin + 390;
-    const colBonusX = margin + 470;
-    const colPtsX = margin + 540;
+   // Narrow columns so headers fit within the brown bar
+const colNameX = margin + 6;
+const colDateX = margin + 170;
+const colTypeX = margin + 240;
+const colNpcX = margin + 310;
+const colMotX = margin + 360;
+const colBonusX = margin + 430;
+const colPtsX = margin + 495;
 
-    doc.text("Event Name", colNameX, y + 18);
-    doc.text("Date", colDateX, y + 18);
-    doc.text("Type", colTypeX, y + 18);
-    doc.text("NPC?", colNpcX, y + 18);
+doc.text("Event Name", colNameX, y + 18);
+doc.text("Date", colDateX, y + 18);
+doc.text("Type", colTypeX, y + 18);
+doc.text("NPC?", colNpcX, y + 18);
 
-    // Wrap "Merchant OT?"
-    doc.text("Merchant", colMotX, y + 14);
-    doc.text("OT?", colMotX, y + 24);
+// Wrap "Merchant OT?"
+doc.text("Merchant", colMotX, y + 14);
+doc.text("OT?", colMotX, y + 24);
 
-    doc.text("Bonus SP", colBonusX, y + 18);
-    doc.text("Skill Pts", colPtsX, y + 18);
+// Wrap "Bonus SP" and "Skill Pts"
+doc.text("Bonus", colBonusX, y + 14);
+doc.text("SP", colBonusX, y + 24);
+
+doc.text("Skill", colPtsX, y + 14);
+doc.text("Pts", colPtsX, y + 24);
+
 
     y += eventHeaderHeight + 4;
 
@@ -662,14 +668,17 @@ function exportCharacterPDF() {
           doc.setFontSize(11);
           doc.setTextColor(255, 255, 255);
 
-          doc.text("Event Name", colNameX, y + 18);
-          doc.text("Date", colDateX, y + 18);
-          doc.text("Type", colTypeX, y + 18);
-          doc.text("NPC?", colNpcX, y + 18);
-          doc.text("Merchant", colMotX, y + 14);
-          doc.text("OT?", colMotX, y + 24);
-          doc.text("Bonus SP", colBonusX, y + 18);
-          doc.text("Skill Pts", colPtsX, y + 18);
+         doc.text("Event Name", colNameX, y + 18);
+doc.text("Date", colDateX, y + 18);
+doc.text("Type", colTypeX, y + 18);
+doc.text("NPC?", colNpcX, y + 18);
+doc.text("Merchant", colMotX, y + 14);
+doc.text("OT?", colMotX, y + 24);
+doc.text("Bonus", colBonusX, y + 14);
+doc.text("SP", colBonusX, y + 24);
+doc.text("Skill", colPtsX, y + 14);
+doc.text("Pts", colPtsX, y + 24);
+
 
           y += eventHeaderHeight + 4;
           doc.setFont("Times", "bold");
