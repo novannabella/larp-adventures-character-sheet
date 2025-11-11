@@ -144,14 +144,15 @@ const bardMilestone3Checkbox = document.getElementById("bardMilestone3");
 const scholarMilestone2Checkbox = document.getElementById("scholarMilestone2");
 const scholarMilestone3Checkbox = document.getElementById("scholarMilestone3");
 
-// ---------- PARCHMENT BACKGROUND FOR PDF ----------
+// ---------- PARCHMENT & TITLE IMAGES FOR PDF ----------
 let parchmentImg = null;
+let titleImg = null;
 
-// preload the parchment image (must be in same folder as index.html)
+// preload parchment.jpg
 (function preloadParchment() {
   const img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = "parchment.jpg"; // make sure this file exists next to index.html
+  img.src = "parchment.jpg"; // must exist next to index.html
 
   img.onload = function () {
     const canvas = document.createElement("canvas");
@@ -163,6 +164,22 @@ let parchmentImg = null;
   };
 })();
 
+// preload la_title.png
+(function preloadTitle() {
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = "la_title.png"; // your transparent PNG title
+
+  img.onload = function () {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    titleImg = canvas.toDataURL("image/png");
+  };
+})();
+
 function drawParchmentBackground(doc) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -170,7 +187,6 @@ function drawParchmentBackground(doc) {
   if (parchmentImg) {
     doc.addImage(parchmentImg, "JPEG", 0, 0, pageWidth, pageHeight);
   } else {
-    // fallback if image not ready yet
     doc.setFillColor(245, 233, 210);
     doc.rect(0, 0, pageWidth, pageHeight, "F");
   }
@@ -1204,27 +1220,41 @@ function exportCharacterPDF() {
   const remainingSP = totalSkillPointsInput.value || "0";
   const organizations = getOrganizations().join(", ");
 
-  // Header
-  doc.setFont("Helvetica", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(20, 20, 30);
-  doc.text("Larp Adventures", margin, y);
+  // HEADER: use la_title.png if available
+  if (titleImg) {
+    const imgRatio = 158 / 684; // original 684x158
+    const maxWidth = Math.min(400, pageWidth - margin * 2);
+    const titleWidth = maxWidth;
+    const titleHeight = titleWidth * imgRatio;
+    const x = (pageWidth - titleWidth) / 2;
 
-  doc.setFontSize(14);
-  doc.setFont("Helvetica", "normal");
-  doc.setTextColor(70, 70, 90);
-  doc.text("Character Sheet", margin, y + 18);
+    doc.addImage(titleImg, "PNG", x, y, titleWidth, titleHeight);
+    y += titleHeight + 10;
+  } else {
+    // Fallback to text header if image not ready
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Larp Adventures", margin, y);
 
-  if (playerName) {
-    doc.setFontSize(10);
-    doc.setTextColor(120, 120, 140);
-    const label = `Player: ${playerName}`;
-    const labelWidth = doc.getTextWidth(label);
-    doc.text(label, pageWidth - margin - labelWidth, y);
+    doc.setFontSize(14);
+    doc.setFont("Helvetica", "bold");
+    doc.text("Character Sheet", margin, y + 18);
+    y += 32;
   }
 
-  y += 32;
-  doc.setDrawColor(80, 80, 90);
+  // Player name in top-right, in black
+  if (playerName) {
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    const label = `Player: ${playerName}`;
+    const labelWidth = doc.getTextWidth(label);
+    doc.text(label, pageWidth - margin - labelWidth, margin);
+  }
+
+  // Separator line
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.7);
   doc.line(margin, y, pageWidth - margin, y);
   y += 18;
@@ -1232,14 +1262,14 @@ function exportCharacterPDF() {
   // Basic Information box
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(13);
-  doc.setTextColor(40, 40, 60);
+  doc.setTextColor(0, 0, 0);
   doc.text("Basic Information", margin, y);
   y += 10;
 
   const basicBoxTop = y - 8;
   const basicBoxHeight = 90;
   const basicBoxWidth = pageWidth - margin * 2;
-  doc.setDrawColor(100, 100, 110);
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.8);
   doc.roundedRect(
     margin - 4,
@@ -1256,20 +1286,22 @@ function exportCharacterPDF() {
 
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(11);
-  doc.setTextColor(60, 60, 80);
+  doc.setTextColor(0, 0, 0);
 
   function labelValue(label, value, x, yLine) {
     const labelText = `${label}:`;
 
+    // label bold black
     doc.setFont("Helvetica", "bold");
-    doc.setTextColor(80, 80, 110);
+    doc.setTextColor(0, 0, 0);
     doc.text(labelText, x, yLine);
 
     const labelWidth = doc.getTextWidth(labelText);
     const valueX = x + labelWidth + 6;
 
+    // value normal black
     doc.setFont("Helvetica", "normal");
-    doc.setTextColor(20, 20, 30);
+    doc.setTextColor(0, 0, 0);
     doc.text(value || "-", valueX, yLine);
   }
 
@@ -1288,21 +1320,21 @@ function exportCharacterPDF() {
   // Skills header
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(13);
-  doc.setTextColor(40, 40, 60);
+  doc.setTextColor(0, 0, 0);
   doc.text("Skills", margin, y);
   y += 10;
 
   const tableWidth = pageWidth - margin * 2;
   const headerHeight = 22;
 
-  // Table header background
-  doc.setFillColor(32, 40, 70);
-  doc.setDrawColor(32, 40, 70);
+  // Table header background (dark neutral instead of blue)
+  doc.setFillColor(60, 40, 20);
+  doc.setDrawColor(60, 40, 20);
   doc.rect(margin, y, tableWidth, headerHeight, "F");
 
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(11);
-  doc.setTextColor(245, 245, 255);
+  doc.setTextColor(255, 255, 255);
 
   // Column positions: Tier | Path / Profession (two-line label) | Skill Name | Uses
   const colTierX = margin + 6;
@@ -1322,9 +1354,9 @@ function exportCharacterPDF() {
   y += headerHeight + 4;
 
   doc.setFont("Helvetica", "normal");
-  doc.setTextColor(20, 20, 30);
+  doc.setTextColor(0, 0, 0);
   doc.setLineWidth(0.5);
-  doc.setDrawColor(60, 60, 70);
+  doc.setDrawColor(0, 0, 0);
 
   const sorted = getSortedSelectedSkills();
   const rowLineHeight = 14;
@@ -1337,24 +1369,24 @@ function exportCharacterPDF() {
 
       const pw = doc.internal.pageSize.getWidth();
       const ph = doc.internal.pageSize.getHeight();
-      // pw/ph not used, but kept for possible future tweaks
+      // pw/ph kept in case we tweak later
 
       y = margin;
 
       // Continued header
       doc.setFont("Helvetica", "bold");
       doc.setFontSize(13);
-      doc.setTextColor(40, 40, 60);
+      doc.setTextColor(0, 0, 0);
       doc.text("Skills (continued)", margin, y);
       y += 10;
 
-      doc.setFillColor(32, 40, 70);
-      doc.setDrawColor(32, 40, 70);
+      doc.setFillColor(60, 40, 20);
+      doc.setDrawColor(60, 40, 20);
       doc.rect(margin, y, tableWidth, headerHeight, "F");
 
       doc.setFont("Helvetica", "bold");
       doc.setFontSize(11);
-      doc.setTextColor(245, 245, 255);
+      doc.setTextColor(255, 255, 255);
       doc.text("Tier", colTierX, y + 12);
       doc.text("Path /", colPathX, y + 9);
       doc.text("Profession", colPathX, y + 18);
@@ -1363,12 +1395,12 @@ function exportCharacterPDF() {
 
       y += headerHeight + 4;
       doc.setFont("Helvetica", "normal");
-      doc.setTextColor(20, 20, 30);
+      doc.setTextColor(0, 0, 0);
       doc.setLineWidth(0.5);
-      doc.setDrawColor(60, 60, 70);
+      doc.setDrawColor(0, 0, 0);
     }
 
-    // Row separator line (no white fill, just a line on parchment)
+    // Row separator line (no white fill)
     doc.line(margin, y + rowLineHeight + 2, margin + tableWidth, y + rowLineHeight + 2);
 
     // Tier & Path
