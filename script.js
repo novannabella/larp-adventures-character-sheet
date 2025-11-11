@@ -1241,7 +1241,7 @@ function exportCharacterPDF() {
   y += 10;
 
   const tableWidth = pageWidth - margin * 2;
-  const headerHeight = 18;
+  const headerHeight = 22;
 
   // Table header background
   doc.setFillColor(32, 40, 70);
@@ -1252,14 +1252,18 @@ function exportCharacterPDF() {
   doc.setFontSize(11);
   doc.setTextColor(245, 245, 255);
 
-  // Column positions: Tier | Path | Skill Name | Uses
+  // Column positions: Tier | Path / Profession (two-line label) | Skill Name | Uses
   const colTierX = margin + 6;
   const colPathX = margin + 60;
-  const colSkillX = margin + 210;
-  const colUsesX = margin + tableWidth - 120; // last 120pt for Uses
+  const colSkillX = margin + 190;
+  const colUsesX = margin + tableWidth - 120; // leave more breathing room for Uses
 
   doc.text("Tier", colTierX, y + 12);
-  doc.text("Path / Profession", colPathX, y + 12);
+
+  // Two-line header: "Path /" then "Profession" under it
+  doc.text("Path /", colPathX, y + 9);
+  doc.text("Profession", colPathX, y + 18);
+
   doc.text("Skill Name", colSkillX, y + 12);
   doc.text("Uses", colUsesX, y + 12);
 
@@ -1300,7 +1304,8 @@ function exportCharacterPDF() {
       doc.setFontSize(11);
       doc.setTextColor(245, 245, 255);
       doc.text("Tier", colTierX, y + 12);
-      doc.text("Path / Profession", colPathX, y + 12);
+      doc.text("Path /", colPathX, y + 9);
+      doc.text("Profession", colPathX, y + 18);
       doc.text("Skill Name", colSkillX, y + 12);
       doc.text("Uses", colUsesX, y + 12);
 
@@ -1339,18 +1344,26 @@ function exportCharacterPDF() {
       }
     }
 
-    // Skill name (no uses mashed in here now)
-    let skillLine = sk.name;
+    // Skill name (no uses mashed in here)
+    const skillLine = sk.name;
 
+    // Wrapping widths
     const maxSkillWidth = colUsesX - colSkillX - 10;
     const skillLines = doc.splitTextToSize(skillLine, maxSkillWidth);
+
+    // Uses column may also need wrapping
+    const maxUsesWidth = pageWidth - margin - colUsesX;
+    const usesLines = doc.splitTextToSize(usesDisplay, maxUsesWidth);
+
+    // Draw skill text
     doc.text(skillLines, colSkillX, y + 10);
 
-    // Uses column
-    doc.text(usesDisplay, colUsesX, y + 10);
+    // Draw uses text (possibly multi-line)
+    doc.text(usesLines, colUsesX, y + 10);
 
-    // Advance Y – skill text may wrap
-    y += rowLineHeight * skillLines.length;
+    // Row height is max of both columns
+    const rowLines = Math.max(skillLines.length, usesLines.length);
+    y += rowLineHeight * rowLines;
   });
 
   // Save PDF with character-based name
