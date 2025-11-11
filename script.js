@@ -96,7 +96,7 @@ let pathTierMap = {};
 // Selected-skills sort state
 let skillSortState = {
   column: "default", // "default" | "tier" | "path" | "skill"
-  direction: "asc"   // "asc" | "desc"
+  direction: "asc" // "asc" | "desc"
 };
 
 // Dirty flag for unsaved changes
@@ -230,12 +230,15 @@ function updatePathAndProfessionDisplays() {
 
   Object.keys(tiers).forEach((path) => {
     const t = tiers[path];
-    const label = `${path} ${t}`;
     if (path === mainPath) return;
 
     if (PROFESSION_NAMES.has(path)) {
+      // Professions stay like: Artificer 2, Bard 1
+      const label = `${path} ${t}`;
       professionParts.push(label);
     } else {
+      // Secondary paths: Healer [2], Rogue [2]
+      const label = `${path} [${t}]`;
       secondaryParts.push(label);
     }
   });
@@ -243,13 +246,12 @@ function updatePathAndProfessionDisplays() {
   secondaryPathsDisplay.value = secondaryParts.join(", ");
   professionsDisplay.value = professionParts.join(", ");
 
-   // Show main path tier in the box next to the Path dropdown
+  // Show main path tier in the box next to the Path dropdown
   if (mainPathTierBox) {
     const t = tiers[mainPath] || charTier;
     mainPathTierBox.value = mainPath && t > 0 ? t : "";
   }
 }
-
 
 function computeSkillCost(record) {
   const mainPath = pathDisplaySelect.value || "";
