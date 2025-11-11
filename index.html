@@ -19,25 +19,36 @@
     <h1>Larp Adventures</h1>
     <p class="subtitle">Character Sheet</p>
 
-    <div class="top-controls">
-      <div class="save-load-controls">
-        <button id="loadCharacterBtn" class="button secondary">
-          Load Character
-        </button>
-        <input
-          type="file"
-          id="loadCharacterFile"
-          accept=".json"
-          style="display: none"
-        />
-        <button id="saveCharacterBtn" class="button secondary">
-          Save Character
-        </button>
-        <button id="exportPdfBtn" class="button">
-          Export Character
-        </button>
-      </div>
-    </div>
+<div class="top-controls">
+  <div class="save-load-controls">
+    <button id="loadCharacterBtn" class="button secondary">
+      Load Character
+    </button>
+    <input
+      type="file"
+      id="loadCharacterFile"
+      accept=".json"
+      style="display: none"
+    />
+    <button id="saveCharacterBtn" class="button secondary">
+      Save Character
+    </button>
+    <button id="exportPdfBtn" class="button">
+      Export Character
+    </button>
+
+    <!-- Export options -->
+    <label class="export-option">
+      <input type="checkbox" id="fullSkillInfoCheckbox" />
+      Full skill information
+    </label>
+    <label class="export-option">
+      <input type="checkbox" id="eventSummaryCheckbox" />
+      Event summary
+    </label>
+  </div>
+</div>
+
 
     <div class="app">
       <!-- BASIC INFO -->
@@ -373,6 +384,7 @@
 
   </body>
 </html>
+
 
 
 
