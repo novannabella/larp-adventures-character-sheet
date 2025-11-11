@@ -1135,6 +1135,7 @@ function exportCharacterPDF() {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
+  // Parchment-like background
   doc.setFillColor(245, 233, 210);
   doc.rect(0, 0, pageWidth, pageHeight, "F");
 
@@ -1151,6 +1152,7 @@ function exportCharacterPDF() {
   const remainingSP = totalSkillPointsInput.value || "0";
   const organizations = getOrganizations().join(", ");
 
+  // Header
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(20, 20, 30);
@@ -1175,6 +1177,7 @@ function exportCharacterPDF() {
   doc.line(margin, y, pageWidth - margin, y);
   y += 18;
 
+  // Basic Information box
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(13);
   doc.setTextColor(40, 40, 60);
@@ -1230,6 +1233,7 @@ function exportCharacterPDF() {
 
   y = basicBoxTop + basicBoxHeight + 24;
 
+  // Skills header
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(13);
   doc.setTextColor(40, 40, 60);
@@ -1239,6 +1243,7 @@ function exportCharacterPDF() {
   const tableWidth = pageWidth - margin * 2;
   const headerHeight = 18;
 
+  // Table header background
   doc.setFillColor(32, 40, 70);
   doc.setDrawColor(32, 40, 70);
   doc.rect(margin, y, tableWidth, headerHeight, "F");
@@ -1247,13 +1252,16 @@ function exportCharacterPDF() {
   doc.setFontSize(11);
   doc.setTextColor(245, 245, 255);
 
+  // Column positions: Tier | Path | Skill Name | Uses
   const colTierX = margin + 6;
   const colPathX = margin + 60;
   const colSkillX = margin + 210;
+  const colUsesX = margin + tableWidth - 120; // last 120pt for Uses
 
   doc.text("Tier", colTierX, y + 12);
   doc.text("Path / Profession", colPathX, y + 12);
   doc.text("Skill Name", colSkillX, y + 12);
+  doc.text("Uses", colUsesX, y + 12);
 
   y += headerHeight + 4;
 
@@ -1266,6 +1274,7 @@ function exportCharacterPDF() {
   const rowLineHeight = 14;
 
   sorted.forEach((sk, index) => {
+    // New page if needed
     if (y > pageHeight - margin - 40) {
       doc.addPage();
 
@@ -1276,6 +1285,7 @@ function exportCharacterPDF() {
 
       y = margin;
 
+      // Continued header
       doc.setFont("Helvetica", "bold");
       doc.setFontSize(13);
       doc.setTextColor(40, 40, 60);
@@ -1292,6 +1302,7 @@ function exportCharacterPDF() {
       doc.text("Tier", colTierX, y + 12);
       doc.text("Path / Profession", colPathX, y + 12);
       doc.text("Skill Name", colSkillX, y + 12);
+      doc.text("Uses", colUsesX, y + 12);
 
       y += headerHeight + 4;
       doc.setFont("Helvetica", "normal");
@@ -1300,38 +1311,49 @@ function exportCharacterPDF() {
       doc.setDrawColor(200, 200, 210);
     }
 
+    // Zebra striping
     if (index % 2 === 0) {
       doc.setFillColor(245, 246, 252);
       doc.rect(margin, y - 2, tableWidth, rowLineHeight + 3, "F");
     }
 
+    // Row separator
     doc.line(margin, y + rowLineHeight, margin + tableWidth, y + rowLineHeight);
 
+    // Tier & Path
     doc.text(String(sk.tier), colTierX, y + 10);
     doc.text(sk.path, colPathX, y + 10);
 
-    let skillLine = sk.name;
-    const metaSkill = (skillsByPath[sk.path] || []).find(
-      (s) => s.name === sk.name
-    );
+    // Compute Uses info from meta skill
+    let usesDisplay = "—";
+    const metaSkillList = skillsByPath[sk.path] || [];
+    const metaSkill = metaSkillList.find((s) => s.name === sk.name);
     if (metaSkill) {
       const usesInfo = computeSkillUses(metaSkill);
-      if (usesInfo && usesInfo.display) {
+      if (usesInfo) {
         if (usesInfo.display === "∞") {
-          skillLine = `${sk.name}  [Unlimited]`;
-        } else {
-          skillLine = `${sk.name}  [${usesInfo.display}]`;
+          usesDisplay = "Unlimited";
+        } else if (usesInfo.display) {
+          usesDisplay = usesInfo.display;
         }
       }
     }
 
-    const maxSkillWidth = tableWidth - (colSkillX - margin) - 10;
+    // Skill name (no uses mashed in here now)
+    let skillLine = sk.name;
+
+    const maxSkillWidth = colUsesX - colSkillX - 10;
     const skillLines = doc.splitTextToSize(skillLine, maxSkillWidth);
     doc.text(skillLines, colSkillX, y + 10);
 
+    // Uses column
+    doc.text(usesDisplay, colUsesX, y + 10);
+
+    // Advance Y – skill text may wrap
     y += rowLineHeight * skillLines.length;
   });
 
+  // Save PDF with character-based name
   let suggestedName = charName ? charName : "larp_character";
   let baseName = prompt("Enter a name for the exported PDF:", suggestedName);
   if (!baseName) {
