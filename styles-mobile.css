@@ -172,10 +172,21 @@ label {
 /* Tier & Skill Points side by side on mobile, labels close to boxes */
 .basic-tier-col {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr 1fr;
   column-gap: 6px;
   row-gap: 4px;
   align-items: center;
+}
+
+/* Make each label+input pair stay in its own column */
+.basic-tier-col label[for="tier"],
+.basic-tier-col .inline-input-with-note:nth-of-type(1) {
+  grid-column: 1;
+}
+
+.basic-tier-col label[for="totalSkillPoints"],
+.basic-tier-col .inline-input-with-note:nth-of-type(2) {
+  grid-column: 2;
 }
 
 .basic-tier-col label {
@@ -271,9 +282,10 @@ textarea {
   padding: 0 2px;
 }
 
+/* Stack everything in save-load-controls so export + checkboxes go vertical */
 .save-load-controls {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: flex-start;
   gap: 6px;
 }
@@ -505,12 +517,11 @@ tbody tr:hover {
 
 .event-input-row .field:nth-child(5) {
   grid-area: enpc;
-  align-items: center;
+  /* let label + checkbox align naturally to left */
 }
 
 .event-input-row .field:nth-child(6) {
   grid-area: emot;
-  align-items: center;
 }
 
 .event-input-row .field:nth-child(7) {
@@ -537,28 +548,16 @@ tbody tr:hover {
   width: auto;
 }
 
-/* Shorten "Merchant OT?" label to "Merch" / "OT?" stacked */
+/* "Merchant OT?" label on one line, shorter text */
 .event-input-row label[for="eventMotInput"] {
-  font-size: 0;
-}
-
-.event-input-row label[for="eventMotInput"]::after {
-  content: "Merch\AOT?";
-  white-space: pre;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--muted);
 }
 
-/* Shorten "Bonus SP" label to "Bonus" / "SP" stacked */
+/* "Bonus SP" label on one line */
 .event-input-row label[for="eventBonusInput"] {
-  font-size: 0;
-}
-
-.event-input-row label[for="eventBonusInput"]::after {
-  content: "Bonus\ASP";
-  white-space: pre;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
