@@ -119,20 +119,22 @@ label {
   color: var(--muted);
   white-space: nowrap;
 }
+
+/* Milestones on mobile: stack vertically, full width */
 .basic-milestones {
-  margin-top: 4px;
   display: flex;
-  flex-direction: column;  /* stack on mobile */
+  flex-direction: column;
   gap: 6px;
 }
 
 .milestone-block {
-  padding: 6px 8px;
+  width: 100%;
+  padding: 6px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: rgba(15, 23, 42, 0.9);
-  margin-bottom: 4px;
 }
+
 
 .milestone-title {
   font-size: 10px;
