@@ -140,7 +140,8 @@ const organizationsContainer = document.getElementById(
 const characterNameInput = document.getElementById("characterName");
 const playerNameInput = document.getElementById("playerName");
 const pathDisplaySelect = document.getElementById("pathDisplay");
-const mainPathTierDisplay = document.getElementById("mainPathTierDisplay");
+const mainPathTierBox = document.getElementById("mainPathTierBox");
+
 const factionSelect = document.getElementById("faction");
 
 const secondaryPathsDisplay = document.getElementById("secondaryPathsDisplay");
@@ -242,16 +243,13 @@ function updatePathAndProfessionDisplays() {
   secondaryPathsDisplay.value = secondaryParts.join(", ");
   professionsDisplay.value = professionParts.join(", ");
 
-  // Show main path tier next to the path name
-  if (mainPathTierDisplay) {
+   // Show main path tier in the box next to the Path dropdown
+  if (mainPathTierBox) {
     const t = tiers[mainPath] || charTier;
-    if (mainPath && t > 0) {
-      mainPathTierDisplay.textContent = ` (Tier ${t})`;
-    } else {
-      mainPathTierDisplay.textContent = "";
-    }
+    mainPathTierBox.value = mainPath && t > 0 ? t : "";
   }
 }
+
 
 function computeSkillCost(record) {
   const mainPath = pathDisplaySelect.value || "";
