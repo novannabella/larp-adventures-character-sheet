@@ -68,21 +68,26 @@
 
           <div class="section-row">
             <div class="field">
-  <label for="pathDisplay">Path</label>
-  <div class="path-tier-inline">
-    <select id="pathDisplay">
-      <option value="">-- Select Path --</option>
-      <option value="Healer">Healer</option>
-      <option value="Mage">Mage</option>
-      <option value="Rogue">Rogue</option>
-      <option value="Warrior">Warrior</option>
-    </select>
-    <div class="main-tier-box">
-      <label for="mainPathTierBox" class="main-tier-label">Tier</label>
-      <input type="text" id="mainPathTierBox" readonly />
-    </div>
-  </div>
-</div>
+              <label for="pathDisplay">Path</label>
+              <div class="path-tier-inline">
+                <select id="pathDisplay">
+                  <option value="">-- Select Path --</option>
+                  <option value="Healer">Healer</option>
+                  <option value="Mage">Mage</option>
+                  <option value="Rogue">Rogue</option>
+                  <option value="Warrior">Warrior</option>
+                </select>
+                <div class="main-tier-box">
+                  <label for="mainPathTierBox" class="main-tier-label">Tier</label>
+                  <input
+                    type="text"
+                    id="mainPathTierBox"
+                    readonly
+                    title="Calculated from events"
+                  />
+                </div>
+              </div>
+            </div>
 
             <div class="field">
               <label for="faction">Faction</label>
@@ -117,7 +122,7 @@
 
           <div class="section-row">
             <div class="field">
-              <label for="secondaryPathsDisplay">Secondary Path(s)</label>
+              <label for="secondaryPathsDisplay">Secondary Path(s) [Tier]</label>
               <input type="text" id="secondaryPathsDisplay" readonly />
             </div>
             <div class="field">
@@ -409,5 +414,3 @@
     <script src="pdf-export.js"></script>
   </body>
 </html>
-
-
