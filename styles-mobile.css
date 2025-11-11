@@ -430,12 +430,25 @@ tbody tr:hover {
   max-width: 100%;
 }
 
-/* Align "Earned for free?" checkbox properly */
+/* Align "Earned for free?" checkbox properly
+   and force label to one line "Earned for Free?" */
 .skill-free-field {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
+}
+
+.skill-free-field label[for="skillFreeFlag"] {
+  font-size: 0; /* hide original (with <br/>) */
+}
+
+.skill-free-field label[for="skillFreeFlag"]::after {
+  content: "Earned for Free?";
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
 }
 
 .skill-free-field input[type="checkbox"] {
