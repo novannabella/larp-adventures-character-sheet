@@ -79,17 +79,34 @@ function exportCharacterPDF() {
   const margin = 40;
   let y = margin;
 
-  const charName = (window.characterNameInput?.value || "");
-  const playerName = (window.playerNameInput?.value || "");
-  const path = (window.pathDisplaySelect?.value || "");
-  const faction = (window.factionSelect?.value || "");
-  const secondaryPaths = (window.secondaryPathsDisplay?.value || "");
-  const professions = (window.professionsDisplay?.value || "");
-  const tier = (window.tierInput?.value || "0");
-  const remainingSP = (window.totalSkillPointsInput?.value || "0");
-  const organizations = (typeof getOrganizations === "function"
-    ? getOrganizations().join(", ")
-    : "");
+  // Grab everything directly from the DOM so we don't depend on window.*
+  const charName =
+    document.getElementById("characterName")?.value.trim() || "";
+  const playerName =
+    document.getElementById("playerName")?.value.trim() || "";
+  const path = document.getElementById("pathDisplay")?.value || "";
+  const faction = document.getElementById("faction")?.value || "";
+  const secondaryPaths =
+    document.getElementById("secondaryPathsDisplay")?.value || "";
+  const professions =
+    document.getElementById("professionsDisplay")?.value || "";
+  const tier = document.getElementById("tier")?.value || "0";
+  const remainingSP =
+    document.getElementById("totalSkillPoints")?.value || "0";
+
+  let organizations = "";
+  if (typeof getOrganizations === "function") {
+    organizations = getOrganizations().join(", ");
+  } else {
+    const orgContainer = document.getElementById("organizationsContainer");
+    if (orgContainer) {
+      organizations = Array.from(
+        orgContainer.querySelectorAll('input[type="checkbox"]:checked')
+      )
+        .map((cb) => cb.value)
+        .join(", ");
+    }
+  }
 
   // HEADER: title image left at margin
   if (titleImg) {
@@ -138,7 +155,7 @@ function exportCharacterPDF() {
 
   // BASIC BOX + MILESTONES IN SAME ROW
   const totalInfoWidth = pageWidth - margin * 2;
-  const basicBoxWidth = totalInfoWidth * 0.7; // widened from 0.6 to 0.7
+  const basicBoxWidth = totalInfoWidth * 0.7; // 70% for basic info
   const milestonesWidth = totalInfoWidth - basicBoxWidth - 16; // gap of 16
 
   const basicBoxTop = y - 8;
@@ -237,40 +254,27 @@ function exportCharacterPDF() {
   const squareSize = 10;
   const rowOffset = 8;
 
+  const artificerMilestone2Checkbox = document.getElementById(
+    "artificerMilestone2"
+  );
+  const artificerMilestone3Checkbox = document.getElementById(
+    "artificerMilestone3"
+  );
+  const bardMilestone2Checkbox = document.getElementById("bardMilestone2");
+  const bardMilestone3Checkbox = document.getElementById("bardMilestone3");
+  const scholarMilestone2Checkbox = document.getElementById("scholarMilestone2");
+  const scholarMilestone3Checkbox = document.getElementById("scholarMilestone3");
+
   function isMilestoneChecked(pathName, level) {
     if (pathName === "Artificer") {
-      if (level === 2)
-        return !!(
-          window.artificerMilestone2Checkbox &&
-          window.artificerMilestone2Checkbox.checked
-        );
-      if (level === 3)
-        return !!(
-          window.artificerMilestone3Checkbox &&
-          window.artificerMilestone3Checkbox.checked
-        );
+      if (level === 2) return !!(artificerMilestone2Checkbox?.checked);
+      if (level === 3) return !!(artificerMilestone3Checkbox?.checked);
     } else if (pathName === "Bard") {
-      if (level === 2)
-        return !!(
-          window.bardMilestone2Checkbox &&
-          window.bardMilestone2Checkbox.checked
-        );
-      if (level === 3)
-        return !!(
-          window.bardMilestone3Checkbox &&
-          window.bardMilestone3Checkbox.checked
-        );
+      if (level === 2) return !!(bardMilestone2Checkbox?.checked);
+      if (level === 3) return !!(bardMilestone3Checkbox?.checked);
     } else if (pathName === "Scholar") {
-      if (level === 2)
-        return !!(
-          window.scholarMilestone2Checkbox &&
-          window.scholarMilestone2Checkbox.checked
-        );
-      if (level === 3)
-        return !!(
-          window.scholarMilestone3Checkbox &&
-          window.scholarMilestone3Checkbox.checked
-        );
+      if (level === 2) return !!(scholarMilestone2Checkbox?.checked);
+      if (level === 3) return !!(scholarMilestone3Checkbox?.checked);
     }
     return false;
   }
@@ -293,7 +297,7 @@ function exportCharacterPDF() {
     if (isMilestoneChecked(p, 2)) {
       doc.text("X", box2X + 3, box2Y + 8);
     }
-    doc.setFontSize(9); // was 11
+    doc.setFontSize(9); // label for "2"
     doc.text("2", box2X + squareSize + 4, box2Y + 8);
 
     const box3Y = box2Y + squareSize + 4;
@@ -304,7 +308,7 @@ function exportCharacterPDF() {
     }
     doc.text("3", box3X + squareSize + 4, box3Y + 8);
 
-    doc.setFontSize(10); // restore for next label
+    doc.setFontSize(10); // restore for next path label
   });
 
   const boxesBottom = basicBoxTop + basicBoxHeight;
@@ -318,7 +322,7 @@ function exportCharacterPDF() {
   y += 10;
 
   const tableWidth = pageWidth - margin * 2;
-  const headerHeight = 22;
+  const headerHeight = 28; // slightly taller so text sits fully inside
 
   // Table header background
   doc.setFillColor(60, 40, 20);
@@ -334,14 +338,14 @@ function exportCharacterPDF() {
   const colSkillX = margin + 140;
   const colUsesX = margin + tableWidth * 0.65;
 
-  doc.text("Tier", colTierX, y + 12);
+  doc.text("Tier", colTierX, y + 16);
 
-  // add a bit more vertical gap between "Path /" and "Profession"
-  doc.text("Path /", colPathX, y + 8);    // was +9
-  doc.text("Profession", colPathX, y + 22); // was +18
+  // More spacing between "Path /" and "Profession"
+  doc.text("Path /", colPathX, y + 12);
+  doc.text("Profession", colPathX, y + 26);
 
-  doc.text("Skill Name", colSkillX, y + 12);
-  doc.text("Uses", colUsesX, y + 12);
+  doc.text("Skill Name", colSkillX, y + 16);
+  doc.text("Uses", colUsesX, y + 16);
 
   y += headerHeight + 4;
 
@@ -377,11 +381,11 @@ function exportCharacterPDF() {
       doc.setFont("Times", "bold");
       doc.setFontSize(13);
       doc.setTextColor(255, 255, 255);
-      doc.text("Tier", colTierX, y + 12);
-      doc.text("Path /", colPathX, y + 8);
-      doc.text("Profession", colPathX, y + 22);
-      doc.text("Skill Name", colSkillX, y + 12);
-      doc.text("Uses", colUsesX, y + 12);
+      doc.text("Tier", colTierX, y + 16);
+      doc.text("Path /", colPathX, y + 12);
+      doc.text("Profession", colPathX, y + 26);
+      doc.text("Skill Name", colSkillX, y + 16);
+      doc.text("Uses", colUsesX, y + 16);
 
       y += headerHeight + 4;
       doc.setFont("Times", "bold");
@@ -394,21 +398,27 @@ function exportCharacterPDF() {
     const rowTop = y;
     const textBaseline = rowTop + 12;
 
+    // Tier
     doc.text(String(sk.tier), colTierX, textBaseline);
+
+    // Path
     doc.text(sk.path, colPathX, textBaseline);
 
+    // Uses (computed from CSV meta)
     let usesDisplay = "—";
-    const metaSkillList = (window.skillsByPath?.[sk.path] || []);
-    const metaSkill = metaSkillList.find((s) => s.name === sk.name);
-    if (metaSkill && typeof computeSkillUses === "function") {
-      const usesInfo = computeSkillUses(metaSkill);
-      if (usesInfo) {
-        if (usesInfo.numeric === Infinity) {
-          usesDisplay = "Unlimited";
-        } else if (usesInfo.display) {
-          usesDisplay = usesInfo.display;
-        } else if (usesInfo.periodicity) {
-          usesDisplay = usesInfo.periodicity;
+    if (typeof computeSkillUses === "function" && typeof skillsByPath !== "undefined") {
+      const metaSkillList = skillsByPath[sk.path] || [];
+      const metaSkill = metaSkillList.find((s) => s.name === sk.name);
+      if (metaSkill) {
+        const usesInfo = computeSkillUses(metaSkill);
+        if (usesInfo) {
+          if (usesInfo.numeric === Infinity) {
+            usesDisplay = "Unlimited";
+          } else if (usesInfo.display) {
+            usesDisplay = usesInfo.display;
+          } else if (usesInfo.periodicity) {
+            usesDisplay = usesInfo.periodicity;
+          }
         }
       }
     }
