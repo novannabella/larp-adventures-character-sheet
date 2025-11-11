@@ -212,7 +212,7 @@ function exportCharacterPDF() {
   y = labelsY + 10;
 
   const basicBoxTop = y;
-  const basicBoxHeight = 78; // tightened
+  const basicBoxHeight = 100; // increased to allow orgs row
   const milestonesBoxTop = y;
   const milestonesBoxHeight = basicBoxHeight;
 
@@ -236,25 +236,8 @@ function exportCharacterPDF() {
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
 
-  // Helper that can wrap Organizations
   function labelValue(label, value, x, yLine) {
     const labelText = `${label}:`;
-
-    if (label === "Organizations") {
-      doc.setFont("Times", "bold");
-      doc.setFontSize(13);
-      doc.text(labelText, x, yLine);
-
-      const labelWidth = doc.getTextWidth(labelText);
-      const valueX = x + labelWidth + 6;
-
-      const maxValueWidth = basicBoxX + basicBoxWidth - valueX - 8;
-
-      doc.setFontSize(11);
-      const lines = doc.splitTextToSize(value || "-", maxValueWidth);
-      doc.text(lines, valueX, yLine);
-      return;
-    }
 
     doc.setFont("Times", "bold");
     doc.setFontSize(13);
@@ -274,10 +257,26 @@ function exportCharacterPDF() {
   labelValue("Professions", professions, colRightX, infoY + 16);
 
   labelValue("Path", path, colLeftX, infoY + 32);
-  labelValue("Organizations", organizations, colRightX, infoY + 32);
 
   labelValue("Tier", tier, colLeftX, infoY + 48);
   labelValue("Skill Pts", remainingSP, colRightX, infoY + 48);
+
+  // Organizations on their own row, spanning the width of the box
+  const orgLabelY = infoY + 64;
+  const orgLabelText = "Organizations:";
+  doc.setFont("Times", "bold");
+  doc.setFontSize(13);
+  doc.text(orgLabelText, colLeftX, orgLabelY);
+
+  const orgLabelWidth = doc.getTextWidth(orgLabelText);
+  const orgValueX = colLeftX + orgLabelWidth + 6;
+  const orgMaxWidth = basicBoxX + basicBoxWidth - orgValueX - 8;
+
+  const orgValueText = organizations || "-";
+  doc.setFont("Times", "normal");
+  doc.setFontSize(11);
+  const orgLines = doc.splitTextToSize(orgValueText, orgMaxWidth);
+  doc.text(orgLines, orgValueX, orgLabelY);
 
   // Milestones box to the right
   doc.roundedRect(
@@ -298,19 +297,21 @@ function exportCharacterPDF() {
   );
   const bardMilestone2Checkbox = document.getElementById("bardMilestone2");
   const bardMilestone3Checkbox = document.getElementById("bardMilestone3");
-  const scholarMilestone2Checkbox = document.getElementById("scholarMilestone2");
-  const scholarMilestone3Checkbox = document.getElementById("scholarMilestone3");
+  const scholarMilestone2Checkbox =
+    document.getElementById("scholarMilestone2");
+  const scholarMilestone3Checkbox =
+    document.getElementById("scholarMilestone3");
 
   function isMilestoneChecked(pathName, level) {
     if (pathName === "Artificer") {
-      if (level === 2) return !!(artificerMilestone2Checkbox?.checked);
-      if (level === 3) return !!(artificerMilestone3Checkbox?.checked);
+      if (level === 2) return !!artificerMilestone2Checkbox?.checked;
+      if (level === 3) return !!artificerMilestone3Checkbox?.checked;
     } else if (pathName === "Bard") {
-      if (level === 2) return !!(bardMilestone2Checkbox?.checked);
-      if (level === 3) return !!(bardMilestone3Checkbox?.checked);
+      if (level === 2) return !!bardMilestone2Checkbox?.checked;
+      if (level === 3) return !!bardMilestone3Checkbox?.checked;
     } else if (pathName === "Scholar") {
-      if (level === 2) return !!(scholarMilestone2Checkbox?.checked);
-      if (level === 3) return !!(scholarMilestone3Checkbox?.checked);
+      if (level === 2) return !!scholarMilestone2Checkbox?.checked;
+      if (level === 3) return !!scholarMilestone3Checkbox?.checked;
     }
     return false;
   }
@@ -418,6 +419,15 @@ function exportCharacterPDF() {
 
   const rowLineHeight = 14;
 
+  // For full-skill cards we track a separate column layout
+  let cardColumn = 0; // 0 = left, 1 = right
+  let cardCurrentY = y;
+  const cardColumnGap = 12;
+  const cardWidthFull = pageWidth - margin * 2;
+  const cardWidthTwoCol = (pageWidth - margin * 2 - cardColumnGap) / 2;
+  const cardPadding = 10;
+  const cardMinHeight = 80;
+
   sorted.forEach((sk, index) => {
     if (!fullSkillInfo) {
       // ---------- COMPACT TABLE MODE ----------
@@ -442,9 +452,9 @@ function exportCharacterPDF() {
         doc.setFontSize(13);
         doc.setTextColor(255, 255, 255);
 
-        const tierLabel = "Tier";
-        const tierLabelWidth = doc.getTextWidth(tierLabel);
-        doc.text(tierLabel, colTierCenterX - tierLabelWidth / 2, y + 16);
+        const tierLabel2 = "Tier";
+        const tierLabelWidth2 = doc.getTextWidth(tierLabel2);
+        doc.text(tierLabel2, colTierCenterX - tierLabelWidth2 / 2, y + 16);
         doc.text("Path /", colPathX, y + 12);
         doc.text("Profession", colPathX, y + 26);
         doc.text("Skill Name", colSkillX, y + 16);
@@ -494,54 +504,55 @@ function exportCharacterPDF() {
 
       y = lineY + 6;
     } else {
-      // ---------- FULL SKILL CARD MODE ----------
-      const cardMinHeight = 80;
-      if (y > pageHeight - margin - cardMinHeight) {
+      // ---------- FULL SKILL CARD MODE (TWO COLUMNS) ----------
+      // New page if not enough vertical space for another card row
+      if (cardCurrentY > pageHeight - margin - cardMinHeight) {
         doc.addPage();
         drawParchmentBackground(doc);
 
-        y = margin;
+        let newY = margin;
         doc.setFont("Times", "bold");
         doc.setFontSize(15);
         doc.setTextColor(0, 0, 0);
-        doc.text("Skills (continued)", margin, y);
-        y += 10;
+        doc.text("Skills (continued)", margin, newY);
+        newY += 10;
 
         doc.setFont("Times", "bold");
         doc.setFontSize(11);
         doc.setTextColor(0, 0, 0);
+
+        cardCurrentY = newY + 4;
+        cardColumn = 0;
       }
 
-      const cardX = margin;
-      const cardWidth = pageWidth - margin * 2;
-      const cardTop = y;
-      const cardPadding = 10;
+      const cardWidth = cardWidthTwoCol;
+      const cardX =
+        cardColumn === 0
+          ? margin
+          : margin + cardWidthTwoCol + cardColumnGap;
+      const cardTop = cardCurrentY;
 
       let currentY = cardTop + cardPadding + 12;
 
-      // Header line: "Mage   Tier 0   Basic Weapon Proficiency"
-      const headerBaseX = cardX + cardPadding;
-
+      // Top of card:
+      // Line 1: Skill Name
+      // Line 2: Job Tier (e.g. "Mage Tier 5")
       doc.setFont("Times", "bold");
       doc.setFontSize(12);
 
-      const pathText = sk.path;
-      const tierText = `Tier ${sk.tier}`;
-      const usesDisplay = getUsesDisplayForSkill(sk);
+      const skillName = sk.name || "";
+      const nameMaxWidth = cardWidth - cardPadding * 2;
+      const skillNameLines = doc.splitTextToSize(skillName, nameMaxWidth);
+      doc.text(skillNameLines, cardX + cardPadding, currentY);
 
-      doc.text(pathText, headerBaseX, currentY);
+      currentY += rowLineHeight * skillNameLines.length;
 
-      const pathWidth = doc.getTextWidth(pathText) + 12;
-      doc.text(tierText, headerBaseX + pathWidth, currentY);
+      const jobTierText = `${sk.path} Tier ${sk.tier}`;
+      doc.setFont("Times", "normal");
+      doc.setFontSize(11);
+      doc.text(jobTierText, cardX + cardPadding, currentY);
 
-      const tierWidth = doc.getTextWidth(tierText) + 12;
-      const nameX = headerBaseX + pathWidth + tierWidth;
-
-      const nameMaxWidth = cardX + cardWidth - cardPadding - nameX;
-      const nameLines = doc.splitTextToSize(sk.name, nameMaxWidth);
-      doc.text(nameLines, nameX, currentY);
-
-      currentY += rowLineHeight * Math.max(1, nameLines.length) + 4;
+      currentY += rowLineHeight;
 
       // Find meta-skill for details
       let metaSkill = null;
@@ -570,10 +581,9 @@ function exportCharacterPDF() {
         addLabeledBlock("Prerequisite", metaSkill.prereq);
       }
 
-      // Uses line (always present)
+      const usesDisplay = getUsesDisplayForSkill(sk);
       addLabeledBlock("# of uses", usesDisplay);
 
-      // Card border last
       const cardBottom = currentY + cardPadding;
       const cardHeight = cardBottom - cardTop;
 
@@ -581,7 +591,15 @@ function exportCharacterPDF() {
       doc.setLineWidth(0.7);
       doc.roundedRect(cardX, cardTop, cardWidth, cardHeight, 5, 5);
 
-      y = cardTop + cardHeight + 8; // gap before next card
+      // Advance column/row for next card
+      if (cardColumn === 0) {
+        // move to right column, same row
+        cardColumn = 1;
+      } else {
+        // move to next row, reset to left column
+        cardColumn = 0;
+        cardCurrentY = cardTop + cardHeight + 8;
+      }
     }
   });
 
@@ -610,31 +628,30 @@ function exportCharacterPDF() {
     doc.setFontSize(11);
     doc.setTextColor(255, 255, 255);
 
-   // Narrow columns so headers fit within the brown bar
-const colNameX = margin + 6;
-const colDateX = margin + 170;
-const colTypeX = margin + 240;
-const colNpcX = margin + 310;
-const colMotX = margin + 360;
-const colBonusX = margin + 430;
-const colPtsX = margin + 495;
+    // Narrow columns so headers fit within the brown bar
+    const colNameX = margin + 6;
+    const colDateX = margin + 170;
+    const colTypeX = margin + 240;
+    const colNpcX = margin + 310;
+    const colMotX = margin + 360;
+    const colBonusX = margin + 430;
+    const colPtsX = margin + 495;
 
-doc.text("Event Name", colNameX, y + 18);
-doc.text("Date", colDateX, y + 18);
-doc.text("Type", colTypeX, y + 18);
-doc.text("NPC?", colNpcX, y + 18);
+    doc.text("Event Name", colNameX, y + 18);
+    doc.text("Date", colDateX, y + 18);
+    doc.text("Type", colTypeX, y + 18);
+    doc.text("NPC?", colNpcX, y + 18);
 
-// Wrap "Merchant OT?"
-doc.text("Merchant", colMotX, y + 14);
-doc.text("OT?", colMotX, y + 24);
+    // Wrap "Merchant OT?"
+    doc.text("Merchant", colMotX, y + 14);
+    doc.text("OT?", colMotX, y + 24);
 
-// Wrap "Bonus SP" and "Skill Pts"
-doc.text("Bonus", colBonusX, y + 14);
-doc.text("SP", colBonusX, y + 24);
+    // Wrap "Bonus SP" and "Skill Pts"
+    doc.text("Bonus", colBonusX, y + 14);
+    doc.text("SP", colBonusX, y + 24);
 
-doc.text("Skill", colPtsX, y + 14);
-doc.text("Pts", colPtsX, y + 24);
-
+    doc.text("Skill", colPtsX, y + 14);
+    doc.text("Pts", colPtsX, y + 24);
 
     y += eventHeaderHeight + 4;
 
@@ -668,17 +685,16 @@ doc.text("Pts", colPtsX, y + 24);
           doc.setFontSize(11);
           doc.setTextColor(255, 255, 255);
 
-         doc.text("Event Name", colNameX, y + 18);
-doc.text("Date", colDateX, y + 18);
-doc.text("Type", colTypeX, y + 18);
-doc.text("NPC?", colNpcX, y + 18);
-doc.text("Merchant", colMotX, y + 14);
-doc.text("OT?", colMotX, y + 24);
-doc.text("Bonus", colBonusX, y + 14);
-doc.text("SP", colBonusX, y + 24);
-doc.text("Skill", colPtsX, y + 14);
-doc.text("Pts", colPtsX, y + 24);
-
+          doc.text("Event Name", colNameX, y + 18);
+          doc.text("Date", colDateX, y + 18);
+          doc.text("Type", colTypeX, y + 18);
+          doc.text("NPC?", colNpcX, y + 18);
+          doc.text("Merchant", colMotX, y + 14);
+          doc.text("OT?", colMotX, y + 24);
+          doc.text("Bonus", colBonusX, y + 14);
+          doc.text("SP", colBonusX, y + 24);
+          doc.text("Skill", colPtsX, y + 14);
+          doc.text("Pts", colPtsX, y + 24);
 
           y += eventHeaderHeight + 4;
           doc.setFont("Times", "bold");
