@@ -348,43 +348,50 @@ function exportCharacterPDF() {
   doc.setFont("Times", "bold");
   doc.setFontSize(10);
 
-  const innerX = milestonesBoxX + 6;
   const innerTopY = milestonesBoxTop + 6;
 
   // "Milestones:" INSIDE the box
+  const innerX = milestonesBoxX + 6;
   doc.text("Milestones:", innerX, innerTopY + 8);
 
-  const colCount = 3;
-  const colWidth = (milestonesWidth - 12) / colCount;
   const squareSize = 10;
   const rowOffset = 8;
-
   const labelBaseY = innerTopY + 24; // move path labels down slightly
 
+  // Use evenly spaced column centers so Bard isn't hugging Artificer
+  const colWidthMs = milestonesWidth / 3;
+
   milestonePaths.forEach((p, idx) => {
-    const startX = innerX + idx * colWidth;
+    const centerX = milestonesBoxX + colWidthMs * (idx + 0.5);
+    const labelText = `${p}:`;
+    const labelWidth = doc.getTextWidth(labelText);
+
+    const labelX = centerX - labelWidth / 2;
     const labelY = labelBaseY;
 
-    doc.text(`${p}:`, startX, labelY);
+    doc.text(labelText, labelX, labelY);
 
+    // Center checkboxes under label
+    const boxTotalWidth = squareSize + 4; // box + little gap before number text
+    const box2X = centerX - boxTotalWidth / 2;
     const box2Y = labelY + rowOffset;
-    const box2X = startX;
+
     doc.rect(box2X, box2Y, squareSize, squareSize);
     if (isMilestoneChecked(p, 2)) {
       doc.text("X", box2X + 3, box2Y + 8);
     }
-    doc.setFontSize(9); // label for "2"
+    doc.setFontSize(9);
     doc.text("2", box2X + squareSize + 4, box2Y + 8);
 
+    const box3X = box2X;
     const box3Y = box2Y + squareSize + 4;
-    const box3X = startX;
     doc.rect(box3X, box3Y, squareSize, squareSize);
     if (isMilestoneChecked(p, 3)) {
       doc.text("X", box3X + 3, box3Y + 8);
     }
     doc.text("3", box3X + squareSize + 4, box3Y + 8);
 
-    doc.setFontSize(10); // restore for next path label
+    doc.setFontSize(10); // restore
   });
 
   const boxesBottom = basicBoxTop + basicBoxHeight;
@@ -467,11 +474,18 @@ function exportCharacterPDF() {
 
     // Top padding + offset for first line
     current += cardPadding + 8;
-    // Skill name block
-    current += rowLH * skillNameLines.length;
 
-    // Space for Path line (baseline + some gap below)
-    current += 20; // matches linePathY + 16 pattern
+    if (skillNameLines.length > 0) {
+      // first line row
+      current += rowLH;
+      const extraLines = skillNameLines.length - 1;
+      if (extraLines > 0) {
+        current += extraLines * rowLH;
+      }
+    }
+
+    // Path / Profession line block
+    current += 16;
 
     // Now all the labeled blocks
     function measureBlock(text) {
@@ -614,7 +628,7 @@ function exportCharacterPDF() {
       // Tighter space between top border and skill name
       let currentY = cardTop + cardPadding + 8;
 
-      // Top of card: Skill Name (left) and Tier (right, same line)
+      // Top of card: Skill Name (left), Path/Profession (center), Tier (right)
       doc.setFont("Times", "bold");
       doc.setFontSize(12);
 
@@ -622,18 +636,39 @@ function exportCharacterPDF() {
       const nameMaxWidth = cardWidth - cardPadding * 2;
       const skillNameLines = doc.splitTextToSize(skillName, nameMaxWidth);
 
-      // baseline for first line
-      const nameBaselineY = currentY;
-      doc.text(skillNameLines, cardX + cardPadding, nameBaselineY);
+      const firstLine = skillNameLines[0] || "";
+      const remainingLines = skillNameLines.slice(1);
 
-      // Tier text on same line, right-justified
+      const lineY = currentY;
+
+      // Skill name (first line) on the left
+      doc.text(firstLine, cardX + cardPadding, lineY);
+
+      // Tier text on the right
       const tierText = `Tier ${sk.tier}`;
       const tierWidth = doc.getTextWidth(tierText);
       const tierX = cardX + cardWidth - cardPadding - tierWidth;
-      doc.text(tierText, tierX, nameBaselineY);
+      doc.text(tierText, tierX, lineY);
 
-      // move currentY down by height of name block
-      currentY += rowLineHeight * skillNameLines.length;
+      // Path / Profession centered between
+      const jobText = sk.path || "";
+      const jobWidth = doc.getTextWidth(jobText);
+      const centerX = cardX + cardWidth / 2;
+      const jobX = centerX - jobWidth / 2;
+      doc.text(jobText, jobX, lineY);
+
+      // Move down for extra name lines, if any
+      currentY += rowLineHeight;
+      if (remainingLines.length > 0) {
+        doc.setFont("Times", "bold");
+        doc.setFontSize(12);
+        doc.text(
+          remainingLines,
+          cardX + cardPadding,
+          currentY
+        );
+        currentY += rowLineHeight * remainingLines.length;
+      }
 
       doc.setFont("Times", "normal");
       doc.setFontSize(10);
@@ -657,15 +692,6 @@ function exportCharacterPDF() {
         doc.text(lines, cardX + cardPadding + 10, currentY);
         currentY += lines.length * 12 + 3;
       }
-
-      // Path / Profession directly under the skill name block
-      doc.setFont("Times", "bold");
-      doc.setFontSize(11);
-      const jobText = sk.path || "";
-      const linePathY = currentY + 4;
-      doc.text(jobText, cardX + cardPadding, linePathY);
-
-      currentY = linePathY + 16;
 
       // Then show detailed fields from the CSV
       if (metaSkill) {
