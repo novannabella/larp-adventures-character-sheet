@@ -126,30 +126,17 @@
               <input type="text" id="secondaryPathsDisplay" readonly />
             </div>
             <div class="field">
-              <label for="professionsDisplay">Profession(s)</label>
+              <label for="professionsDisplay">Profession(s) [Tier]</label>
               <input type="text" id="professionsDisplay" readonly />
             </div>
           </div>
 
-          <!-- Tier/Skill Points (left) + Milestones (middle) + Organizations (right) -->
+          <!-- Bottom row: (hidden) Unspent + Milestones + Organizations -->
           <div class="section-row basic-bottom-row">
-            <!-- LEFT: Unspent Skill Points (Tier kept hidden) -->
-            <div class="field basic-tier-col">
-              <!-- Hidden Tier value (still used by logic & PDF) -->
+            <!-- LEFT: keep tier/points as hidden values only -->
+            <div class="field basic-tier-col" style="display: none;">
               <input type="hidden" id="tier" />
-
-              <label>Unspent</label>
-              <label for="totalSkillPoints" style="margin-top: 2px;">
-                Skill Points
-              </label>
-              <div class="inline-input-with-note">
-                <input
-                  type="number"
-                  id="totalSkillPoints"
-                  readonly
-                  title="Calculated from events"
-                />
-              </div>
+              <input type="hidden" id="totalSkillPoints" />
             </div>
 
             <!-- MIDDLE: Milestones -->
@@ -251,7 +238,13 @@
       <!-- SKILLS -->
       <div class="card">
         <div class="card-inner">
-          <h2>Skills</h2>
+          <h2 class="skills-header">
+            <span>Skills</span>
+            <span class="unspent-sp-display">
+              Unspent SP
+              <span class="unspent-sp-box" id="unspentSkillPointsHeader">0</span>
+            </span>
+          </h2>
 
           <div class="skills-row">
             <div class="field">
