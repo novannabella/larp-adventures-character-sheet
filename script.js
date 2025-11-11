@@ -775,28 +775,22 @@ function renderSelectedSkills() {
     tdName.textContent = sk.name;
     tr.appendChild(tdName);
 
-    // Uses & Periodicity based on current tier / milestones
+    // Uses: combined numeric + periodicity, just like the PDF
     let usesDisplay = "—";
-    let periodicityText = "—";
     const metaSkillList = skillsByPath[sk.path] || [];
     const metaSkill = metaSkillList.find((s) => s.name === sk.name);
     if (metaSkill) {
       const usesInfo = computeSkillUses(metaSkill);
       if (usesInfo) {
         if (usesInfo.numeric === Infinity) {
-          usesDisplay = "∞";
-          if (!usesInfo.periodicity) {
-            periodicityText = "Unlimited";
-          } else {
-            periodicityText = usesInfo.periodicity;
-          }
-        } else if (Number.isFinite(usesInfo.numeric)) {
-          usesDisplay = String(usesInfo.numeric);
-          periodicityText = usesInfo.periodicity || periodicityText;
+          // match PDF behavior: Unlimited
+          usesDisplay = "Unlimited";
         } else if (usesInfo.display) {
-          // fallback
+          // e.g. "10 × Per Event Day"
           usesDisplay = usesInfo.display;
-          periodicityText = usesInfo.periodicity || periodicityText;
+        } else if (usesInfo.periodicity) {
+          // fallback: just show periodicity
+          usesDisplay = usesInfo.periodicity;
         }
       }
     }
@@ -804,10 +798,6 @@ function renderSelectedSkills() {
     const tdUses = document.createElement("td");
     tdUses.textContent = usesDisplay;
     tr.appendChild(tdUses);
-
-    const tdPeriod = document.createElement("td");
-    tdPeriod.textContent = periodicityText;
-    tr.appendChild(tdPeriod);
 
     const tdCost = document.createElement("td");
     const tag = document.createElement("span");
@@ -1025,8 +1015,7 @@ function recomputeTotals() {
   totalSkillPointsInput.value = available;
 
   renderEvents();
-  // IMPORTANT: also re-render skills so Uses updates with new Tier
-  renderSelectedSkills();
+  renderSelectedSkills(); // refresh Uses when tier changes
 }
 
 // ---------- SAVE / LOAD CHARACTER ----------
@@ -1052,7 +1041,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 13,
+    version: 14,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -1219,7 +1208,7 @@ function exportCharacterPDF() {
   const remainingSP = totalSkillPointsInput.value || "0";
   const organizations = getOrganizations().join(", ");
 
-  // HEADER: title image left at margin
+  // HEADER
   if (titleImg) {
     const imgRatio = 158 / 684;
     const maxWidth = Math.min(400, pageWidth - margin * 2);
@@ -1241,13 +1230,12 @@ function exportCharacterPDF() {
     y += 32;
   }
 
-  // Separator under title
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.7);
   doc.line(margin, y, pageWidth - margin, y);
   y += 18;
 
-  // BASIC INFO HEADER: left "Basic Information", right "Player: ... "
+  // BASIC INFO HEADER
   doc.setFont("Times", "bold");
   doc.setFontSize(15);
   doc.setTextColor(0, 0, 0);
@@ -1264,10 +1252,9 @@ function exportCharacterPDF() {
 
   y = basicHeaderY + 10;
 
-  // BASIC BOX + MILESTONES IN SAME ROW
   const totalInfoWidth = pageWidth - margin * 2;
-  const basicBoxWidth = totalInfoWidth * 0.6; // left 60%
-  const milestonesWidth = totalInfoWidth - basicBoxWidth - 16; // gap of 16
+  const basicBoxWidth = totalInfoWidth * 0.6;
+  const milestonesWidth = totalInfoWidth - basicBoxWidth - 16;
 
   const basicBoxTop = y - 8;
   const basicBoxHeight = 90;
@@ -1277,7 +1264,6 @@ function exportCharacterPDF() {
   const milestonesBoxTop = basicBoxTop;
   const milestonesBoxHeight = basicBoxHeight;
 
-  // Basic box border
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.8);
   doc.roundedRect(
@@ -1325,7 +1311,7 @@ function exportCharacterPDF() {
   labelValue("Tier", tier, colLeftX, infoY + 48);
   labelValue("Skill Pts", remainingSP, colRightX, infoY + 48);
 
-  // Milestones box to the right
+  // Milestones box
   doc.roundedRect(
     milestonesBoxX,
     milestonesBoxTop,
@@ -1335,14 +1321,12 @@ function exportCharacterPDF() {
     6
   );
 
-  // Title "Milestones:"
   doc.setFont("Times", "bold");
   doc.setFontSize(13);
   doc.setTextColor(0, 0, 0);
   const milestonesTitleY = milestonesBoxTop + 14;
   doc.text("Milestones:", milestonesBoxX + 6, milestonesTitleY);
 
-  // Three narrow columns: Artificer:, Bard:, Scholar:
   const innerX = milestonesBoxX + 6;
   const innerTopY = milestonesTitleY + 4;
   const colCount = 3;
@@ -1423,7 +1407,6 @@ function exportCharacterPDF() {
   const tableWidth = pageWidth - margin * 2;
   const headerHeight = 22;
 
-  // Table header background
   doc.setFillColor(60, 40, 20);
   doc.setDrawColor(60, 40, 20);
   doc.rect(margin, y, tableWidth, headerHeight, "F");
@@ -1502,10 +1485,10 @@ function exportCharacterPDF() {
       if (usesInfo) {
         if (usesInfo.numeric === Infinity) {
           usesDisplay = "Unlimited";
-        } else if (Number.isFinite(usesInfo.numeric)) {
-          usesDisplay = `${usesInfo.display}`;
         } else if (usesInfo.display) {
           usesDisplay = usesInfo.display;
+        } else if (usesInfo.periodicity) {
+          usesDisplay = usesInfo.periodicity;
         }
       }
     }
