@@ -385,6 +385,11 @@ tbody tr:hover {
   white-space: nowrap; /* ensure the title never wraps */
 }
 
+.basic-milestones-field {
+  /* nothing strictly needed here, but you could tweak spacing if desired */
+}
+
+
 .milestone-checkbox {
   display: flex;
   align-items: center;
