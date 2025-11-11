@@ -144,6 +144,38 @@ const bardMilestone3Checkbox = document.getElementById("bardMilestone3");
 const scholarMilestone2Checkbox = document.getElementById("scholarMilestone2");
 const scholarMilestone3Checkbox = document.getElementById("scholarMilestone3");
 
+// ---------- PARCHMENT BACKGROUND FOR PDF ----------
+let parchmentImg = null;
+
+// preload the parchment image (must be in same folder as index.html)
+(function preloadParchment() {
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = "parchment.jpg"; // make sure this file exists next to index.html
+
+  img.onload = function () {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    parchmentImg = canvas.toDataURL("image/jpeg");
+  };
+})();
+
+function drawParchmentBackground(doc) {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  if (parchmentImg) {
+    doc.addImage(parchmentImg, "JPEG", 0, 0, pageWidth, pageHeight);
+  } else {
+    // fallback if image not ready yet
+    doc.setFillColor(245, 233, 210);
+    doc.rect(0, 0, pageWidth, pageHeight, "F");
+  }
+}
+
 // ---------- HELPERS ----------
 function getOrganizations() {
   return Array.from(
@@ -240,9 +272,7 @@ function getMilestonesForPath(path) {
   return milestones;
 }
 
-// Compute Uses, including:
-// - Tier scaling
-// - Milestone-based behavior via Per Milestone 1 & Per Milestone 2
+// Compute Uses, including tier scaling + bard/artificer/scholar milestones
 function computeSkillUses(skill) {
   if (!skill) return null;
 
@@ -258,7 +288,7 @@ function computeSkillUses(skill) {
   const perMilestone1 = !!skill.perMilestone1;
   const perMilestone2 = !!skill.perMilestone2;
 
-  // Unlimited if explicitly indicated or no numeric usage info at all
+  // Unlimited if explicitly indicated or no numeric usage info
   if (
     periodicity.toLowerCase().includes("unlimited") ||
     (!base && !perExtra && !startTier && !perMilestone1 && !perMilestone2)
@@ -269,7 +299,7 @@ function computeSkillUses(skill) {
 
   const path = skill.path || "";
 
-  // Milestone-based variants for Bard/Artificer/Scholar
+  // Milestone-based behavior (Bard / Artificer / Scholar)
   if (
     (perMilestone1 || perMilestone2) &&
     (path === "Bard" || path === "Artificer" || path === "Scholar")
@@ -277,7 +307,7 @@ function computeSkillUses(skill) {
     const milestones = getMilestonesForPath(path);
     const label = periodicity || "Per Event Day";
 
-    // Case 1: Per Milestone 1 AND Per Milestone 2 => fully per milestone
+    // Case 1: Y in both Per Milestone 1 & 2 => fully per milestone
     if (perMilestone1 && perMilestone2) {
       const perMilestoneBase = base || 1;
       const total = perMilestoneBase * milestones;
@@ -288,7 +318,7 @@ function computeSkillUses(skill) {
       };
     }
 
-    // Case 2: Only Per Milestone 2 => extra use once at milestone 2+
+    // Case 2: only Per Milestone 2 => extra use once at milestone 2+
     if (!perMilestone1 && perMilestone2) {
       const baseUses = base || 1;
       const hasSecondOrMore = milestones > 1;
@@ -300,7 +330,7 @@ function computeSkillUses(skill) {
       };
     }
 
-    // If somehow only Per Milestone 1 is set, treat like per-milestone
+    // Case 3: only Per Milestone 1 => treat like per milestone
     if (perMilestone1 && !perMilestone2) {
       const perMilestoneBase = base || 1;
       const total = perMilestoneBase * milestones;
@@ -322,7 +352,6 @@ function computeSkillUses(skill) {
   }
 
   if (Number.isFinite(total) && total > 0) {
-    // For fractional perExtra (e.g. 0.5 / tier), floor to integer uses
     total = Math.floor(total + 1e-6);
   } else {
     total = 0;
@@ -659,7 +688,7 @@ function addSelectedSkill() {
 
   const free = skillFreeFlag.checked;
 
-  // Recompute totals first so we know current SP
+  // Recompute totals so we know current SP
   recomputeTotals();
   const available =
     parseInt(totalSkillPointsInput.value, 10) >= 0
@@ -1130,24 +1159,6 @@ function handleLoadCharacterFile(e) {
   };
   reader.readAsText(file);
 }
-// add parchment background
-
-let parchmentImg = null;
-const parchmentImgUrl = "parchment.jpg"; // your local image path
-
-// Preload parchment image
-const parchment = new Image();
-parchment.crossOrigin = "anonymous";
-parchment.src = parchmentImgUrl;
-parchment.onload = () => {
-  const canvas = document.createElement("canvas");
-  canvas.width = parchment.width;
-  canvas.height = parchment.height;
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(parchment, 0, 0);
-  parchmentImg = canvas.toDataURL("image/jpeg");
-};
-
 
 // ---------- PDF EXPORT ----------
 function exportCharacterPDF() {
@@ -1177,9 +1188,8 @@ function exportCharacterPDF() {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  // Parchment-like background
-  doc.setFillColor(245, 233, 210);
-  doc.rect(0, 0, pageWidth, pageHeight, "F");
+  // draw background on page 1
+  drawParchmentBackground(doc);
 
   const margin = 40;
   let y = margin;
@@ -1214,7 +1224,7 @@ function exportCharacterPDF() {
   }
 
   y += 32;
-  doc.setDrawColor(200, 200, 210);
+  doc.setDrawColor(80, 80, 90);
   doc.setLineWidth(0.7);
   doc.line(margin, y, pageWidth - margin, y);
   y += 18;
@@ -1229,7 +1239,7 @@ function exportCharacterPDF() {
   const basicBoxTop = y - 8;
   const basicBoxHeight = 90;
   const basicBoxWidth = pageWidth - margin * 2;
-  doc.setDrawColor(210, 210, 225);
+  doc.setDrawColor(100, 100, 110);
   doc.setLineWidth(0.8);
   doc.roundedRect(
     margin - 4,
@@ -1286,14 +1296,9 @@ function exportCharacterPDF() {
   const headerHeight = 22;
 
   // Table header background
-if (parchmentImg) {
-  doc.addImage(parchmentImg, "JPEG", 0, 0, pageWidth, pageHeight);
-} else {
-  // fallback in case image hasn't loaded yet
-  doc.setFillColor(245, 233, 210);
-  doc.rect(0, 0, pageWidth, pageHeight, "F");
-}
-
+  doc.setFillColor(32, 40, 70);
+  doc.setDrawColor(32, 40, 70);
+  doc.rect(margin, y, tableWidth, headerHeight, "F");
 
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(11);
@@ -1303,11 +1308,11 @@ if (parchmentImg) {
   const colTierX = margin + 6;
   const colPathX = margin + 60;
   const colSkillX = margin + 190;
-  const colUsesX = margin + tableWidth - 120; // leave more breathing room for Uses
+  const colUsesX = margin + tableWidth - 120; // leave room on right
 
   doc.text("Tier", colTierX, y + 12);
 
-  // Two-line header: "Path /" then "Profession" under it
+  // Two-line header: "Path /" then "Profession"
   doc.text("Path /", colPathX, y + 9);
   doc.text("Profession", colPathX, y + 18);
 
@@ -1318,8 +1323,8 @@ if (parchmentImg) {
 
   doc.setFont("Helvetica", "normal");
   doc.setTextColor(20, 20, 30);
-  doc.setLineWidth(0.25);
-  doc.setDrawColor(200, 200, 210);
+  doc.setLineWidth(0.5);
+  doc.setDrawColor(60, 60, 70);
 
   const sorted = getSortedSelectedSkills();
   const rowLineHeight = 14;
@@ -1328,11 +1333,11 @@ if (parchmentImg) {
     // New page if needed
     if (y > pageHeight - margin - 40) {
       doc.addPage();
+      drawParchmentBackground(doc);
 
       const pw = doc.internal.pageSize.getWidth();
       const ph = doc.internal.pageSize.getHeight();
-      doc.setFillColor(245, 233, 210);
-      doc.rect(0, 0, pw, ph, "F");
+      // pw/ph not used, but kept for possible future tweaks
 
       y = margin;
 
@@ -1359,18 +1364,12 @@ if (parchmentImg) {
       y += headerHeight + 4;
       doc.setFont("Helvetica", "normal");
       doc.setTextColor(20, 20, 30);
-      doc.setLineWidth(0.25);
-      doc.setDrawColor(200, 200, 210);
+      doc.setLineWidth(0.5);
+      doc.setDrawColor(60, 60, 70);
     }
 
-    // Zebra striping
-    if (index % 2 === 0) {
-      doc.setFillColor(245, 246, 252);
-      doc.rect(margin, y - 2, tableWidth, rowLineHeight + 3, "F");
-    }
-
-    // Row separator
-    doc.line(margin, y + rowLineHeight, margin + tableWidth, y + rowLineHeight);
+    // Row separator line (no white fill, just a line on parchment)
+    doc.line(margin, y + rowLineHeight + 2, margin + tableWidth, y + rowLineHeight + 2);
 
     // Tier & Path
     doc.text(String(sk.tier), colTierX, y + 10);
@@ -1391,24 +1390,22 @@ if (parchmentImg) {
       }
     }
 
-    // Skill name (no uses mashed in here)
+    // Skill name
     const skillLine = sk.name;
 
     // Wrapping widths
     const maxSkillWidth = colUsesX - colSkillX - 10;
     const skillLines = doc.splitTextToSize(skillLine, maxSkillWidth);
 
-    // Uses column may also need wrapping
     const maxUsesWidth = pageWidth - margin - colUsesX;
     const usesLines = doc.splitTextToSize(usesDisplay, maxUsesWidth);
 
     // Draw skill text
     doc.text(skillLines, colSkillX, y + 10);
 
-    // Draw uses text (possibly multi-line)
+    // Draw uses text
     doc.text(usesLines, colUsesX, y + 10);
 
-    // Row height is max of both columns
     const rowLines = Math.max(skillLines.length, usesLines.length);
     y += rowLineHeight * rowLines;
   });
