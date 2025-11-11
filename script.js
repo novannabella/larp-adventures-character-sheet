@@ -91,7 +91,7 @@ const QUALIFYING_FOR_TIER = new Set([
 const PROFESSION_NAMES = new Set(["Artificer", "Bard", "Merchant", "Scholar"]);
 
 // Per-path / profession tiers inferred from skills + main tier
-let pathTierMap = {}; // { Mage: 7, Healer: 3, Artificer: 2, ... }
+let pathTierMap = {};
 
 // Selected-skills sort state
 let skillSortState = {
@@ -140,6 +140,7 @@ const organizationsContainer = document.getElementById(
 const characterNameInput = document.getElementById("characterName");
 const playerNameInput = document.getElementById("playerName");
 const pathDisplaySelect = document.getElementById("pathDisplay");
+const mainPathTierDisplay = document.getElementById("mainPathTierDisplay");
 const factionSelect = document.getElementById("faction");
 
 const secondaryPathsDisplay = document.getElementById("secondaryPathsDisplay");
@@ -206,7 +207,7 @@ function updatePathAndProfessionDisplays() {
 
   const tiers = {};
 
-  // Derive tier from highest-tier skill per path
+  // Tier inferred from skills
   selectedSkills.forEach((sk) => {
     if (!sk.path) return;
     const t = parseInt(sk.tier || 0, 10) || 0;
@@ -215,13 +216,13 @@ function updatePathAndProfessionDisplays() {
     }
   });
 
-  // Override main path with character tier from events
+  // Main path gets character tier from events
   if (mainPath) {
     tiers[mainPath] = charTier;
   }
 
   pathTierMap = tiers;
-  window.pathTierMap = tiers; // used by pdf-export.js if needed
+  window.pathTierMap = tiers;
 
   const secondaryParts = [];
   const professionParts = [];
@@ -240,6 +241,16 @@ function updatePathAndProfessionDisplays() {
 
   secondaryPathsDisplay.value = secondaryParts.join(", ");
   professionsDisplay.value = professionParts.join(", ");
+
+  // Show main path tier next to the path name
+  if (mainPathTierDisplay) {
+    const t = tiers[mainPath] || charTier;
+    if (mainPath && t > 0) {
+      mainPathTierDisplay.textContent = ` (Tier ${t})`;
+    } else {
+      mainPathTierDisplay.textContent = "";
+    }
+  }
 }
 
 function computeSkillCost(record) {
@@ -1174,7 +1185,6 @@ function recomputeTotals() {
   const available = Math.max(0, totalEventPoints - totalSkillCost);
   totalSkillPointsInput.value = available;
 
-  // Rebuild per-path tiers + displays, then re-render
   updatePathAndProfessionDisplays();
   renderEvents();
   renderSelectedSkills();
