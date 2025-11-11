@@ -132,7 +132,7 @@ const factionSelect = document.getElementById("faction");
 const secondaryPathsDisplay = document.getElementById("secondaryPathsDisplay");
 const professionsDisplay = document.getElementById("professionsDisplay");
 
-// Milestone checkboxes
+// Milestone checkboxes (UI-side)
 const artificerMilestone2Checkbox = document.getElementById(
   "artificerMilestone2"
 );
@@ -152,7 +152,7 @@ let titleImg = null;
 (function preloadParchment() {
   const img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = "parchment.jpg"; // must exist next to index.html
+  img.src = "parchment.jpg";
 
   img.onload = function () {
     const canvas = document.createElement("canvas");
@@ -168,7 +168,7 @@ let titleImg = null;
 (function preloadTitle() {
   const img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = "la_title.png"; // your transparent PNG title
+  img.src = "la_title.png";
 
   img.onload = function () {
     const canvas = document.createElement("canvas");
@@ -258,7 +258,6 @@ function computeSkillCost(record) {
   }
 }
 
-// Milestone counts per path (Artificer, Bard, Scholar)
 function getMilestonesForPath(path) {
   let milestones = 1; // baseline milestone 1
 
@@ -288,23 +287,23 @@ function getMilestonesForPath(path) {
   return milestones;
 }
 
-// Compute Uses, including tier scaling + bard/artificer/scholar milestones
 function computeSkillUses(skill) {
   if (!skill) return null;
 
   const periodicity = (skill.periodicity || "").trim();
-  const base = typeof skill.usesBasePerDay === "number"
-    ? skill.usesBasePerDay
-    : parseFloat(skill.usesBasePerDay || "0") || 0;
-  const perExtra = typeof skill.usesPerExtraTier === "number"
-    ? skill.usesPerExtraTier
-    : parseFloat(skill.usesPerExtraTier || "0") || 0;
+  const base =
+    typeof skill.usesBasePerDay === "number"
+      ? skill.usesBasePerDay
+      : parseFloat(skill.usesBasePerDay || "0") || 0;
+  const perExtra =
+    typeof skill.usesPerExtraTier === "number"
+      ? skill.usesPerExtraTier
+      : parseFloat(skill.usesPerExtraTier || "0") || 0;
   const startTier = parseInt(skill.usesScaleStartTier || "0", 10) || 0;
 
   const perMilestone1 = !!skill.perMilestone1;
   const perMilestone2 = !!skill.perMilestone2;
 
-  // Unlimited if explicitly indicated or no numeric usage info
   if (
     periodicity.toLowerCase().includes("unlimited") ||
     (!base && !perExtra && !startTier && !perMilestone1 && !perMilestone2)
@@ -315,7 +314,6 @@ function computeSkillUses(skill) {
 
   const path = skill.path || "";
 
-  // Milestone-based behavior (Bard / Artificer / Scholar)
   if (
     (perMilestone1 || perMilestone2) &&
     (path === "Bard" || path === "Artificer" || path === "Scholar")
@@ -323,7 +321,6 @@ function computeSkillUses(skill) {
     const milestones = getMilestonesForPath(path);
     const label = periodicity || "Per Event Day";
 
-    // Case 1: Y in both Per Milestone 1 & 2 => fully per milestone
     if (perMilestone1 && perMilestone2) {
       const perMilestoneBase = base || 1;
       const total = perMilestoneBase * milestones;
@@ -334,7 +331,6 @@ function computeSkillUses(skill) {
       };
     }
 
-    // Case 2: only Per Milestone 2 => extra use once at milestone 2+
     if (!perMilestone1 && perMilestone2) {
       const baseUses = base || 1;
       const hasSecondOrMore = milestones > 1;
@@ -346,7 +342,6 @@ function computeSkillUses(skill) {
       };
     }
 
-    // Case 3: only Per Milestone 1 => treat like per milestone
     if (perMilestone1 && !perMilestone2) {
       const perMilestoneBase = base || 1;
       const total = perMilestoneBase * milestones;
@@ -358,7 +353,6 @@ function computeSkillUses(skill) {
     }
   }
 
-  // Normal tier-based scaling
   const currentTier = getCurrentTier();
   let total = base;
 
@@ -704,7 +698,6 @@ function addSelectedSkill() {
 
   const free = skillFreeFlag.checked;
 
-  // Recompute totals so we know current SP
   recomputeTotals();
   const available =
     parseInt(totalSkillPointsInput.value, 10) >= 0
@@ -743,7 +736,6 @@ function renderSelectedSkills() {
   sorted.forEach((sk) => {
     const tr = document.createElement("tr");
 
-    // Remove button (left-most)
     const tdMinus = document.createElement("td");
     const minusBtn = document.createElement("button");
     minusBtn.textContent = "−";
@@ -771,22 +763,18 @@ function renderSelectedSkills() {
     tdMinus.appendChild(minusBtn);
     tr.appendChild(tdMinus);
 
-    // Tier
     const tdTier = document.createElement("td");
     tdTier.textContent = sk.tier;
     tr.appendChild(tdTier);
 
-    // Path
     const tdPath = document.createElement("td");
     tdPath.textContent = sk.path;
     tr.appendChild(tdPath);
 
-    // Name
     const tdName = document.createElement("td");
     tdName.textContent = sk.name;
     tr.appendChild(tdName);
 
-    // Uses & Periodicity
     let usesDisplay = "—";
     let periodicityText = "—";
     const metaSkillList = skillsByPath[sk.path] || [];
@@ -810,7 +798,6 @@ function renderSelectedSkills() {
     tdPeriod.textContent = periodicityText;
     tr.appendChild(tdPeriod);
 
-    // Cost
     const tdCost = document.createElement("td");
     const tag = document.createElement("span");
     const cost = computeSkillCost(sk);
@@ -1052,7 +1039,7 @@ function collectCharacterState() {
   );
 
   return {
-    version: 10,
+    version: 11,
     characterName: characterNameInput.value || "",
     playerName: playerNameInput.value || "",
     pathDisplay: pathDisplaySelect.value || "",
@@ -1204,7 +1191,6 @@ function exportCharacterPDF() {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  // draw background on page 1
   drawParchmentBackground(doc);
 
   const margin = 40;
@@ -1220,59 +1206,69 @@ function exportCharacterPDF() {
   const remainingSP = totalSkillPointsInput.value || "0";
   const organizations = getOrganizations().join(", ");
 
-  // HEADER: use la_title.png if available
+  // HEADER: title image left at margin
   if (titleImg) {
-    const imgRatio = 158 / 684; // original 684x158
+    const imgRatio = 158 / 684;
     const maxWidth = Math.min(400, pageWidth - margin * 2);
     const titleWidth = maxWidth;
     const titleHeight = titleWidth * imgRatio;
-    const x = (pageWidth - titleWidth) / 2;
+    const x = margin;
 
     doc.addImage(titleImg, "PNG", x, y, titleWidth, titleHeight);
     y += titleHeight + 10;
   } else {
-    // Fallback to text header if image not ready
-    doc.setFont("Helvetica", "bold");
+    doc.setFont("Times", "bold");
     doc.setFontSize(22);
     doc.setTextColor(0, 0, 0);
     doc.text("Larp Adventures", margin, y);
 
     doc.setFontSize(14);
-    doc.setFont("Helvetica", "bold");
+    doc.setFont("Times", "bold");
     doc.text("Character Sheet", margin, y + 18);
     y += 32;
   }
 
-  // Player name in top-right, in black
-  if (playerName) {
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    const label = `Player: ${playerName}`;
-    const labelWidth = doc.getTextWidth(label);
-    doc.text(label, pageWidth - margin - labelWidth, margin);
-  }
-
-  // Separator line
+  // Separator under title
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.7);
   doc.line(margin, y, pageWidth - margin, y);
   y += 18;
 
-  // Basic Information box
-  doc.setFont("Helvetica", "bold");
+  // BASIC INFO HEADER: left "Basic Information", right "Player: ... "
+  doc.setFont("Times", "bold");
   doc.setFontSize(13);
   doc.setTextColor(0, 0, 0);
-  doc.text("Basic Information", margin, y);
-  y += 10;
+  const basicHeaderY = y;
+
+  doc.text("Basic Information", margin, basicHeaderY);
+
+  const playerLabel =
+    playerName && playerName.trim().length > 0
+      ? `Player: ${playerName}`
+      : "Player:";
+  const playerLabelWidth = doc.getTextWidth(playerLabel);
+  doc.text(playerLabel, pageWidth - margin - playerLabelWidth, basicHeaderY);
+
+  y = basicHeaderY + 10;
+
+  // BASIC BOX + MILESTONES IN SAME ROW
+  const totalInfoWidth = pageWidth - margin * 2;
+  const basicBoxWidth = totalInfoWidth * 0.6; // left 60%
+  const milestonesWidth = totalInfoWidth - basicBoxWidth - 16; // gap of 16
 
   const basicBoxTop = y - 8;
   const basicBoxHeight = 90;
-  const basicBoxWidth = pageWidth - margin * 2;
+  const basicBoxX = margin;
+
+  const milestonesBoxX = basicBoxX + basicBoxWidth + 16;
+  const milestonesBoxTop = basicBoxTop;
+  const milestonesBoxHeight = basicBoxHeight;
+
+  // Basic box border
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.8);
   doc.roundedRect(
-    margin - 4,
+    basicBoxX - 4,
     basicBoxTop,
     basicBoxWidth + 8,
     basicBoxHeight,
@@ -1280,45 +1276,126 @@ function exportCharacterPDF() {
     6
   );
 
-  const colLeftX = margin;
-  const colRightX = margin + basicBoxWidth / 2 + 4;
+  const colLeftX = basicBoxX;
+  const colRightX = basicBoxX + basicBoxWidth / 2 + 4;
   let infoY = y + 6;
 
-  doc.setFont("Helvetica", "normal");
+  doc.setFont("Times", "normal");
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
 
   function labelValue(label, value, x, yLine) {
     const labelText = `${label}:`;
 
-    // label bold black
-    doc.setFont("Helvetica", "bold");
+    doc.setFont("Times", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text(labelText, x, yLine);
 
     const labelWidth = doc.getTextWidth(labelText);
     const valueX = x + labelWidth + 6;
 
-    // value normal black
-    doc.setFont("Helvetica", "normal");
+    doc.setFont("Times", "normal");
     doc.setTextColor(0, 0, 0);
     doc.text(value || "-", valueX, yLine);
   }
 
+  // Inside the basic box, rows:
+  // Character: (L) / Secondary: (R)
+  // Faction:   (L) / Professions: (R)
+  // Path:      (L) / Organizations: (R)
+  // Tier:      (L) / Skill Pts: (R)
   labelValue("Character", charName, colLeftX, infoY);
-  labelValue("Path", path, colLeftX, infoY + 16);
-  labelValue("Secondary", secondaryPaths, colLeftX, infoY + 32);
-  labelValue("Professions", professions, colLeftX, infoY + 48);
+  labelValue("Secondary", secondaryPaths, colRightX, infoY);
 
-  labelValue("Faction", faction, colRightX, infoY);
-  labelValue("Tier", tier, colRightX, infoY + 16);
-  labelValue("Skill Pts", remainingSP, colRightX, infoY + 32);
-  labelValue("Organizations", organizations, colRightX, infoY + 48);
+  labelValue("Faction", faction, colLeftX, infoY + 16);
+  labelValue("Professions", professions, colRightX, infoY + 16);
 
-  y = basicBoxTop + basicBoxHeight + 24;
+  labelValue("Path", path, colLeftX, infoY + 32);
+  labelValue("Organizations", organizations, colRightX, infoY + 32);
+
+  labelValue("Tier", tier, colLeftX, infoY + 48);
+  labelValue("Skill Pts", remainingSP, colRightX, infoY + 48);
+
+  // Milestones box to the right
+  doc.roundedRect(
+    milestonesBoxX,
+    milestonesBoxTop,
+    milestonesWidth,
+    milestonesBoxHeight,
+    6,
+    6
+  );
+
+  // Title "Milestones"
+  doc.setFont("Times", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0);
+  const milestonesTitleY = milestonesBoxTop + 14;
+  doc.text("Milestones", milestonesBoxX + 6, milestonesTitleY);
+
+  // Three narrow columns: Artificer, Bard, Scholar
+  const innerX = milestonesBoxX + 6;
+  const innerTopY = milestonesTitleY + 4;
+  const colCount = 3;
+  const colWidth = (milestonesWidth - 12) / colCount;
+  const squareSize = 10;
+  const rowOffset = 8;
+
+  function isMilestoneChecked(path, level) {
+    if (path === "Artificer") {
+      if (level === 2) return !!(artificerMilestone2Checkbox && artificerMilestone2Checkbox.checked);
+      if (level === 3) return !!(artificerMilestone3Checkbox && artificerMilestone3Checkbox.checked);
+    } else if (path === "Bard") {
+      if (level === 2) return !!(bardMilestone2Checkbox && bardMilestone2Checkbox.checked);
+      if (level === 3) return !!(bardMilestone3Checkbox && bardMilestone3Checkbox.checked);
+    } else if (path === "Scholar") {
+      if (level === 2) return !!(scholarMilestone2Checkbox && scholarMilestone2Checkbox.checked);
+      if (level === 3) return !!(scholarMilestone3Checkbox && scholarMilestone3Checkbox.checked);
+    }
+    return false;
+  }
+
+  const milestonePaths = ["Artificer", "Bard", "Scholar"];
+
+  doc.setFont("Times", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+
+  milestonePaths.forEach((p, idx) => {
+    const startX = innerX + idx * colWidth;
+    const labelY = innerTopY + 12;
+
+    // Path label
+    doc.setFont("Times", "bold");
+    doc.text(p, startX, labelY);
+
+    doc.setFont("Times", "normal");
+
+    // Milestone 2
+    const box2Y = labelY + rowOffset;
+    const box2X = startX;
+    doc.rect(box2X, box2Y, squareSize, squareSize);
+    if (isMilestoneChecked(p, 2)) {
+      doc.text("X", box2X + 3, box2Y + 8);
+    }
+    doc.text("2", box2X + squareSize + 4, box2Y + 8);
+
+    // Milestone 3
+    const box3Y = box2Y + squareSize + 4;
+    const box3X = startX;
+    doc.rect(box3X, box3Y, squareSize, squareSize);
+    if (isMilestoneChecked(p, 3)) {
+      doc.text("X", box3X + 3, box3Y + 8);
+    }
+    doc.text("3", box3X + squareSize + 4, box3Y + 8);
+  });
+
+  // Move y below both boxes
+  const boxesBottom = basicBoxTop + basicBoxHeight;
+  y = boxesBottom + 24;
 
   // Skills header
-  doc.setFont("Helvetica", "bold");
+  doc.setFont("Times", "bold");
   doc.setFontSize(13);
   doc.setTextColor(0, 0, 0);
   doc.text("Skills", margin, y);
@@ -1327,33 +1404,30 @@ function exportCharacterPDF() {
   const tableWidth = pageWidth - margin * 2;
   const headerHeight = 22;
 
-  // Table header background (dark neutral instead of blue)
+  // Table header background
   doc.setFillColor(60, 40, 20);
   doc.setDrawColor(60, 40, 20);
   doc.rect(margin, y, tableWidth, headerHeight, "F");
 
-  doc.setFont("Helvetica", "bold");
+  doc.setFont("Times", "bold");
   doc.setFontSize(11);
   doc.setTextColor(255, 255, 255);
 
-  // Column positions: Tier | Path / Profession (two-line label) | Skill Name | Uses
+  // Column positions: Tier | Path/Profession | Skill Name | Uses
   const colTierX = margin + 6;
   const colPathX = margin + 60;
-  const colSkillX = margin + 190;
-  const colUsesX = margin + tableWidth - 120; // leave room on right
+  const colSkillX = margin + 140;              // slightly more left
+  const colUsesX = margin + tableWidth - 100;  // further right, more room
 
   doc.text("Tier", colTierX, y + 12);
-
-  // Two-line header: "Path /" then "Profession"
   doc.text("Path /", colPathX, y + 9);
   doc.text("Profession", colPathX, y + 18);
-
   doc.text("Skill Name", colSkillX, y + 12);
   doc.text("Uses", colUsesX, y + 12);
 
   y += headerHeight + 4;
 
-  doc.setFont("Helvetica", "normal");
+  doc.setFont("Times", "normal");
   doc.setTextColor(0, 0, 0);
   doc.setLineWidth(0.5);
   doc.setDrawColor(0, 0, 0);
@@ -1361,20 +1435,14 @@ function exportCharacterPDF() {
   const sorted = getSortedSelectedSkills();
   const rowLineHeight = 14;
 
-  sorted.forEach((sk, index) => {
-    // New page if needed
-    if (y > pageHeight - margin - 40) {
+  sorted.forEach((sk) => {
+    if (y > pageHeight - margin - 60) {
       doc.addPage();
       drawParchmentBackground(doc);
 
-      const pw = doc.internal.pageSize.getWidth();
-      const ph = doc.internal.pageSize.getHeight();
-      // pw/ph kept in case we tweak later
-
       y = margin;
 
-      // Continued header
-      doc.setFont("Helvetica", "bold");
+      doc.setFont("Times", "bold");
       doc.setFontSize(13);
       doc.setTextColor(0, 0, 0);
       doc.text("Skills (continued)", margin, y);
@@ -1384,7 +1452,7 @@ function exportCharacterPDF() {
       doc.setDrawColor(60, 40, 20);
       doc.rect(margin, y, tableWidth, headerHeight, "F");
 
-      doc.setFont("Helvetica", "bold");
+      doc.setFont("Times", "bold");
       doc.setFontSize(11);
       doc.setTextColor(255, 255, 255);
       doc.text("Tier", colTierX, y + 12);
@@ -1394,20 +1462,20 @@ function exportCharacterPDF() {
       doc.text("Uses", colUsesX, y + 12);
 
       y += headerHeight + 4;
-      doc.setFont("Helvetica", "normal");
+      doc.setFont("Times", "normal");
       doc.setTextColor(0, 0, 0);
       doc.setLineWidth(0.5);
       doc.setDrawColor(0, 0, 0);
     }
 
-    // Row separator line (no white fill)
-    doc.line(margin, y + rowLineHeight + 2, margin + tableWidth, y + rowLineHeight + 2);
+    const rowTop = y;
+    const textBaseline = rowTop + 12; // slightly more padding from line above
 
     // Tier & Path
-    doc.text(String(sk.tier), colTierX, y + 10);
-    doc.text(sk.path, colPathX, y + 10);
+    doc.text(String(sk.tier), colTierX, textBaseline);
+    doc.text(sk.path, colPathX, textBaseline);
 
-    // Compute Uses info from meta skill
+    // Uses & skill name
     let usesDisplay = "—";
     const metaSkillList = skillsByPath[sk.path] || [];
     const metaSkill = metaSkillList.find((s) => s.name === sk.name);
@@ -1422,27 +1490,26 @@ function exportCharacterPDF() {
       }
     }
 
-    // Skill name
     const skillLine = sk.name;
 
-    // Wrapping widths
     const maxSkillWidth = colUsesX - colSkillX - 10;
     const skillLines = doc.splitTextToSize(skillLine, maxSkillWidth);
 
     const maxUsesWidth = pageWidth - margin - colUsesX;
     const usesLines = doc.splitTextToSize(usesDisplay, maxUsesWidth);
 
-    // Draw skill text
-    doc.text(skillLines, colSkillX, y + 10);
-
-    // Draw uses text
-    doc.text(usesLines, colUsesX, y + 10);
+    doc.text(skillLines, colSkillX, textBaseline);
+    doc.text(usesLines, colUsesX, textBaseline);
 
     const rowLines = Math.max(skillLines.length, usesLines.length);
-    y += rowLineHeight * rowLines;
+    const rowTextHeight = rowLineHeight * rowLines;
+
+    const lineY = rowTop + rowTextHeight + 4;
+    doc.line(margin, lineY, margin + tableWidth, lineY);
+
+    y = lineY + 6; // a bit more padding before next row
   });
 
-  // Save PDF with character-based name
   let suggestedName = charName ? charName : "larp_character";
   let baseName = prompt("Enter a name for the exported PDF:", suggestedName);
   if (!baseName) {
