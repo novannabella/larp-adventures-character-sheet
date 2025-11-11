@@ -233,8 +233,8 @@ function updatePathAndProfessionDisplays() {
     if (path === mainPath) return;
 
     if (PROFESSION_NAMES.has(path)) {
-      // Professions stay like: Artificer 2, Bard 1
-      const label = `${path} ${t}`;
+      // Professions now: Artificer [2], Bard [1]
+      const label = `${path} [${t}]`;
       professionParts.push(label);
     } else {
       // Secondary paths: Healer [2], Rogue [2]
@@ -1233,6 +1233,12 @@ function recomputeTotals() {
 
   const available = Math.max(0, totalEventPoints - totalSkillCost);
   totalSkillPointsInput.value = available;
+
+  // Update Unspent SP header
+  const unspentHeader = document.getElementById("unspentSkillPointsHeader");
+  if (unspentHeader) {
+    unspentHeader.textContent = available;
+  }
 
   updatePathAndProfessionDisplays();
   renderEvents();
