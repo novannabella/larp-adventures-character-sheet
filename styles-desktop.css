@@ -324,7 +324,6 @@ tbody tr:hover {
 }
 
 /* Organizations grid */
-
 .org-block {
   padding: 6px 8px;
   border-radius: var(--radius-sm);
@@ -497,6 +496,39 @@ tbody tr:hover {
 
 .event-input-row #eventBonusInput {
   max-width: 60px;
+}
+
+/* ==== NEW: Path + Tier inline layout in Basic Info ==== */
+
+.path-tier-inline {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.path-tier-inline select#pathDisplay {
+  flex: 1 1 auto;
+  max-width: 70%;
+}
+
+.main-tier-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.main-tier-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+#mainPathTierBox {
+  width: 48px;
+  text-align: center;
+  padding-inline: 4px;
 }
 
 @media (max-width: 900px) {
