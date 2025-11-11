@@ -363,17 +363,16 @@ tbody tr:hover {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 12px; /* a touch more breathing room */
+  gap: 8px;
 }
 
 .milestone-block {
-  flex: 1;
-  min-width: 220px; /* ensures Artificer has room for title */
+  flex: 1 1 0;
+  min-width: 0; /* allow them to shrink so 3 fit in a row */
   padding: 8px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: rgba(15, 23, 42, 0.8);
-  white-space: nowrap; /* prevents wrapping in title */
 }
 
 .milestone-title {
@@ -382,8 +381,22 @@ tbody tr:hover {
   letter-spacing: 0.08em;
   color: var(--muted);
   margin-bottom: 4px;
-  white-space: nowrap; /* ensure the title never wraps */
+  white-space: nowrap;
 }
+
+.milestone-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text);
+}
+
+.milestone-checkbox span {
+  min-width: 10px;
+  text-align: left;
+}
+
 
 .basic-milestones-field {
   /* nothing strictly needed here, but you could tweak spacing if desired */
