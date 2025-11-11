@@ -117,7 +117,6 @@ label {
   white-space: nowrap;
 }
 
-
 input[type="text"],
 input[type="number"],
 input[type="date"],
@@ -141,6 +140,7 @@ textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent-soft);
 }
+
 /* Hide number input arrows for Tier & Skill Points */
 #tier,
 #totalSkillPoints {
@@ -348,7 +348,6 @@ tbody tr:hover {
   white-space: nowrap;
 }
 
-
 .org-item input[type="checkbox"] {
   margin: 0;
 }
@@ -379,7 +378,6 @@ tbody tr:hover {
   white-space: nowrap;           /* keep "Artificer" on one line */
 }
 
-
 .milestone-title {
   font-size: 11px;
   text-transform: uppercase;
@@ -402,11 +400,9 @@ tbody tr:hover {
   text-align: left;
 }
 
-
 .basic-milestones-field {
-  /* nothing strictly needed here, but you could tweak spacing if desired */
+  /* tweak spacing if desired */
 }
-
 
 .milestone-checkbox {
   display: flex;
@@ -419,7 +415,6 @@ tbody tr:hover {
 .milestone-checkbox input[type="checkbox"] {
   width: auto;
 }
-
 
 .milestone-title {
   font-size: 11px;
@@ -487,6 +482,12 @@ tbody tr:hover {
   text-align: center;
   font-size: 12px;
   color: var(--muted-text);
+}
+
+/* Center Tier column in Selected Skills table */
+.skills-table th:nth-child(2),
+.skills-table td:nth-child(2) {
+  text-align: center;
 }
 
 /* Date and Bonus SP sizing */
