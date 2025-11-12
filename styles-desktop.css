@@ -671,3 +671,32 @@ tbody tr:hover {
   color: #ffffff;              /* number white as well */
   border-color: rgba(255, 255, 255, 0.7);
 }
+/* Override: Skill detail modal styling */
+.modal-content {
+  background: #243b53;       /* deep bluish panel */
+  color: #fdf7e6;            /* light text */
+  max-width: 640px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #ffe6b3;            /* slightly warmer heading */
+}
+
+#skillModalBody p {
+  margin: 4px 0 8px;
+  color: #fdf7e6;            /* ensure body text stays readable */
+}
+
+.modal-close {
+  color: #fdf7e6;
+}
