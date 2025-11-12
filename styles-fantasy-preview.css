@@ -1,0 +1,175 @@
+/* === Fantasy / D&D Preview Theme ===========================
+   This file only SKINS the sheet. It assumes your existing
+   layout is in styles-desktop.css / styles-mobile.css and
+   is loaded AFTER them so it can override colors/fonts.
+   ========================================================== */
+
+/* 1. Fantasy fonts */
+@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cardo&display=swap');
+
+body {
+  font-family: 'Cardo', serif;
+  background: #2b2114;
+  color: #2d2211;
+}
+
+/* In case your sheet is wrapped in one of these containers */
+.main-container,
+.sheet-container,
+.character-sheet,
+#app {
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 16px;
+  background: rgba(244, 231, 197, 0.92); /* parchment panel */
+  border-radius: 8px;
+  border: 2px solid #6b5631;
+  box-shadow: 0 0 24px rgba(0,0,0,0.45);
+}
+
+/* 2. Headings: old-book fantasy look */
+h1, h2, h3, .section-title {
+  font-family: 'Uncial Antiqua', serif;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: #3b2915;
+}
+
+/* Big title at top */
+h1,
+.header-title,
+.sheet-title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 10px;
+  text-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+
+/* Section headings */
+h2, h3, .section-title {
+  font-size: 1.1rem;
+  margin: 12px 0 6px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #8e7545;
+}
+
+/* 3. Inputs look like ink on parchment */
+input,
+select,
+textarea {
+  background-color: rgba(255, 248, 230, 0.9);
+  border: 1px solid #bca47b;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-family: 'Cardo', serif;
+  color: #2d2211;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.15);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #bfa76a;
+  box-shadow: 0 0 5px #bfa76a;
+}
+
+/* 4. Labels & small text */
+label,
+.small-label,
+.field-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #5a4327;
+}
+
+/* 5. Section boxes (skills, events, etc.) */
+.section,
+.section-box,
+.panel {
+  background: rgba(249, 239, 211, 0.95);
+  border: 1px solid #b09b74;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+/* Optional subtle dividing lines between rows */
+.section-row,
+.skill-row,
+.event-row {
+  border-top: 1px dashed rgba(129, 103, 59, 0.5);
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+/* 6. Buttons -> fantasy “inked plaques” */
+button,
+.button,
+.btn {
+  background: linear-gradient(#d7c088, #ad8a4c);
+  border: 1px solid #6b5631;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-family: 'Uncial Antiqua', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2d2211;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #5a4327, 0 3px 4px rgba(0,0,0,0.4);
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+button:hover,
+.button:hover,
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 #5a4327, 0 4px 6px rgba(0,0,0,0.5);
+}
+
+button:active,
+.button:active,
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #5a4327, 0 2px 3px rgba(0,0,0,0.4);
+}
+
+/* 7. Fancy horizontal rule for visual breaks */
+hr {
+  border: 0;
+  height: 2px;
+  margin: 10px 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    #6b5631,
+    transparent
+  );
+}
+
+/* 8. Tiny embellishments for tables / lists */
+table {
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  border-bottom: 1px solid rgba(139, 111, 63, 0.4);
+  padding: 3px 6px;
+}
+
+table th {
+  background: rgba(191, 167, 106, 0.35);
+  font-family: 'Uncial Antiqua', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 0.75rem;
+}
+
+/* 9. Tooltips / hints: parchment tooltip bubble */
+.tooltip,
+[title] {
+  cursor: help;
+}
