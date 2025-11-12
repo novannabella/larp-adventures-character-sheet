@@ -700,3 +700,18 @@ tbody tr:hover {
 .modal-close {
   color: #fdf7e6;
 }
+/* Hide the vertical bar between Skills and Unspent Skill Points */
+.skills-header-separator {
+  display: none;
+}
+/* Keep label same color as Skills, but make the value white */
+.unspent-sp-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: inherit; /* inherit the yellow from the h2 */
+}
+
+.unspent-sp-display .unspent-sp-box {
+  color: #ffffff;                         /* number in the box is white */
+  border-color: rgba(255, 255, 255, 0.7); /* subtle light border */
+}
