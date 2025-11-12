@@ -62,6 +62,33 @@ function formatDateDisplay(isoStr) {
   return `${m}-${d}-${y}`;
 }
 
+// ---------- SMALL HTML HELPERS ----------
+function escapeHtml(str) {
+  if (!str) return "";
+  return str.replace(/[&<>"']/g, (c) => {
+    switch (c) {
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      case "'":
+        return "&#39;";
+      default:
+        return c;
+    }
+  });
+}
+
+function formatMultiLineBlock(label, text) {
+  if (!text) return "";
+  const safe = escapeHtml(text).replace(/\n/g, "<br />");
+  return `<p><strong>${label}:</strong><br />${safe}</p>`;
+}
+
 // ---------- DATA ----------
 let skillsData = [];
 let skillsByPath = {};
@@ -159,6 +186,17 @@ const bardMilestone3Checkbox = document.getElementById("bardMilestone3");
 const scholarMilestone2Checkbox = document.getElementById("scholarMilestone2");
 const scholarMilestone3Checkbox = document.getElementById("scholarMilestone3");
 
+// Modal
+const skillModal = document.getElementById("skillModal");
+const skillModalTitle = document.getElementById("skillModalTitle");
+const skillModalBody = document.getElementById("skillModalBody");
+const skillModalClose = document.getElementById("skillModalClose");
+
+// Unspent SP header
+const unspentSkillPointsHeader = document.getElementById(
+  "unspentSkillPointsHeader"
+);
+
 // ---------- DIRTY HELPERS ----------
 function markDirty() {
   isDirty = true;
@@ -233,7 +271,7 @@ function updatePathAndProfessionDisplays() {
     if (path === mainPath) return;
 
     if (PROFESSION_NAMES.has(path)) {
-      // Professions now: Artificer [2], Bard [1]
+      // Professions: Artificer [2], Bard [1]
       const label = `${path} [${t}]`;
       professionParts.push(label);
     } else {
@@ -302,7 +340,7 @@ function getMilestonesForPath(path) {
   return milestones;
 }
 
-// Uses now depend on the tier of the specific path/profession, not always main tier
+// Uses depend on the tier of the specific path/profession
 function computeSkillUses(skill) {
   if (!skill) return null;
 
@@ -344,7 +382,6 @@ function computeSkillUses(skill) {
     const label = periodicity || "Per Event Day";
 
     if (perMilestone1 && perMilestone2) {
-      // per milestone (1,2,3...) with extra at milestone 2
       const perMilestoneBase = base || 1;
       const total = perMilestoneBase * milestones;
       return {
@@ -355,7 +392,6 @@ function computeSkillUses(skill) {
     }
 
     if (!perMilestone1 && perMilestone2) {
-      // base uses +1 at milestone 2+
       const baseUses = base || 1;
       const hasSecondOrMore = milestones > 1;
       const total = baseUses + (hasSecondOrMore ? 1 : 0);
@@ -377,7 +413,7 @@ function computeSkillUses(skill) {
     }
   }
 
-  // Linear scaling: depends on effectiveTier (per path/profession)
+  // Linear scaling
   let total = base;
 
   if (effectiveTier > startTier && perExtra) {
@@ -767,6 +803,52 @@ function attachSkillSortHandlers() {
   }
 }
 
+// ---------- SKILL DETAIL MODAL ----------
+function closeSkillModal() {
+  if (!skillModal) return;
+  skillModal.classList.add("hidden");
+}
+
+function showSkillDetail(selectedRecord) {
+  if (!skillModal || !skillModalTitle || !skillModalBody) return;
+
+  const { path, name } = selectedRecord;
+  const list = skillsByPath[path] || [];
+  const skill = list.find((s) => s.name === name);
+  if (!skill) {
+    alert("No detailed information found for this skill.");
+    return;
+  }
+
+  const usesInfo = computeSkillUses(skill);
+
+  skillModalTitle.textContent = skill.name || "Skill";
+
+  let html = "";
+  html += `<p><strong>Path/Profession:</strong> ${escapeHtml(
+    skill.path || ""
+  )}</p>`;
+  html += `<p><strong>Tier:</strong> ${escapeHtml(String(skill.tier || 0))}</p>`;
+
+  html += formatMultiLineBlock("Description", skill.description);
+  html += formatMultiLineBlock("Augment", skill.augment);
+  html += formatMultiLineBlock("Special", skill.special);
+  html += formatMultiLineBlock("Limitations", skill.limitations);
+  html += formatMultiLineBlock("Phys Rep", skill.phys);
+  html += formatMultiLineBlock("Prerequisite", skill.prereq);
+
+  if (usesInfo && usesInfo.display) {
+    html += `<p><strong>Uses:</strong> ${escapeHtml(usesInfo.display)}</p>`;
+  }
+
+  if (!html.trim()) {
+    html = "<p>No additional information.</p>";
+  }
+
+  skillModalBody.innerHTML = html;
+  skillModal.classList.remove("hidden");
+}
+
 // ---------- ADD / RENDER SELECTED SKILLS ----------
 function addSelectedSkill() {
   const val = skillSelect.value;
@@ -858,18 +940,15 @@ function addSelectedSkill() {
           (sk) => sk.path === "Artificer" && /^Appraise\b/i.test(sk.name)
         ).length;
 
-        // current Artificer tier from pathTierMap; fallback 0
         const map = window.pathTierMap || {};
         const currentArtificerTier =
           typeof map["Artificer"] === "number" ? map["Artificer"] : 0;
 
-        // After buying this skill, Artificer tier would be at least its tier
         const newArtificerTier = Math.max(
           currentArtificerTier,
           skill.tier || 0
         );
 
-        // You can have at most (Artificer tier) Appraise skills
         if (existingAppraises >= newArtificerTier) {
           alert(
             `You can only have a number of Appraise skills equal to your Artificer tier.\n\n` +
@@ -972,13 +1051,41 @@ function renderSelectedSkills() {
           s.tier === sk.tier &&
           s.free === sk.free
       );
-      if (originalIndex !== -1) {
-        if (confirm("Are you sure you want to remove this skill?")) {
-          selectedSkills.splice(originalIndex, 1);
-          markDirty();
-          populateSkillSelect();
-          recomputeTotals();
+      if (originalIndex === -1) return;
+
+      const skillToRemove = selectedSkills[originalIndex];
+
+      // Extra Appraise safety: don't allow removing the last Appraise
+      // if there are other Artificer skills left.
+      if (
+        skillToRemove.path === "Artificer" &&
+        /^Appraise\b/i.test(skillToRemove.name)
+      ) {
+        const remainingAppraises = selectedSkills.filter((s, idx) => {
+          if (idx === originalIndex) return false;
+          return s.path === "Artificer" && /^Appraise\b/i.test(s.name);
+        }).length;
+
+        const remainingNonAppraiseArtificer = selectedSkills.filter(
+          (s, idx) => {
+            if (idx === originalIndex) return false;
+            return s.path === "Artificer" && !/^Appraise\b/i.test(s.name);
+          }
+        ).length;
+
+        if (remainingAppraises === 0 && remainingNonAppraiseArtificer > 0) {
+          alert(
+            "You must have at least one Appraise skill if you have other Artificer skills."
+          );
+          return;
         }
+      }
+
+      if (confirm("Are you sure you want to remove this skill?")) {
+        selectedSkills.splice(originalIndex, 1);
+        markDirty();
+        populateSkillSelect();
+        recomputeTotals();
       }
     });
     tdMinus.appendChild(minusBtn);
@@ -995,6 +1102,11 @@ function renderSelectedSkills() {
 
     const tdName = document.createElement("td");
     tdName.textContent = sk.name;
+    tdName.classList.add("skill-clickable");
+    tdName.title = "Click for full details";
+    tdName.addEventListener("click", () => {
+      showSkillDetail(sk);
+    });
     tr.appendChild(tdName);
 
     let usesDisplay = "—";
@@ -1234,10 +1346,8 @@ function recomputeTotals() {
   const available = Math.max(0, totalEventPoints - totalSkillCost);
   totalSkillPointsInput.value = available;
 
-  // Update Unspent SP header
-  const unspentHeader = document.getElementById("unspentSkillPointsHeader");
-  if (unspentHeader) {
-    unspentHeader.textContent = available;
+  if (unspentSkillPointsHeader) {
+    unspentSkillPointsHeader.textContent = available;
   }
 
   updatePathAndProfessionDisplays();
@@ -1331,7 +1441,6 @@ function applyCharacterState(state) {
     ? state.selectedSkills.slice()
     : [];
 
-  // Load sort state if present
   if (state.skillSortState) {
     skillSortState = state.skillSortState;
   } else {
@@ -1446,7 +1555,6 @@ window.addEventListener("DOMContentLoaded", () => {
   });
   loadCharacterFile.addEventListener("change", handleLoadCharacterFile);
 
-  // exportCharacterPDF is defined in pdf-export.js and attached to window
   exportPdfBtn.addEventListener("click", () => {
     if (typeof window.exportCharacterPDF === "function") {
       window.exportCharacterPDF();
@@ -1490,6 +1598,23 @@ window.addEventListener("DOMContentLoaded", () => {
 
   attachSkillSortHandlers();
   updateSkillSortHeaderIndicators();
+
+  // Modal close handlers
+  if (skillModalClose) {
+    skillModalClose.addEventListener("click", closeSkillModal);
+  }
+  if (skillModal) {
+    skillModal.addEventListener("click", (e) => {
+      if (e.target === skillModal) {
+        closeSkillModal();
+      }
+    });
+  }
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && skillModal && !skillModal.classList.contains("hidden")) {
+      closeSkillModal();
+    }
+  });
 
   recomputeTotals();
   markClean();
