@@ -1,175 +1,163 @@
-/* === Fantasy / D&D Preview Theme ===========================
-   This file only SKINS the sheet. It assumes your existing
-   layout is in styles-desktop.css / styles-mobile.css and
-   is loaded AFTER them so it can override colors/fonts.
+/* ==========================================================
+   FANTASY THEME v2 — Parchment-Based D&D Aesthetic
+   Uses your parchment.jpg for full immersive background
    ========================================================== */
 
-/* 1. Fantasy fonts */
+/* 1. Typography --------------------------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cardo&display=swap');
 
 body {
   font-family: 'Cardo', serif;
-  background: #2b2114;
-  color: #2d2211;
+  background: url("parchment.jpg") center / cover repeat fixed !important;
+  color: #2a1d0d !important;
+  margin: 0;
+  padding: 0;
 }
 
-/* In case your sheet is wrapped in one of these containers */
+/* 2. Main containers (sheet panels) ------------------------------ */
 .main-container,
 .sheet-container,
 .character-sheet,
 #app {
-  max-width: 1100px;
-  margin: 20px auto;
+  background: rgba(255, 248, 230, 0.92) !important; /* parchment panel */
+  border: 2px solid #8b6a39 !important;
+  border-radius: 8px !important;
   padding: 16px;
-  background: rgba(244, 231, 197, 0.92); /* parchment panel */
-  border-radius: 8px;
-  border: 2px solid #6b5631;
-  box-shadow: 0 0 24px rgba(0,0,0,0.45);
+  margin: 20px auto;
+  max-width: 1100px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.45) !important;
 }
 
-/* 2. Headings: old-book fantasy look */
+/* 3. Headings ------------------------------------------------------ */
 h1, h2, h3, .section-title {
-  font-family: 'Uncial Antiqua', serif;
+  font-family: 'Uncial Antiqua', serif !important;
   letter-spacing: 0.06em;
-  text-transform: none;
-  color: #3b2915;
+  color: #3a2813 !important;
 }
 
-/* Big title at top */
-h1,
-.header-title,
-.sheet-title {
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: 10px;
-  text-shadow: 0 0 4px rgba(0,0,0,0.4);
+h1 {
+  font-size: 2.1rem !important;
+  text-align: center !important;
+  margin-bottom: 12px !important;
+  text-shadow: 0 0 5px rgba(0,0,0,0.35);
 }
 
-/* Section headings */
 h2, h3, .section-title {
-  font-size: 1.1rem;
-  margin: 12px 0 6px;
-  padding-bottom: 2px;
-  border-bottom: 1px solid #8e7545;
+  font-size: 1.2rem !important;
+  border-bottom: 1px solid #8e7545 !important;
+  padding-bottom: 3px !important;
+  margin-top: 14px !important;
 }
 
-/* 3. Inputs look like ink on parchment */
+/* 4. Inputs, dropdowns, textareas -------------------------------- */
 input,
 select,
 textarea {
-  background-color: rgba(255, 248, 230, 0.9);
-  border: 1px solid #bca47b;
-  border-radius: 4px;
-  padding: 3px 6px;
-  font-family: 'Cardo', serif;
-  color: #2d2211;
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.15);
+  background: #fff6dc !important;
+  border: 1px solid #b29564 !important;
+  color: #2c1e0e !important;
+  border-radius: 4px !important;
+  padding: 4px 6px !important;
+  font-family: 'Cardo', serif !important;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.15) !important;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  outline: none;
-  border-color: #bfa76a;
-  box-shadow: 0 0 5px #bfa76a;
+  outline: none !important;
+  border-color: #cab078 !important;
+  box-shadow: 0 0 6px #cab078 !important;
 }
 
-/* 4. Labels & small text */
+/* 5. Labels -------------------------------------------------------- */
 label,
 .small-label,
 .field-label {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #5a4327;
+  font-size: 0.82rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  color: #5a4327 !important;
 }
 
-/* 5. Section boxes (skills, events, etc.) */
+/* 6. Section boxes (skill list, events, profession) --------------- */
 .section,
 .section-box,
-.panel {
-  background: rgba(249, 239, 211, 0.95);
-  border: 1px solid #b09b74;
-  border-radius: 6px;
-  padding: 8px;
-  margin-bottom: 10px;
-}
-
-/* Optional subtle dividing lines between rows */
-.section-row,
+.panel,
 .skill-row,
 .event-row {
-  border-top: 1px dashed rgba(129, 103, 59, 0.5);
-  padding-top: 4px;
-  margin-top: 4px;
+  background: #faf0d8 !important;
+  border: 1px solid #bca47b !important;
+  border-radius: 6px !important;
+  padding: 8px !important;
+  margin-bottom: 10px !important;
+  color: #2c1e0e !important;
 }
 
-/* 6. Buttons -> fantasy “inked plaques” */
+.skill-row + .skill-row,
+.event-row + .event-row {
+  border-top: 1px dashed rgba(129, 103, 59, 0.45) !important;
+}
+
+/* 7. Buttons -------------------------------------------------------- */
 button,
-.button,
-.btn {
-  background: linear-gradient(#d7c088, #ad8a4c);
-  border: 1px solid #6b5631;
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-family: 'Uncial Antiqua', serif;
-  font-size: 0.9rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #2d2211;
-  cursor: pointer;
-  box-shadow: 0 2px 0 #5a4327, 0 3px 4px rgba(0,0,0,0.4);
-  transition: transform 0.05s ease, box-shadow 0.05s ease;
+.btn,
+.controls button {
+  background: linear-gradient(#dbc691, #b89863) !important;
+  border: 1px solid #7a5d35 !important;
+  border-radius: 20px !important;
+  padding: 5px 14px !important;
+  font-family: 'Uncial Antiqua', serif !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.07em !important;
+  color: #2b1d0d !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 0 #5a4327, 0 3px 4px rgba(0,0,0,0.4) !important;
+  transition: transform 0.05s ease, box-shadow 0.05s ease !important;
 }
 
 button:hover,
-.button:hover,
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 0 #5a4327, 0 4px 6px rgba(0,0,0,0.5);
+.btn:hover,
+.controls button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 0 #5a4327, 0 4px 6px rgba(0,0,0,0.5) !important;
 }
 
 button:active,
-.button:active,
 .btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 0 #5a4327, 0 2px 3px rgba(0,0,0,0.4);
+  transform: translateY(1px) !important;
+  box-shadow: 0 1px 0 #5a4327, 0 2px 3px rgba(0,0,0,0.4) !important;
 }
 
-/* 7. Fancy horizontal rule for visual breaks */
-hr {
-  border: 0;
-  height: 2px;
-  margin: 10px 0;
-  background: linear-gradient(
-    to right,
-    transparent,
-    #6b5631,
-    transparent
-  );
-}
-
-/* 8. Tiny embellishments for tables / lists */
+/* 8. Tables --------------------------------------------------------- */
 table {
-  border-collapse: collapse;
+  border-collapse: collapse !important;
 }
 
 table th,
 table td {
-  border-bottom: 1px solid rgba(139, 111, 63, 0.4);
-  padding: 3px 6px;
+  border-bottom: 1px solid rgba(111, 87, 48, 0.4) !important;
+  padding: 4px 6px !important;
+  color: #2c1e0e !important;
 }
 
 table th {
-  background: rgba(191, 167, 106, 0.35);
-  font-family: 'Uncial Antiqua', serif;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  font-size: 0.75rem;
+  background: rgba(191, 167, 106, 0.25) !important;
+  font-family: 'Uncial Antiqua', serif !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  font-size: 0.75rem !important;
 }
 
-/* 9. Tooltips / hints: parchment tooltip bubble */
-.tooltip,
+/* 9. Horizontal rules (fancy) -------------------------------------- */
+hr {
+  border: 0 !important;
+  height: 2px !important;
+  margin: 10px 0 !important;
+  background: linear-gradient(to right, transparent, #6b5631, transparent) !important;
+}
+
+/* 10. Tooltip cursors ---------------------------------------------- */
 [title] {
-  cursor: help;
+  cursor: help !important;
 }
