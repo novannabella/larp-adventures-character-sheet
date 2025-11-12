@@ -363,6 +363,19 @@ function computeSkillUses(skill) {
   // Resolve effective tier for this path/profession
   const map = window.pathTierMap || {};
   let effectiveTier =
+
+  // Special-case: Scrolls & Potions uses the highest of Mage or Healer tier
+  try {
+    const normName = normalizeSkillName(skill.name);
+    if (normName === normalizeSkillName("Scrolls & Potions")) {
+      const map = window.pathTierMap || {};
+      const mageTier = typeof map["Mage"] === "number" ? map["Mage"] : 0;
+      const healerTier = typeof map["Healer"] === "number" ? map["Healer"] : 0;
+      effectiveTier = Math.max(mageTier, healerTier);
+    }
+  } catch (e) {
+    // no-op fallback
+  }
     typeof map[path] === "number" ? map[path] : getCurrentTier();
 
   if (
