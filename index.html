@@ -131,9 +131,9 @@
             </div>
           </div>
 
-          <!-- Bottom row: (hidden) Unspent + Milestones + Organizations -->
+          <!-- Bottom row: hidden numeric tier/SP + milestones + orgs -->
           <div class="section-row basic-bottom-row">
-            <!-- LEFT: keep tier/points as hidden values only -->
+            <!-- Hidden numeric tier & SP (for calculations only) -->
             <div class="field basic-tier-col" style="display: none;">
               <input type="hidden" id="tier" />
               <input type="hidden" id="totalSkillPoints" />
@@ -240,9 +240,16 @@
         <div class="card-inner">
           <h2 class="skills-header">
             <span>Skills</span>
+            <span class="skills-header-separator">|</span>
             <span class="unspent-sp-display">
-              Unspent SP
-              <span class="unspent-sp-box" id="unspentSkillPointsHeader">0</span>
+              Unspent Skill Points:
+              <span
+                class="unspent-sp-box"
+                id="unspentSkillPointsHeader"
+                title="Calculated from events"
+              >
+                0
+              </span>
             </span>
           </h2>
 
@@ -394,6 +401,17 @@
             <span id="qualifyingEventsCount">0</span>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Skill detail modal -->
+    <div id="skillModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="skillModalClose" type="button">
+          &times;
+        </button>
+        <h3 id="skillModalTitle"></h3>
+        <div id="skillModalBody"></div>
       </div>
     </div>
 
