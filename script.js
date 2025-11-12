@@ -1631,4 +1631,30 @@ window.addEventListener("DOMContentLoaded", () => {
 
   recomputeTotals();
   markClean();
+    // ============================================
+  // UI THEME MODE TOGGLE (Modern <-> Fantasy)
+  // ============================================
+  const toggleBtn = document.getElementById("uiModeToggle");
+  const fantasyCSS = document.getElementById("fantasyStylesheet");
+
+  if (toggleBtn && fantasyCSS) {
+    const savedMode = localStorage.getItem("uiMode") || "modern";
+    applyUIMode(savedMode);
+
+    toggleBtn.addEventListener("click", () => {
+      const newMode = fantasyCSS.disabled ? "fantasy" : "modern";
+      applyUIMode(newMode);
+      localStorage.setItem("uiMode", newMode);
+    });
+
+    function applyUIMode(mode) {
+      if (mode === "fantasy") {
+        fantasyCSS.disabled = false;
+        toggleBtn.textContent = "Modern Mode";
+      } else {
+        fantasyCSS.disabled = true;
+        toggleBtn.textContent = "Fantasy Mode";
+      }
+    }
+  }
 });
