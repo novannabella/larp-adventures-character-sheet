@@ -161,3 +161,42 @@ hr {
 [title] {
   cursor: help !important;
 }
+
+/* === FIX: TITLE VISIBILITY === */
+h1 {
+  color: #1d1208 !important;
+  text-shadow: 0 0 6px rgba(255, 245, 220, 0.8),
+               0 0 2px rgba(0,0,0,0.6) !important;
+}
+
+/* === FIX: REMOVE ALL BLUE BACKGROUNDS === */
+input,
+select,
+textarea,
+.section,
+.section-box,
+.panel,
+.skill-row,
+.event-row,
+table,
+table th,
+table td,
+.controls,
+.box,
+.container {
+  background: #faecd2 !important;
+  border-color: #8b6a39 !important;
+  color: #1b1208 !important;
+}
+
+/* === FIX: DARKEN ALL TEXT INSIDE BOXES === */
+.section *,
+.section-box *,
+.panel *,
+.skill-row *,
+.event-row *,
+input,
+select,
+textarea {
+  color: #1a1109 !important;
+}
