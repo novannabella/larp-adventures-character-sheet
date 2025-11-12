@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <title>Larp Adventures Character Sheet</title>
+
+      <!-- Theme Toggle Button -->
+      <button id="uiModeToggle" class="btn">Fantasy Mode</button>
+    
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
       rel="stylesheet"
@@ -16,7 +20,8 @@
       href="styles-mobile.css"
       media="(max-width: 700px)"
     />
-    
+    <!-- Fantasy skin (off by default) -->
+   <link id="fantasyStylesheet" rel="stylesheet" href="styles-fantasy-preview.css" disabled>
     
   </head>
   <body>
@@ -429,6 +434,7 @@
     <script src="pdf-export.js"></script>
   </body>
 </html>
+
 
 
 
