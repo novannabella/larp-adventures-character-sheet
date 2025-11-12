@@ -200,3 +200,54 @@ select,
 textarea {
   color: #1a1109 !important;
 }
+
+/* === FINAL FIXES: Visibility + Blue Box Override === */
+
+/* Fix h1 subtitle contrast */
+h1 {
+  color: #1a0e06 !important;
+  text-shadow: 0 1px 2px #fef6e2, 0 0 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Force all residual containers to use parchment tone */
+input,
+select,
+textarea,
+button,
+.btn,
+.controls,
+.section,
+.section-box,
+.panel,
+.skill-row,
+.event-row,
+#skillsList .row,
+#eventList .row,
+#professionRow,
+#pathRow,
+#basicInfoContainer,
+#outputContainer,
+#skillsContainer,
+#eventsContainer,
+#milestoneContainer,
+.container,
+.box {
+  background-color: #fdf2db !important;
+  border-color: #8c6a3d !important;
+  color: #1a0e06 !important;
+}
+
+/* Deep override for text color inside all boxes and inputs */
+input *,
+select *,
+textarea *,
+.section *,
+.section-box *,
+.panel *,
+.skill-row *,
+.event-row *,
+.controls *,
+.container *,
+.box * {
+  color: #1a0e06 !important;
+}
