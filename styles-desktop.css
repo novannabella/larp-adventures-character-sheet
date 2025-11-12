@@ -660,3 +660,14 @@ tbody tr:hover {
   margin: 4px 0 8px;
 }
 
+/* Override: Unspent Skill Points color */
+.unspent-sp-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;              /* label text white */
+}
+
+.unspent-sp-display .unspent-sp-box {
+  color: #ffffff;              /* number white as well */
+  border-color: rgba(255, 255, 255, 0.7);
+}
