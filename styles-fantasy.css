@@ -1076,3 +1076,21 @@ input[type="text"], input[type="number"], input[type="date"], select, textarea {
 .section {
   border: 1px solid #8c6a3d !important;
 }
+/* === OVERRIDE: Make Basic Info / Skills / Events boxes larger
+   and reduce the visible dark frame around them === */
+
+/* Less dark-space around the entire layout */
+body {
+  padding: 8px 10px !important;
+}
+
+/* Let the grid of main boxes span wider on the page */
+.app {
+  max-width: 1400px !important;   /* was 1200px */
+  margin: 0 auto 20px auto !important;
+}
+
+/* Slightly enlarge the main cards themselves */
+.card {
+  padding: 20px 22px !important;  /* more internal space */
+}
