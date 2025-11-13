@@ -1,126 +1,84 @@
 
-/* ==========================================================
-   FANTASY MOBILE THEME — for widths <= 700px
-   Built to override styles-mobile.css when fantasy mode is active
-   ========================================================== */
+/* FANTASY THEME — Mobile Version */
+@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cardo&display=swap');
 
-@media (max-width: 700px) {
+body {
+  font-family: 'Cardo', serif;
+  background: url("parchment.jpg") center / cover repeat fixed !important;
+  color: #2a1d0d !important;
+  margin: 0;
+  padding: 8px;
+}
 
-  /* General layout adjustments */
-  body {
-    font-size: 15px !important;
-    padding: 10px !important;
-  }
+.card, .card-inner, .panel, .section-box, .section, .field, .skill-row, .event-row, .box {
+  background-color: #faecd2 !important;
+  border: 1px solid #8c6a3d !important;
+  color: #1a0e06 !important;
+  box-shadow: none !important;
+  margin-bottom: 10px !important;
+}
 
-  h1 {
-    font-size: 1.5rem !important;
-  }
+/* Headers */
+h1, h2, h3, .section-title, label {
+  font-family: 'Uncial Antiqua', serif !important;
+  color: #1a0e06 !important;
+  font-weight: bold !important;
+}
 
-  h2, h3, .section-title {
-    font-size: 1.1rem !important;
-  }
+/* Inputs & textareas */
+input, select, textarea {
+  background: #fff6dc !important;
+  color: #1a0e06 !important;
+  border: 1px solid #b29564 !important;
+  font-family: 'Cardo', serif !important;
+  width: 100% !important;
+}
 
-  input,
-  select,
-  textarea,
-  button,
-  .btn,
-  .unspent-sp-box,
-  .tag,
-  .milestone-block,
-  .org-block {
-    font-size: 15px !important;
-    padding: 8px 10px !important;
-  }
+/* Buttons */
+button, .btn {
+  background: linear-gradient(#dbc691, #b89863) !important;
+  border: 1px solid #7a5d35 !important;
+  color: #1a0e06 !important;
+  font-family: 'Uncial Antiqua', serif !important;
+  font-weight: bold !important;
+  width: 100%;
+  margin-top: 5px;
+}
 
-  .section,
-  .section-box,
-  .panel,
-  .card,
-  .card-inner {
-    padding: 12px !important;
-  }
+/* Checkboxes */
+input[type="checkbox"] {
+  appearance: none !important;
+  background-color: #8c6a3d !important;
+  border: 1px solid #5c4226 !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+input[type="checkbox"]:checked::before {
+  content: "\2713";
+  position: absolute;
+  top: -1px;
+  left: 1px;
+  font-size: 14px;
+  color: black;
+}
 
-  .skills-row,
-  .event-input-row {
-    display: block !important;
-  }
+/* Milestones and Organizations */
+.milestone-block, .org-block {
+  background-color: #f9e9c4 !important;
+  border-color: #8c6a3d !important;
+  color: #1a0e06 !important;
+}
+.org-item, .milestone-title {
+  font-weight: bold !important;
+  color: #1a0e06 !important;
+}
 
-  .milestone-checkbox {
-    gap: 8px !important;
-    font-size: 14px !important;
-  }
-
-  .org-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .org-item {
-    font-size: 14px !important;
-  }
-
-  .button,
-  .btn {
-    padding: 10px 14px !important;
-    font-size: 14px !important;
-  }
-
-  .modal-content {
-    font-size: 14px !important;
-    padding: 16px !important;
-  }
-
-  /* Remove duplicate labels (mobile-specific behavior from modern theme) */
-  .skill-free-field label[for="skillFreeFlag"],
-  .event-input-row label[for="eventMotInput"] {
-    display: none !important;
-  }
-
-  .skill-free-field label[for="skillFreeFlag"]::after {
-    content: "Earned for Free?";
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #1a0e06 !important;
-    font-weight: bold !important;
-  }
-
-  .event-input-row label[for="eventMotInput"]::after {
-    content: "Merch OT?";
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #1a0e06 !important;
-    font-weight: bold !important;
-  }
-
-  /* Force all labels to dark ink */
-  label {
-    color: #1a0e06 !important;
-    font-weight: bold !important;
-  }
-
-  /* Fix mobile skill table overflow */
-  #skillsTable,
-  .skills-table,
-  #skillsTable th,
-  #skillsTable td {
-    display: block !important;
-    width: 100% !important;
-    text-align: left !important;
-    white-space: normal !important;
-  }
-
-  #skillsTable thead {
-    display: none !important;
-  }
-
-  .selected-skills-row {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 4px !important;
-    padding: 8px !important;
-    border-bottom: 1px solid #a68b5c !important;
-  }
+/* Unspent SP box */
+.unspent-sp-box {
+  background: #f6e7c2 !important;
+  color: black !important;
+  border: 1px solid #5c4226 !important;
 }
