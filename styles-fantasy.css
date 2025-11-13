@@ -252,16 +252,22 @@ textarea *,
   color: #1a0e06 !important;
 }
 
-/* === OVERRIDE MODERN .card STYLES IN FANTASY MODE === */
-.card,
-.card-inner {
-  background: #faecd2 !important;
-  border: 1px solid #8c6a3d !important;
+/* === FINAL OVERRIDES: Milestones + Organizations === */
+
+/* Override milestone boxes (blue background from modern theme) */
+.milestone-block {
+  background-color: #faecd2 !important;
+  border-color: #8c6a3d !important;
   color: #1a0e06 !important;
-  box-shadow: none !important;
 }
 
-/* Cancel background overlays from modern theme */
-.card::before {
-  content: none !important;
+/* Override organization checkbox blocks */
+.org-block {
+  background-color: #f9e9c4 !important;
+  border-color: #8c6a3d !important;
+  color: #1a0e06 !important;
+}
+
+.org-item {
+  color: #1a0e06 !important;
 }
