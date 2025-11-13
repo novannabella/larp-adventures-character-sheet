@@ -348,12 +348,9 @@ tbody tr:hover {
 
 .org-block,
 .milestone-block {
-  padding: 6px 10px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background-color: var(--parchment-deep);
-  margin-top: 4px;
-  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .org-grid {
@@ -392,7 +389,7 @@ tbody tr:hover {
 }
 
 .milestone-checkbox {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 4px;
   font-size: 11px;
