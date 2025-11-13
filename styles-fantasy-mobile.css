@@ -1245,3 +1245,18 @@ input[type="text"], input[type="number"], input[type="date"], select, textarea {
   --muted: #3b250f;
   --border: #8c6a3d;
 }
+
+
+/* FONT FIX */
+body, h1, h2, h3, h4, h5, h6, label, button, input, select, textarea {
+  font-family: 'Cardo', 'Uncial Antiqua', serif !important;
+}
+
+
+/* REMOVE BLUE/THIN BORDERS AND ENFORCE FINAL CARD/BLOCK LOOK */
+.card, .section, .box, .card-inner {
+  border: 1px solid #8c6a3d !important;
+  box-shadow: none !important;
+  background-color: #faecd2 !important;
+  color: #1a0e06 !important;
+}
