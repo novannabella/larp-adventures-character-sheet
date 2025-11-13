@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+  
   <head>
     <meta charset="UTF-8" />
     <title>Larp Adventures Character Sheet</title>
@@ -14,11 +15,417 @@
     <link id="fantasyStylesheet" rel="stylesheet" href="styles-fantasy.css" disabled />
     <link id="fantasyMobileStylesheet" rel="stylesheet" href="styles-fantasy-mobile.css" disabled />
   </head>
+
   <body>
-    <div class="container">
-      <button id="uiModeToggle" class="btn">Fantasy Mode</button>
-      <!-- The rest of your character sheet HTML goes here -->
+    <h1>Larp Adventures</h1>
+    <button id="uiModeToggle" class="btn">Fantasy Mode</button>
+    <p class="subtitle">Character Sheet</p>
+
+    <div class="top-controls">
+      <div class="save-load-controls">
+        <button id="loadCharacterBtn" class="button secondary">
+          Load Character
+        </button>
+        <input
+          type="file"
+          id="loadCharacterFile"
+          accept=".json"
+          style="display: none"
+        />
+        <button id="saveCharacterBtn" class="button secondary">
+          Save Character
+        </button>
+        <button id="exportPdfBtn" class="button">
+          Export Character
+        </button>
+
+        <!-- Export options -->
+        <label class="export-option">
+          <input type="checkbox" id="fullSkillInfoCheckbox" />
+          Full skill information
+        </label>
+        <label class="export-option">
+          <input type="checkbox" id="eventSummaryCheckbox" />
+          Event summary
+        </label>
+      </div>
     </div>
+
+    <div class="app">
+      <!-- BASIC INFO -->
+      <div class="card">
+        <div class="card-inner">
+          <h2>Basic Information</h2>
+
+          <div class="section-row">
+            <div class="field">
+              <label for="characterName">Character Name</label>
+              <input type="text" id="characterName" />
+            </div>
+            <div class="field">
+              <label for="playerName">Player Name</label>
+              <input type="text" id="playerName" />
+            </div>
+          </div>
+
+          <div class="section-row">
+            <div class="field">
+              <label for="pathDisplay">Path</label>
+              <div class="path-tier-inline">
+                <select id="pathDisplay">
+                  <option value="">-- Select Path --</option>
+                  <option value="Healer">Healer</option>
+                  <option value="Mage">Mage</option>
+                  <option value="Rogue">Rogue</option>
+                  <option value="Warrior">Warrior</option>
+                </select>
+                <div class="main-tier-box">
+                  <label for="mainPathTierBox" class="main-tier-label" title="Calculated from events">Tier</label>
+                  <input
+                    type="text"
+                    id="mainPathTierBox"
+                    readonly
+                    title="Calculated from events"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="faction">Faction</label>
+              <select id="faction">
+                <option value="">-- Select Faction --</option>
+                <option value="Blackthorne Company">Blackthorne Company</option>
+                <option value="Catalpa">Catalpa</option>
+                <option value="Cedar Hill">Cedar Hill</option>
+                <option value="Eponore">Eponore</option>
+                <option value="Geth">Geth</option>
+                <option value="Grimfrost">Grimfrost</option>
+                <option value="Guild of the Black Sky">
+                  Guild of the Black Sky
+                </option>
+                <option value="Kult of Tharros">Kult of Tharros</option>
+                <option value="Mellondor">Mellondor</option>
+                <option value="Prismatic Troupe">Prismatic Troupe</option>
+                <option value="Sunsteel Company">Sunsteel Company</option>
+                <option value="The Dismissed">The Dismissed</option>
+                <option value="The Free Folk">The Free Folk</option>
+                <option value="The Grove">The Grove</option>
+                <option value="The House of Silver Branches">
+                  The House of Silver Branches
+                </option>
+                <option value="The Order">The Order</option>
+                <option value="The Wardens">The Wardens</option>
+                <option value="The White Ravens">The White Ravens</option>
+                <option value="Vidarian Khanate">Vidarian Khanate</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-row">
+            <div class="field">
+              <label for="secondaryPathsDisplay">Secondary Path(s) [Tier]</label>
+              <input type="text" id="secondaryPathsDisplay" readonly />
+            </div>
+            <div class="field">
+              <label for="professionsDisplay">Profession(s) [Tier]</label>
+              <input type="text" id="professionsDisplay" readonly />
+            </div>
+          </div>
+
+          <!-- Bottom row: hidden numeric tier/SP + milestones + orgs -->
+          <div class="section-row basic-bottom-row">
+            <!-- Hidden numeric tier & SP (for calculations only) -->
+            <div class="field basic-tier-col" style="display: none;">
+              <input type="hidden" id="tier" />
+              <input type="hidden" id="totalSkillPoints" />
+            </div>
+
+            <!-- MIDDLE: Milestones -->
+            <div class="field basic-milestones-field">
+              <label>Milestones</label>
+              <div class="basic-milestones">
+                <div class="milestone-block">
+                  <div class="milestone-title">Artificer</div>
+                  <label class="milestone-checkbox">
+                    <input type="checkbox" id="artificerMilestone2" />
+                    <span>2</span>
+                  </label>
+                  <label class="milestone-checkbox">
+                    <input type="checkbox" id="artificerMilestone3" />
+                    <span>3</span>
+                  </label>
+                </div>
+
+                <div class="milestone-block">
+                  <div class="milestone-title">Bard</div>
+                  <label class="milestone-checkbox">
+                    <input type="checkbox" id="bardMilestone2" />
+                    <span>2</span>
+                  </label>
+                  <label class="milestone-checkbox">
+                    <input type="checkbox" id="bardMilestone3" />
+                    <span>3</span>
+                  </label>
+                </div>
+
+                <div class="milestone-block">
+                  <div class="milestone-title">Scholar</div>
+                  <label class="milestone-checkbox">
+                    <input type="checkbox" id="scholarMilestone2" />
+                    <span>2</span>
+                  </label>
+                  <label class="milestone-checkbox">
+                    <input type="checkbox" id="scholarMilestone3" />
+                    <span>3</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: Organizations -->
+            <div class="field basic-orgs">
+              <label>Organizations</label>
+              <div class="org-block">
+                <div id="organizationsContainer" class="org-grid">
+                  <label class="org-item">
+                    <input type="checkbox" value="Merchant Guild" />Merchant
+                    Guild
+                  </label>
+                  <label class="org-item">
+                    <input type="checkbox" value="The Sentinels" />The Sentinels
+                  </label>
+                  <label class="org-item">
+                    <input type="checkbox" value="The Shield" />The Shield
+                  </label>
+                  <label class="org-item">
+                    <input type="checkbox" value="Order of Light" />Order of
+                    Light
+                  </label>
+                  <label class="org-item">
+                    <input
+                      type="checkbox"
+                      value="Sanguine Order"
+                    />Sanguine Order
+                  </label>
+                  <label class="org-item">
+                    <input type="checkbox" value="THoTH" />THoTH
+                  </label>
+                  <label class="org-item">
+                    <input
+                      type="checkbox"
+                      value="Order of the Dismissed"
+                    />Order of the Dismissed
+                  </label>
+                  <label class="org-item">
+                    <input
+                      type="checkbox"
+                      value="The Church of Pecune"
+                    />The Church of Pecune
+                  </label>
+                  <label class="org-item">
+                    <input
+                      type="checkbox"
+                      value="The Circle of the Green Goddess"
+                    />
+                    The Circle of the Green Goddess
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="card">
+        <div class="card-inner">
+          <h2 class="skills-header">
+            <span>Skills</span>
+            <span class="skills-header-separator">|</span>
+            <span class="unspent-sp-display">
+              Unspent Skill Points:
+              <span
+                class="unspent-sp-box"
+                id="unspentSkillPointsHeader"
+                title="Calculated from events"
+              >
+                0
+              </span>
+            </span>
+          </h2>
+
+          <div class="skills-row">
+            <div class="field">
+              <label for="skillPath">Path / Profession</label>
+              <select id="skillPath" class="select-path">
+                <option value="">-- Select Path / Profession --</option>
+              </select>
+            </div>
+            <div class="field skill-free-field">
+              <label for="skillFreeFlag">Earned for<br />Free?</label>
+              <input type="checkbox" id="skillFreeFlag" />
+            </div>
+            <div class="field">
+              <label for="skillSelect">Skill</label>
+              <select id="skillSelect">
+                <option value="">-- Select Skill --</option>
+              </select>
+            </div>
+            <div class="field skill-add-field">
+              <label>&nbsp;</label>
+              <button id="addSkillBtn" class="button small secondary">
+                Add Skill
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="skillDescription">Skill Description</label>
+            <textarea id="skillDescription" readonly></textarea>
+          </div>
+
+          <h3 style="margin-top: 10px; font-size: 13px">
+            Selected Skills
+            <button
+              id="resetSkillSortBtn"
+              class="button tiny secondary"
+              type="button"
+              style="margin-left: 8px;"
+            >
+              Reset Sort
+            </button>
+          </h3>
+
+          <table id="skillsTable" class="skills-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th id="thTier" class="sortable">Tier</th>
+                <th id="thPath" class="sortable">Path/Profession</th>
+                <th id="thSkill" class="sortable">Skill</th>
+                <th>Uses</th>
+                <th>Cost</th>
+              </tr>
+            </thead>
+            <tbody id="selectedSkillsBody"></tbody>
+          </table>
+
+          <div class="total-row">
+            Total skill points spent on non-free skills:
+            <span id="totalSkillCost">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="card">
+        <div class="card-inner">
+          <h2>Events</h2>
+
+          <!-- Event input row -->
+          <div
+            class="event-input-row"
+            style="
+              display: grid;
+              grid-template-columns: repeat(4, minmax(0, 1fr));
+              gap: 8px;
+              margin-bottom: 8px;
+            "
+          >
+            <div class="field">
+              <label for="eventNameInput">Event Name</label>
+              <input type="text" id="eventNameInput" />
+            </div>
+            <div class="field">
+              <label for="eventDateInput">Date</label>
+              <input type="date" id="eventDateInput" />
+            </div>
+            <div class="field">
+              <label for="eventTypeSelect">Type</label>
+              <select id="eventTypeSelect">
+                <option value="">-- Select --</option>
+                <option>Day Event</option>
+                <option>Campout</option>
+                <option>Festival Event</option>
+                <option>Virtual Event</option>
+                <option>Work Weekend</option>
+                <option>Survey/Misc</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="eventBonusInput">Bonus SP</label>
+              <input
+                type="number"
+                id="eventBonusInput"
+                min="0"
+                max="99"
+                value="0"
+              />
+            </div>
+
+            <div class="field">
+              <label for="eventNpcInput">NPC?</label>
+              <input type="checkbox" id="eventNpcInput" />
+            </div>
+            <div class="field">
+              <label for="eventMotInput">Merchant OT?</label>
+              <input type="checkbox" id="eventMotInput" />
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button class="button small secondary" id="addEventBtn">
+                Add Event
+              </button>
+            </div>
+          </div>
+
+          <!-- Stored events list -->
+          <table id="eventsTable" class="events-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Event Name</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>NPC?</th>
+                <th>Merchant<br />OT?</th>
+                <th>Bonus SP</th>
+                <th>Skill Pts</th>
+              </tr>
+            </thead>
+            <tbody id="eventsBody"></tbody>
+          </table>
+
+          <div class="total-row">
+            Total event skill points: <span id="totalEventPoints">0</span> •
+            Qualifying events for Tier:
+            <span id="qualifyingEventsCount">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill detail modal -->
+    <div id="skillModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="skillModalClose" type="button">
+          &times;
+        </button>
+        <h3 id="skillModalTitle"></h3>
+        <div id="skillModalBody"></div>
+      </div>
+    </div>
+
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Main app script -->
     <script src="script.js"></script>
+
+    <!-- PDF export logic -->
+    <script src="pdf-export.js"></script>
   </body>
 </html>
+
+
