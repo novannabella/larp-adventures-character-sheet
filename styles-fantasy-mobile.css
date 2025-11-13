@@ -1,0 +1,126 @@
+
+/* ==========================================================
+   FANTASY MOBILE THEME — for widths <= 700px
+   Built to override styles-mobile.css when fantasy mode is active
+   ========================================================== */
+
+@media (max-width: 700px) {
+
+  /* General layout adjustments */
+  body {
+    font-size: 15px !important;
+    padding: 10px !important;
+  }
+
+  h1 {
+    font-size: 1.5rem !important;
+  }
+
+  h2, h3, .section-title {
+    font-size: 1.1rem !important;
+  }
+
+  input,
+  select,
+  textarea,
+  button,
+  .btn,
+  .unspent-sp-box,
+  .tag,
+  .milestone-block,
+  .org-block {
+    font-size: 15px !important;
+    padding: 8px 10px !important;
+  }
+
+  .section,
+  .section-box,
+  .panel,
+  .card,
+  .card-inner {
+    padding: 12px !important;
+  }
+
+  .skills-row,
+  .event-input-row {
+    display: block !important;
+  }
+
+  .milestone-checkbox {
+    gap: 8px !important;
+    font-size: 14px !important;
+  }
+
+  .org-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .org-item {
+    font-size: 14px !important;
+  }
+
+  .button,
+  .btn {
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+  }
+
+  .modal-content {
+    font-size: 14px !important;
+    padding: 16px !important;
+  }
+
+  /* Remove duplicate labels (mobile-specific behavior from modern theme) */
+  .skill-free-field label[for="skillFreeFlag"],
+  .event-input-row label[for="eventMotInput"] {
+    display: none !important;
+  }
+
+  .skill-free-field label[for="skillFreeFlag"]::after {
+    content: "Earned for Free?";
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1a0e06 !important;
+    font-weight: bold !important;
+  }
+
+  .event-input-row label[for="eventMotInput"]::after {
+    content: "Merch OT?";
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1a0e06 !important;
+    font-weight: bold !important;
+  }
+
+  /* Force all labels to dark ink */
+  label {
+    color: #1a0e06 !important;
+    font-weight: bold !important;
+  }
+
+  /* Fix mobile skill table overflow */
+  #skillsTable,
+  .skills-table,
+  #skillsTable th,
+  #skillsTable td {
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+    white-space: normal !important;
+  }
+
+  #skillsTable thead {
+    display: none !important;
+  }
+
+  .selected-skills-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    padding: 8px !important;
+    border-bottom: 1px solid #a68b5c !important;
+  }
+}
