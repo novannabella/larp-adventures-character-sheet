@@ -377,10 +377,10 @@ tbody tr:hover {
 }
 
 .basic-milestones {
-  display: flex;
-  flex-direction: column; /* vertical stack of Artificer / Bard / Scholar */
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+  align-items: flex-start;
 }
 
 .milestone-title {
@@ -428,7 +428,6 @@ tbody tr:hover {
   align-items: flex-end;
 }
 
-/* All event inputs on one line (desktop & mobile) */
 .event-input-row {
   display: grid;
   grid-template-columns:
@@ -438,7 +437,7 @@ tbody tr:hover {
     70px            /* Bonus SP */
     auto            /* NPC? */
     auto            /* Merchant OT? */
-    auto;           /* Add Event button */
+    auto;           /* Add Event */
   gap: 8px;
   align-items: end;
   margin-bottom: 8px;
@@ -490,11 +489,6 @@ tbody tr:hover {
   justify-content: space-between;
   align-items: baseline;
   gap: 8px;
-}
-
-/* Hide the ' | ' separator element entirely */
-.skills-header-separator {
-  display: none;
 }
 
 .unspent-sp-display {
@@ -623,12 +617,27 @@ tbody tr:hover {
     grid-template-columns: 1fr;
   }
 
-  /* Keep event inputs on one line even on mobile by allowing horizontal scrolling if needed */
   .event-input-row {
-    overflow-x: auto;
-  }
+  display: grid;
+  grid-template-columns:
+    minmax(0, 3fr)  /* Event Name */
+    130px           /* Date */
+    1.5fr           /* Type */
+    70px            /* Bonus SP */
+    auto            /* NPC? */
+    auto            /* Merchant OT? */
+    auto;           /* Add Event */
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
 
   .selected-skills-row {
     grid-template-columns: 24px 1fr;
   }
+}
+
+
+.skills-header-separator {
+  display: none;
 }
