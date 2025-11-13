@@ -1636,8 +1636,9 @@ window.addEventListener("DOMContentLoaded", () => {
   // ============================================
   const toggleBtn = document.getElementById("uiModeToggle");
   const fantasyCSS = document.getElementById("fantasyStylesheet");
+  const fantasyMobileCSS = document.getElementById("fantasyMobileStylesheet");
 
-  if (toggleBtn && fantasyCSS) {
+  if (toggleBtn && fantasyCSS && fantasyMobileCSS) {
     const savedMode = localStorage.getItem("uiMode") || "modern";
     applyUIMode(savedMode);
 
@@ -1650,9 +1651,11 @@ window.addEventListener("DOMContentLoaded", () => {
     function applyUIMode(mode) {
       if (mode === "fantasy") {
         fantasyCSS.disabled = false;
+        fantasyMobileCSS.disabled = false;
         toggleBtn.textContent = "Modern Mode";
       } else {
         fantasyCSS.disabled = true;
+        fantasyMobileCSS.disabled = true;
         toggleBtn.textContent = "Fantasy Mode";
       }
     }
