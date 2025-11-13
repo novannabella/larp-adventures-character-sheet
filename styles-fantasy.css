@@ -640,3 +640,19 @@ tbody tr:hover {
   max-width: 60px;
 }
 
+
+
+/* === Milestone layout fix: keep 2 and 3 stacked vertically inside each box === */
+.milestone-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.milestone-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--ink);
+}
