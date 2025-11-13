@@ -1,265 +1,267 @@
+/* ==========================================================
+   FANTASY THEME v2 — Parchment-Based D&D Aesthetic
+   Uses your parchment.jpg for full immersive background
+   ========================================================== */
+
+/* 1. Typography --------------------------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cardo&display=swap');
 
-* {
-  box-sizing: border-box;
+body {
+  font-family: 'Cardo', serif;
+  background: url("parchment.jpg") center / cover repeat fixed !important;
+  color: #2a1d0d !important;
+  margin: 0;
+  padding: 0;
 }
 
-/* === BASE STYLES & FANTASY THEME COLORS === */
-body {
-  margin: 0;
-  padding: 24px;
-  font-family: 'Cardo', serif; /* FANTASY FONT */
-  background: url("parchment.jpg") center / cover repeat fixed !important; /* FANTASY BG */
-  color: #1a0e06 !important; /* DARK TEXT */
+/* 2. Main containers (sheet panels) ------------------------------ */
+.main-container,
+.sheet-container,
+.character-sheet,
+#app {
+  background: rgba(255, 248, 230, 0.92) !important; /* parchment panel */
+  border: 2px solid #8b6a39 !important;
+  border-radius: 8px !important;
+  padding: 16px;
+  margin: 20px auto;
+  max-width: 1100px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.45) !important;
+}
+
+/* 3. Headings ------------------------------------------------------ */
+h1, h2, h3, .section-title {
+  font-family: 'Uncial Antiqua', serif !important;
+  letter-spacing: 0.06em;
+  color: #3a2813 !important;
 }
 
 h1 {
-  text-align: center;
-  margin-bottom: 8px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 26px;
-  color: #3b250f !important; /* FANTASY HEADING COLOR */
-  font-family: 'Uncial Antiqua', serif !important; /* FANTASY HEADING FONT */
+  font-size: 2.1rem !important;
+  text-align: center !important;
+  margin-bottom: 12px !important;
+  text-shadow: 0 0 5px rgba(0,0,0,0.35);
 }
 
-.subtitle {
-  text-align: center;
-  margin-bottom: 24px;
-  color: #3b250f !important; /* DARK BROWN MUTED COLOR */
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+h2, h3, .section-title {
+  font-size: 1.2rem !important;
+  border-bottom: 1px solid #8e7545 !important;
+  padding-bottom: 3px !important;
+  margin-top: 14px !important;
 }
 
-/* Apply FANTASY HEADING FONT and COLOR to all section titles and labels */
-h2, h3, .section-title, .milestone-title, .org-item,
-.skills-table th, .events-table th, #selectedSkillsTable th,
-.total-label, .event-label {
-    color: #3b250f !important;
-    font-family: 'Uncial Antiqua', serif !important;
-    font-weight: bold;
-}
-
-/* === LAYOUT RULES: PRESERVED (UNCHANGED) === */
-.app {
-  max-width: 1200px;
-  margin: 0 auto 40px auto;
-  display: grid;
-  gap: 20px;
-}
-
-.section-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 20px;
-  margin-bottom: 10px;
-}
-/* ... all other structural rules for .app, .section-row, .field, etc. are preserved ... */
-
-/* === CARD/BOX APPEARANCE: FANTASY & USER FIXES === */
-.card, .card-inner, .section, .box {
-  background-color: #faecd2 !important; /* LIGHT PARCHMENT BG */
-  border-radius: 4px; /* Tighter radius */
-  padding: 16px 18px 18px;
-  box-shadow: none !important; /* Remove dark shadow */
-  border: 1px solid #8c6a3d !important; /* USER FIX: THIN BROWN BORDER */
-  position: relative;
-  overflow: hidden;
-  color: #1a0e06 !important; /* Ensure dark text inside */
-}
-
-.card::before {
-  /* Remove the modern blue glow effect */
-  display: none;
-}
-
-.card h2 {
-  color: #3b250f !important; /* FANTASY HEADING COLOR */
-  font-family: 'Uncial Antiqua', serif !important; /* FANTASY HEADING FONT */
-}
-
-label {
-  color: #3b250f !important; /* DARK BROWN MUTED COLOR */
-}
-
-/* === INPUTS: FANTASY & USER FIXES (NO BORDER) === */
-input[type="text"],
-input[type="number"],
-input[type="date"],
+/* 4. Inputs, dropdowns, textareas -------------------------------- */
+input,
 select,
 textarea {
-  padding: 6px 8px;
-  border-radius: 4px;
-  border: none !important; /* <-- USER FIX: NO BORDER */
-  background: #fff6dc !important; /* LIGHTER PARCHMENT BG */
-  color: #1a0e06 !important; /* DARK TEXT */
-  font-family: 'Cardo', serif !important; /* FANTASY FONT */
+  background: #fff6dc !important;
+  border: 1px solid #b29564 !important;
+  color: #2c1e0e !important;
+  border-radius: 4px !important;
+  padding: 4px 6px !important;
+  font-family: 'Cardo', serif !important;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.15) !important;
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus,
+input:focus,
 select:focus,
 textarea:focus {
-  /* Add focus feedback */
-  border: 1px solid #8c6a3d !important;
-  box-shadow: 0 0 0 1px rgba(132, 98, 54, 0.4) !important;
+  outline: none !important;
+  border-color: #cab078 !important;
+  box-shadow: 0 0 6px #cab078 !important;
 }
 
-/* === BUTTONS & CONTROLS === */
-.button {
-  border: 1px solid #7a5d35 !important;
-  background: linear-gradient(#dbc691, #b89863) !important; /* EARTHY GRADIENT */
-  color: #1a0e06 !important; /* DARK TEXT */
-  font-family: 'Uncial Antiqua', serif !important;
-  font-weight: bold !important;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.46) !important;
+/* 5. Labels -------------------------------------------------------- */
+label,
+.small-label,
+.field-label {
+  font-size: 0.82rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  color: #5a4327 !important;
 }
 
-.button.secondary {
-  background: transparent !important;
-  color: #3b250f !important;
-  border-color: #8c6a3d !important;
-  box-shadow: none !important;
-}
-
-/* Pills and Tags */
-.tag, .pill {
-  background-color: #e0c9a6 !important;
-  color: #1a0e06 !important;
-  font-weight: bold !important;
-}
-
-.tag.free {
-  color: #3c7d24 !important; /* Dark green */
-  border: 1px solid #3c7d24 !important;
-  background: #d4e8cc !important;
-}
-
-.tag.paid {
-  color: #8c6a3d !important; /* Dark brown */
-  border: 1px solid #8c6a3d !important;
-  background: #e9e0d1 !important;
-}
-
-/* Unspent SP Pill */
-.unspent-sp-box {
-  background: #f6e7c2 !important;
-  color: #1a0e06 !important;
-  border: 1px solid #5c4226 !important;
-}
-
-/* === TABLES, MILESTONES, ORGANIZATIONS === */
-
-/* Tables and inner elements use dark text */
-th, td {
-  color: #1a0e06 !important;
-  border-bottom: 1px solid rgba(132, 98, 54, 0.3) !important;
-}
-
-th {
-  color: #3b250f !important; /* Heading color */
-  border-bottom: 1px solid #8c6a3d !important; /* Brown separator */
-}
-
-tbody tr:nth-child(odd) {
-  background: #f9e9c4 !important; /* Slight alternating row color */
-}
-
-tbody tr:hover {
-  background: #f7e0b5 !important;
-}
-
-.total-row {
-  color: #3b250f !important; /* Dark brown label */
-}
-.total-row span {
-  color: #1a0e06 !important; /* Dark text value */
-}
-
-/* Milestones/Organizations Block */
-.org-block, .milestone-block {
-  border: 1px solid #8c6a3d !important;
-  background: #f9e9c4 !important; /* SLIGHTLY LIGHTER PARCHMENT */
-  color: #1a0e06 !important;
-}
-
-/* Modal for skill details */
-.modal-content {
-    background: #f9e9c4 !important;
-    color: #1a0e06 !important;
-}
-.modal-content h3 {
-    color: #3b250f !important;
-}
-.modal-close {
-  color: #3b250f !important;
-}
-
-
-/* === FINAL FANTASY PATCHES === */
-
-/* Character Sheet Heading: Simulate bold */
-h1 {
-  font-family: 'Uncial Antiqua', serif !important;
-  color: #3b250f !important;
-  text-shadow: 0.7px 0.7px #1a0e06;
-  font-size: 26px;
-}
-
-/* Checkbox Styling */
-input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #5c4226;
-  background-color: transparent;
-  border-radius: 2px;
-  margin-right: 6px;
-  cursor: pointer;
-  position: relative;
-}
-input[type="checkbox"]:checked {
-  background-color: #8c6a3d;
-}
-input[type="checkbox"]:checked::after {
-  content: '✓';
-  position: absolute;
-  left: 2px;
-  top: -2px;
-  font-size: 16px;
-  color: black;
-  font-weight: bold;
-}
-
-/* Ensure fantasy colors on any missed headers */
-.skills-table th, .events-table th, #selectedSkillsTable th,
-.total-label, .event-label, label, th {
-  color: #3b250f !important;
-  font-family: 'Uncial Antiqua', serif !important;
-  font-weight: bold;
-}
-
-/* Tighten up box appearance but ensure spacing */
-.card, .box, .section {
-  border: 1px solid #8c6a3d !important;
-  background-color: #faecd2 !important;
-  padding: 14px !important;
+/* 6. Section boxes (skill list, events, profession) --------------- */
+.section,
+.section-box,
+.panel,
+.skill-row,
+.event-row {
+  background: #faf0d8 !important;
+  border: 1px solid #bca47b !important;
   border-radius: 6px !important;
+  padding: 8px !important;
+  margin-bottom: 10px !important;
+  color: #2c1e0e !important;
+}
+
+.skill-row + .skill-row,
+.event-row + .event-row {
+  border-top: 1px dashed rgba(129, 103, 59, 0.45) !important;
+}
+
+/* 7. Buttons -------------------------------------------------------- */
+button,
+.btn,
+.controls button {
+  background: linear-gradient(#dbc691, #b89863) !important;
+  border: 1px solid #7a5d35 !important;
+  border-radius: 20px !important;
+  padding: 5px 14px !important;
+  font-family: 'Uncial Antiqua', serif !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.07em !important;
+  color: #2b1d0d !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 0 #5a4327, 0 3px 4px rgba(0,0,0,0.4) !important;
+  transition: transform 0.05s ease, box-shadow 0.05s ease !important;
+}
+
+button:hover,
+.btn:hover,
+.controls button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 0 #5a4327, 0 4px 6px rgba(0,0,0,0.5) !important;
+}
+
+button:active,
+.btn:active {
+  transform: translateY(1px) !important;
+  box-shadow: 0 1px 0 #5a4327, 0 2px 3px rgba(0,0,0,0.4) !important;
+}
+
+/* 8. Tables --------------------------------------------------------- */
+table {
+  border-collapse: collapse !important;
+}
+
+table th,
+table td {
+  border-bottom: 1px solid rgba(111, 87, 48, 0.4) !important;
+  padding: 4px 6px !important;
+  color: #2c1e0e !important;
+}
+
+table th {
+  background: rgba(191, 167, 106, 0.25) !important;
+  font-family: 'Uncial Antiqua', serif !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  font-size: 0.75rem !important;
+}
+
+/* 9. Horizontal rules (fancy) -------------------------------------- */
+hr {
+  border: 0 !important;
+  height: 2px !important;
+  margin: 10px 0 !important;
+  background: linear-gradient(to right, transparent, #6b5631, transparent) !important;
+}
+
+/* 10. Tooltip cursors ---------------------------------------------- */
+[title] {
+  cursor: help !important;
+}
+
+/* === FIX: TITLE VISIBILITY === */
+h1 {
+  color: #1d1208 !important;
+  text-shadow: 0 0 6px rgba(255, 245, 220, 0.8),
+               0 0 2px rgba(0,0,0,0.6) !important;
+}
+
+/* === FIX: REMOVE ALL BLUE BACKGROUNDS === */
+input,
+select,
+textarea,
+.section,
+.section-box,
+.panel,
+.skill-row,
+.event-row,
+table,
+table th,
+table td,
+.controls,
+.box,
+.container {
+  background: #faecd2 !important;
+  border-color: #8b6a39 !important;
+  color: #1b1208 !important;
+}
+
+/* === FIX: DARKEN ALL TEXT INSIDE BOXES === */
+.section *,
+.section-box *,
+.panel *,
+.skill-row *,
+.event-row *,
+input,
+select,
+textarea {
+  color: #1a1109 !important;
+}
+
+/* === FINAL FIXES: Visibility + Blue Box Override === */
+
+/* Fix h1 subtitle contrast */
+h1 {
+  color: #1a0e06 !important;
+  text-shadow: 0 1px 2px #fef6e2, 0 0 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Force all residual containers to use parchment tone */
+input,
+select,
+textarea,
+button,
+.btn,
+.controls,
+.section,
+.section-box,
+.panel,
+.skill-row,
+.event-row,
+#skillsList .row,
+#eventList .row,
+#professionRow,
+#pathRow,
+#basicInfoContainer,
+#outputContainer,
+#skillsContainer,
+#eventsContainer,
+#milestoneContainer,
+.container,
+.box {
+  background-color: #fdf2db !important;
+  border-color: #8c6a3d !important;
+  color: #1a0e06 !important;
+}
+
+/* Deep override for text color inside all boxes and inputs */
+input *,
+select *,
+textarea *,
+.section *,
+.section-box *,
+.panel *,
+.skill-row *,
+.event-row *,
+.controls *,
+.container *,
+.box * {
+  color: #1a0e06 !important;
+}
+
+/* === OVERRIDE MODERN .card STYLES IN FANTASY MODE === */
+.card,
+.card-inner {
+  background: #faecd2 !important;
+  border: 1px solid #8c6a3d !important;
+  color: #1a0e06 !important;
   box-shadow: none !important;
 }
 
-/* Unspent SP numbers and totals in black */
-.total-row span,
-.unspent-sp-box {
-  color: #1a0e06 !important;
-  font-weight: bold;
-}
-
-/* Slight spacing and clarity for mobile */
-.card h2, .box h2 {
-  margin-top: 0;
-  margin-bottom: 12px;
+/* Cancel background overlays from modern theme */
+.card::before {
+  content: none !important;
 }
