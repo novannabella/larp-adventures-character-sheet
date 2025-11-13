@@ -271,3 +271,17 @@ textarea *,
 .org-item {
   color: #1a0e06 !important;
 }
+
+/* === OVERRIDE MODERN .card STYLES IN FANTASY MODE === */
+.card,
+.card-inner {
+  background: #faecd2 !important;
+  border: 1px solid #8c6a3d !important;
+  color: #1a0e06 !important;
+  box-shadow: none !important;
+}
+
+/* Cancel background overlays from modern theme */
+.card::before {
+  content: none !important;
+}
