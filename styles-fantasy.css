@@ -319,26 +319,6 @@ table td,
 
 /* === FINAL PATCHES FOR FANTASY v7 === */
 
-/* CHECKBOXES - Brown checkboxes with white checkmarks */
-input[type="checkbox"] {
-  appearance: none !important;
-  background-color: #8c6a3d !important;
-  border: 1px solid #5c4226 !important;
-  width: 14px !important;
-  height: 14px !important;
-  border-radius: 3px !important;
-  cursor: pointer !important;
-  position: relative !important;
-}
-
-input[type="checkbox"]:checked::before {
-  content: "\2713";
-  position: absolute;
-  top: -1px;
-  left: 1px;
-  font-size: 14px;
-  color: white;
-}
 
 /* UNSPENT SKILL POINTS NUMBER - change to black */
 .unspent-sp-box {
@@ -409,4 +389,29 @@ input[type="checkbox"]:checked::before {
 /* Cancel background overlays from modern theme */
 .card::before {
   content: none !important;
+}
+
+/* === CHECKBOX VISUAL TWEAK === */
+input[type="checkbox"] {
+  appearance: none !important;
+  background-color: transparent !important;
+  border: 1px solid #5c4226 !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #8c6a3d !important;
+}
+
+input[type="checkbox"]:checked::before {
+  content: "\2713";
+  position: absolute;
+  top: -1px;
+  left: 1px;
+  font-size: 14px;
+  color: black !important;
 }
