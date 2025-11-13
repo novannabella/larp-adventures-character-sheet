@@ -1189,47 +1189,42 @@ input[type="checkbox"]:checked::before {
   color: black;
 }
 
-
-
-/* === FINAL CRITICAL PATCH === */
-
-/* Force 'Character Sheet' title color */
-h1, h1.title, h1.section-title {
+/* Mobile: Fix Path/Prof header */
+.skills-table th:nth-child(3),
+.skill-free-field label[for="skillFreeFlag"]::after,
+.event-input-row label[for="eventMotInput"] {
   color: #3b250f !important;
-  font-family: 'Uncial Antiqua', serif !important;
 }
 
-/* Remove thick blue borders */
-.section, .card, .card-inner, .box {
-  border: 1px solid #8c6a3d !important;
-  background-color: #faecd2 !important;
-  box-shadow: none !important;
-  color: #1a0e06 !important;
+/* Mobile: Fix event card header labels */
+.events-table tbody td::before {
+  color: #3b250f !important;
 }
 
-/* Checkboxes: transparent until checked */
+/* Mobile: Fix checkbox styling */
 input[type="checkbox"] {
   appearance: none !important;
   background-color: transparent !important;
-  border: 2px solid #8c6a3d !important;
+  border: 1px solid #5c4226 !important;
   width: 16px !important;
   height: 16px !important;
   border-radius: 3px !important;
   cursor: pointer !important;
   position: relative !important;
 }
-
 input[type="checkbox"]:checked {
   background-color: #8c6a3d !important;
-  border: 2px solid #000000 !important;
 }
-
 input[type="checkbox"]:checked::before {
   content: "\2713";
   position: absolute;
   top: -1px;
   left: 1px;
   font-size: 14px;
-  font-weight: bold;
+  color: black;
+}
+
+/* Mobile: Fix total numbers */
+.total-row .value, .total-row span {
   color: black !important;
 }
