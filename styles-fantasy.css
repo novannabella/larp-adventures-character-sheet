@@ -302,6 +302,101 @@ table td,
   font-weight: bold !important;
   color: #1a0e06 !important;
 }
+
+/* === OVERRIDE MODERN .card STYLES IN FANTASY MODE === */
+.card,
+.card-inner {
+  background: #faecd2 !important;
+  border: 1px solid #8c6a3d !important;
+  color: #1a0e06 !important;
+  box-shadow: none !important;
+}
+
+/* Cancel background overlays from modern theme */
+.card::before {
+  content: none !important;
+}
+
+/* === FINAL PATCHES FOR FANTASY v7 === */
+
+/* CHECKBOXES - Brown checkboxes with white checkmarks */
+input[type="checkbox"] {
+  appearance: none !important;
+  background-color: #8c6a3d !important;
+  border: 1px solid #5c4226 !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+
+input[type="checkbox"]:checked::before {
+  content: "\2713";
+  position: absolute;
+  top: -1px;
+  left: 1px;
+  font-size: 14px;
+  color: white;
+}
+
+/* UNSPENT SKILL POINTS NUMBER - change to black */
+.unspent-sp-box {
+  color: #000000 !important;
+  border-color: #5c4226 !important;
+  background: #f6e7c2 !important;
+}
+
+/* COST PILL BUBBLES - better visibility */
+.tag {
+  font-size: 11px !important;
+  padding: 2px 6px !important;
+  border-radius: 999px !important;
+  font-weight: bold !important;
+  border: 1px solid #5c4226 !important;
+  background-color: #e6c897 !important;
+  color: #1a0e06 !important;
+}
+
+.tag.free {
+  background-color: #c6e6a5 !important;
+  border-color: #4a7733 !important;
+  color: #2f3d1c !important;
+}
+
+.tag.paid {
+  background-color: #f4c76b !important;
+  border-color: #8c6a3d !important;
+  color: #4a330f !important;
+}
+
+/* TOTAL SKILL POINTS SPENT - make label and number readable */
+.total-row {
+  text-align: right;
+  font-size: 12px;
+  margin-top: 6px;
+  color: #5c4226 !important;
+  font-weight: bold !important;
+}
+
+.total-row span {
+  color: #000000 !important;
+  font-weight: bold !important;
+}
+
+/* TOTAL EVENT SKILL POINTS / QUALIFYING EVENTS */
+#totalEventPointsDisplay,
+#tierEventCountDisplay {
+  color: #5c4226 !important;
+  font-weight: bold !important;
+}
+
+#totalEventPointsDisplay span,
+#tierEventCountDisplay span {
+  color: #000000 !important;
+  font-weight: bold !important;
+}
+
 /* === OVERRIDE MODERN .card STYLES IN FANTASY MODE === */
 .card,
 .card-inner {
