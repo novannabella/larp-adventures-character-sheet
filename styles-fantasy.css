@@ -347,11 +347,7 @@ tbody tr:hover {
 /* ========== ORGANIZATIONS & MILESTONES ========== */
 
 .org-block,
-.milestone-block {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+
 
 .org-grid {
   display: grid;
@@ -638,3 +634,11 @@ tbody tr:hover {
 .skills-header-separator {
   display: none;
 }
+
+
+.milestone-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
