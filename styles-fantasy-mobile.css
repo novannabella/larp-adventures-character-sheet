@@ -6,9 +6,38 @@ body {
   background: url("parchment.jpg") center / cover repeat fixed !important;
   color: #1a0e06 !important;
   margin: 0;
-  padding: 16px; /* Keep padding from base styles */
-  box-sizing: border-box; /* Ensure proper box sizing */
+  padding: 16px;
+  box-sizing: border-box;
 }
+
+/* === RESTORED STRUCTURAL LAYOUT (Mobile) === */
+.app {
+  max-width: 100%;
+  margin: 0 auto 24px auto; /* <--- CRITICAL: Centers the sheet */
+  display: grid; /* <--- CRITICAL: Enables grid layout */
+  gap: 16px; /* <--- CRITICAL: Space between cards/sections */
+}
+
+/* Card styling */
+.card {
+  border-radius: 4px;
+  padding: 12px 14px 14px; /* <--- CRITICAL: Restores card padding */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Basic info (first card only): keep 2 columns on mobile */
+.card:first-of-type .section-row:not(.basic-bottom-row) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.section-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px 12px;
+  margin-bottom: 8px;
+}
+
 
 /* Character Sheet Title */
 h1 {
@@ -44,13 +73,11 @@ h2, h3, .section-title, label,
 /* === Box/Card Appearance Fixes (Thin Brown Border, Parchment Background) === */
 
 .card, .card-inner, .section, .box {
-  /* Thin brown border for all structural boxes */
-  border: 1px solid #8c6a3d !important; 
-  /* Light parchment background */
-  background-color: #faecd2 !important; 
+  border: 1px solid #8c6a3d !important;
+  background-color: #faecd2 !important;
   color: #1a0e06 !important;
   box-shadow: none !important;
-  border-radius: 4px; /* Rounded corners for fantasy look */
+  border-radius: 4px;
 }
 
 /* Inner block colors */
@@ -69,15 +96,7 @@ h2, h3, .section-title, label,
   color: black !important;
 }
 
-/* Skill and Event table headers */
-#selectedSkillsTable th,
-.skills-table th,
-.events-table th {
-  background: none !important;
-  color: #3b250f !important;
-}
-
-/* Mobile: Fix Path/Prof and Merchant OT labels */
+/* Mobile-specific label color fix */
 .skills-table th:nth-child(3),
 .skill-free-field label[for="skillFreeFlag"]::after,
 .event-input-row label[for="eventMotInput"]::after,
@@ -86,11 +105,14 @@ h2, h3, .section-title, label,
 }
 
 /* === Input/Field Appearance Fixes (No Border) === */
-input[type="text"], input[type="number"], input[type="date"], select, textarea {
-  background: #fff6dc !important; /* Lighter parchment for inputs */
+input, select, textarea {
+  background: #fff6dc !important;
   color: #1a0e06 !important;
-  border: none !important; /* <--- YOUR REQUEST: NO BORDER */
+  border: none !important;
   font-family: 'Cardo', serif !important;
+  padding: 5px 7px; /* <--- CRITICAL: Restores input padding */
+  border-radius: 4px;
+  width: 100%; /* <--- CRITICAL: Makes input fill container */
 }
 
 /* === Buttons, Pills, and Checkbox Appearance Fixes === */
