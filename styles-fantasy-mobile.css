@@ -985,3 +985,110 @@ h1, h2, h3, .section-title, label {
   padding: 2px 6px;
   border-radius: 4px;
 }
+
+
+
+/* === PATCH: Fantasy Theme Visual Fixes === */
+
+/* Universal override for headings and labels */
+h1, h2, h3, .section-title, label,
+.milestone-title, .org-item,
+.skills-table th, .events-table th,
+#selectedSkillsTable th,
+.total-label, .event-label {
+  color: #3b250f !important;
+  font-family: 'Uncial Antiqua', serif !important;
+  font-weight: bold !important;
+}
+
+/* Cost tags (Free / -1sp) */
+.tag, .pill {
+  background-color: #e0c9a6 !important;
+  color: #1a0e06 !important;
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-size: 10px !important;
+  font-weight: bold;
+}
+
+/* Total skill points spent + event totals row */
+.total-row, .total-row td, .total-row th {
+  color: #3b250f !important;
+  font-weight: bold !important;
+}
+.total-row .value {
+  color: black !important;
+}
+
+/* Skill table headers */
+#selectedSkillsTable th,
+.skills-table th,
+.events-table th {
+  background: none !important;
+  color: #3b250f !important;
+  font-weight: bold !important;
+}
+
+/* Fix mobile "Earned for Free?" label */
+.skill-free-field label[for="skillFreeFlag"]::after {
+  color: #3b250f !important;
+}
+
+/* Fix checkbox styling globally */
+input[type="checkbox"] {
+  appearance: none !important;
+  background-color: #8c6a3d !important;
+  border: 1px solid #5c4226 !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+input[type="checkbox"]:checked::before {
+  content: "\2713";
+  position: absolute;
+  top: -1px;
+  left: 1px;
+  font-size: 14px;
+  color: black;
+}
+
+/* Main box borders (basic info, skills, events) */
+.section, .card, .box, .card-inner {
+  background-color: #faecd2 !important;
+  border: 1px solid #8c6a3d !important;
+  color: #1a0e06 !important;
+  box-shadow: none !important;
+}
+
+/* Milestone and organization inner boxes */
+.milestone-block, .org-block {
+  background-color: #f9e9c4 !important;
+  border-color: #8c6a3d !important;
+  color: #1a0e06 !important;
+}
+
+/* Event row card backgrounds */
+.events-table tbody tr {
+  background-color: #faecd2 !important;
+  border: 1px solid #8c6a3d !important;
+  color: #1a0e06 !important;
+}
+
+/* Input/textarea/select backgrounds */
+input, select, textarea {
+  background: #fff6dc !important;
+  color: #1a0e06 !important;
+  border: 1px solid #b29564 !important;
+  font-family: 'Cardo', serif !important;
+}
+
+/* Buttons fantasy styled */
+button, .btn {
+  background: linear-gradient(#dbc691, #b89863) !important;
+  border: 1px solid #7a5d35 !important;
+  color: #1a0e06 !important;
+  font-family: 'Uncial Antiqua', serif !important;
+  font-weight: bold !important;
+}
