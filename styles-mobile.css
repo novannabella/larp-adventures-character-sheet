@@ -1,559 +1,913 @@
-/* ==========================================================
-   FANTASY THEME v2 — Parchment-Based D&D Aesthetic
-   Uses your parchment.jpg for full immersive background
-   ========================================================== */
+:root {
+  --bg: #0b1020;
+  --bg-alt: #151b30;
+  --card: #1e2640;
+  --accent: #f4c76b;
+  --accent-soft: rgba(244, 199, 107, 0.2);
+  --text: #f2f4ff;
+  --muted: #b7bdd7;
+  --border: #2b3658;
+  --danger: #ff6b81;
+  --success: #7ed957;
+  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
+}
 
-/* 1. Typography --------------------------------------------------- */
-@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cardo&display=swap');
+* {
+  box-sizing: border-box;
+}
 
+/* Basic layout */
 body {
-  font-family: 'Cardo', serif;
-  background: url("parchment.jpg") center / cover repeat fixed !important;
-  color: #2a1d0d !important;
   margin: 0;
-  padding: 0;
-}
-
-/* 2. Main containers (sheet panels) ------------------------------ */
-.main-container,
-.sheet-container,
-.character-sheet,
-#app {
-  background: rgba(255, 248, 230, 0.92) !important; /* parchment panel */
-  border: 2px solid #8b6a39 !important;
-  border-radius: 8px !important;
   padding: 16px;
-  margin: 20px auto;
-  max-width: 1100px;
-  box-shadow: 0 0 25px rgba(0,0,0,0.45) !important;
-}
-
-/* 3. Headings ------------------------------------------------------ */
-h1, h2, h3, .section-title {
-  font-family: 'Uncial Antiqua', serif !important;
-  letter-spacing: 0.06em;
-  color: #3a2813 !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: radial-gradient(circle at top, #151b30 0, #050813 55%);
+  color: var(--text);
 }
 
 h1 {
-  font-size: 2.1rem !important;
-  text-align: center !important;
-  margin-bottom: 12px !important;
-  text-shadow: 0 0 5px rgba(0,0,0,0.35);
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 22px;
+  color: var(--accent);
 }
 
-h2, h3, .section-title {
-  font-size: 1.2rem !important;
-  border-bottom: 1px solid #8e7545 !important;
-  padding-bottom: 3px !important;
-  margin-top: 14px !important;
+.subtitle {
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-/* 4. Inputs, dropdowns, textareas -------------------------------- */
-input,
+.app {
+  max-width: 100%;
+  margin: 0 auto 24px auto;
+  display: grid;
+  gap: 16px;
+}
+
+/* Card styling */
+.card {
+  background: linear-gradient(145deg, var(--card), #141a2b);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px 14px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, var(--accent-soft), transparent 55%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.card-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+
+/* Layout helpers */
+.section-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px 12px;
+  margin-bottom: 8px;
+}
+
+/* Basic info (first card only): keep 2 columns on mobile */
+.card:first-of-type .section-row:not(.basic-bottom-row) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+}
+
+label {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.inline-input-with-note {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.calc-note {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Milestones on mobile: side-by-side like desktop */
+.basic-milestones {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.milestone-block {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.milestone-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.milestone-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.milestone-checkbox input[type="checkbox"] {
+  width: auto;
+}
+
+.org-block {
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  margin-top: 4px;
+}
+
+/* Tier & Skill Points side by side on mobile, labels close to boxes */
+.basic-tier-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 6px;
+  row-gap: 4px;
+  align-items: center;
+}
+
+/* Tier pair in column 1, Skill Points pair in column 2 */
+.basic-tier-col label[for="tier"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.basic-tier-col .inline-input-with-note:nth-of-type(1) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.basic-tier-col label[for="totalSkillPoints"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.basic-tier-col .inline-input-with-note:nth-of-type(2) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.basic-tier-col label {
+  margin: 0;
+}
+
+.basic-tier-col .inline-input-with-note {
+  justify-content: flex-start;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="number"],
+input[type="date"],
 select,
 textarea {
-  background: #fff6dc !important;
-  border: 1px solid #b29564 !important;
-  color: #2c1e0e !important;
-  border-radius: 4px !important;
-  padding: 4px 6px !important;
-  font-family: 'Cardo', serif !important;
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.15) !important;
+  padding: 5px 7px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(10, 15, 34, 0.9);
+  color: var(--text);
+  font-size: 12px;
+  outline: none;
+  width: 100%;
 }
 
-input:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
 select:focus,
 textarea:focus {
-  outline: none !important;
-  border-color: #cab078 !important;
-  box-shadow: 0 0 6px #cab078 !important;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft);
 }
 
-/* 5. Labels -------------------------------------------------------- */
-label,
-.small-label,
-.field-label {
-  font-size: 0.82rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.07em !important;
-  color: #5a4327 !important;
+/* Hide number input arrows for Tier & Skill Points */
+#tier,
+#totalSkillPoints {
+  -moz-appearance: textfield;
+  /* Firefox */
+  appearance: textfield;
 }
 
-/* 6. Section boxes (skill list, events, profession) --------------- */
-.section,
-.section-box,
-.panel,
-.skill-row,
-.event-row {
-  background: #faf0d8 !important;
-  border: 1px solid #bca47b !important;
-  border-radius: 6px !important;
-  padding: 8px !important;
-  margin-bottom: 10px !important;
-  color: #2c1e0e !important;
+/* Hide spin buttons in WebKit browsers (Chrome, Edge, etc.) */
+#tier::-webkit-outer-spin-button,
+#tier::-webkit-inner-spin-button,
+#totalSkillPoints::-webkit-outer-spin-button,
+#totalSkillPoints::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-.skill-row + .skill-row,
-.event-row + .event-row {
-  border-top: 1px dashed rgba(129, 103, 59, 0.45) !important;
-}
-
-/* 7. Buttons -------------------------------------------------------- */
-button,
-.btn,
-.controls button {
-  background: linear-gradient(#dbc691, #b89863) !important;
-  border: 1px solid #7a5d35 !important;
-  border-radius: 20px !important;
-  padding: 5px 14px !important;
-  font-family: 'Uncial Antiqua', serif !important;
-  font-size: 0.95rem !important;
-  letter-spacing: 0.07em !important;
-  color: #2b1d0d !important;
-  cursor: pointer !important;
-  box-shadow: 0 2px 0 #5a4327, 0 3px 4px rgba(0,0,0,0.4) !important;
-  transition: transform 0.05s ease, box-shadow 0.05s ease !important;
-}
-
-button:hover,
-.btn:hover,
-.controls button:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 3px 0 #5a4327, 0 4px 6px rgba(0,0,0,0.5) !important;
-}
-
-button:active,
-.btn:active {
-  transform: translateY(1px) !important;
-  box-shadow: 0 1px 0 #5a4327, 0 2px 3px rgba(0,0,0,0.4) !important;
-}
-
-/* 8. Tables --------------------------------------------------------- */
-table {
-  border-collapse: collapse !important;
-}
-
-table th,
-table td {
-  border-bottom: 1px solid rgba(111, 87, 48, 0.4) !important;
-  padding: 4px 6px !important;
-  color: #2c1e0e !important;
-}
-
-table th {
-  background: rgba(191, 167, 106, 0.25) !important;
-  font-family: 'Uncial Antiqua', serif !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  font-size: 0.75rem !important;
-}
-
-/* 9. Horizontal rules (fancy) -------------------------------------- */
-hr {
-  border: 0 !important;
-  height: 2px !important;
-  margin: 10px 0 !important;
-  background: linear-gradient(to right, transparent, #6b5631, transparent) !important;
-}
-
-/* 10. Tooltip cursors ---------------------------------------------- */
-[title] {
-  cursor: help !important;
-}
-
-/* === FIX: TITLE VISIBILITY === */
-h1 {
-  color: #1d1208 !important;
-  text-shadow: 0 0 6px rgba(255, 245, 220, 0.8),
-               0 0 2px rgba(0,0,0,0.6) !important;
-}
-
-/* === FIX: REMOVE ALL BLUE BACKGROUNDS === */
-input,
-select,
-textarea,
-.section,
-.section-box,
-.panel,
-.skill-row,
-.event-row,
-table,
-table th,
-table td,
-.controls,
-.box,
-.container {
-  background: #faecd2 !important;
-  border-color: #8b6a39 !important;
-  color: #1b1208 !important;
-}
-
-/* === FIX: DARKEN ALL TEXT INSIDE BOXES === */
-.section *,
-.section-box *,
-.panel *,
-.skill-row *,
-.event-row *,
-input,
-select,
 textarea {
-  color: #1a1109 !important;
+  resize: vertical;
+  min-height: 60px;
+  max-height: 140px;
 }
 
-/* === FINAL FIXES: Visibility + Blue Box Override === */
-
-/* Fix h1 subtitle contrast */
-h1 {
-  color: #1a0e06 !important;
-  text-shadow: 0 1px 2px #fef6e2, 0 0 6px rgba(0, 0, 0, 0.4) !important;
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* Force all residual containers to use parchment tone */
-input,
-select,
-textarea,
-button,
-.btn,
-.controls,
-.section,
-.section-box,
-.panel,
-.skill-row,
-.event-row,
-#skillsList .row,
-#eventList .row,
-#professionRow,
-#pathRow,
-#basicInfoContainer,
-#outputContainer,
-#skillsContainer,
-#eventsContainer,
-#milestoneContainer,
-.container,
-.box {
-  background-color: #fdf2db !important;
-  border-color: #8c6a3d !important;
-  color: #1a0e06 !important;
+.pill {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 10px;
+  color: var(--muted);
 }
 
-/* Deep override for text color inside all boxes and inputs */
-input *,
-select *,
-textarea *,
-.section *,
-.section-box *,
-.panel *,
-.skill-row *,
-.event-row *,
-.controls *,
-.container *,
-.box * {
-  color: #1a0e06 !important;
-}
-
-/* === FINAL OVERRIDES: Milestones + Organizations === */
-
-/* Override milestone boxes (blue background from modern theme) */
-.milestone-block {
-  background-color: #faecd2 !important;
-  border-color: #8c6a3d !important;
-  color: #1a0e06 !important;
-}
-
-/* Override organization checkbox blocks */
-.org-block {
-  background-color: #f9e9c4 !important;
-  border-color: #8c6a3d !important;
-  color: #1a0e06 !important;
-}
-
-.org-item {
-  color: #1a0e06 !important;
-}
-
-/* === FINAL VISIBILITY FIXES & BOLD FONTS === */
-
-/* Force darker ink on milestone titles and checkboxes */
-.milestone-title,
-.milestone-checkbox,
-.milestone-checkbox span {
-  color: #1a0e06 !important;
-  font-weight: bold !important;
-}
-
-/* Force dark ink and bold on header text */
-h1, h2, h3, .section-title, .subtitle {
-  color: #1a0e06 !important;
-  font-weight: bold !important;
-}
-
-/* Also darken and bold any lingering label or UI text */
-label,
-.field-label,
-input,
-select,
-textarea,
-button,
-.btn,
-table th,
-table td,
-.org-item {
-  font-weight: bold !important;
-  color: #1a0e06 !important;
-}
-
-/* === OVERRIDE MODERN .card STYLES IN FANTASY MODE === */
-.card,
-.card-inner {
-  background: #faecd2 !important;
-  border: 1px solid #8c6a3d !important;
-  color: #1a0e06 !important;
-  box-shadow: none !important;
-}
-
-/* Cancel background overlays from modern theme */
-.card::before {
-  content: none !important;
-}
-
-/* === FINAL PATCHES FOR FANTASY v7 === */
-
-
-/* UNSPENT SKILL POINTS NUMBER - change to black */
-.unspent-sp-box {
-  color: #000000 !important;
-  border-color: #5c4226 !important;
-  background: #f6e7c2 !important;
-}
-
-/* COST PILL BUBBLES - better visibility */
-.tag {
-  font-size: 11px !important;
-  padding: 2px 6px !important;
-  border-radius: 999px !important;
-  font-weight: bold !important;
-  border: 1px solid #5c4226 !important;
-  background-color: #e6c897 !important;
-  color: #1a0e06 !important;
-}
-
-.tag.free {
-  background-color: #c6e6a5 !important;
-  border-color: #4a7733 !important;
-  color: #2f3d1c !important;
-}
-
-.tag.paid {
-  background-color: #f4c76b !important;
-  border-color: #8c6a3d !important;
-  color: #4a330f !important;
-}
-
-/* TOTAL SKILL POINTS SPENT - make label and number readable */
+/* Totals under sections */
 .total-row {
   text-align: right;
-  font-size: 12px;
-  margin-top: 6px;
-  color: #5c4226 !important;
-  font-weight: bold !important;
+  font-size: 11px;
+  margin-top: 4px;
+  color: var(--muted);
 }
 
 .total-row span {
-  color: #000000 !important;
-  font-weight: bold !important;
+  color: var(--accent);
+  font-weight: 600;
 }
 
-/* TOTAL EVENT SKILL POINTS / QUALIFYING EVENTS */
-#totalEventPointsDisplay,
-#tierEventCountDisplay {
-  color: #5c4226 !important;
-  font-weight: bold !important;
+/* Top controls */
+.top-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 100%;
+  margin: 0 auto 10px;
+  padding: 0 2px;
 }
 
-#totalEventPointsDisplay span,
-#tierEventCountDisplay span {
-  color: #000000 !important;
-  font-weight: bold !important;
+/* Buttons and checkboxes layout at top */
+.save-load-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
 }
 
-/* === OVERRIDE MODERN .card STYLES IN FANTASY MODE === */
-.card,
-.card-inner {
-  background: #faecd2 !important;
-  border: 1px solid #8c6a3d !important;
-  color: #1a0e06 !important;
-  box-shadow: none !important;
+/* Force labels (Full Skill Info / Event Summary) onto their own lines */
+.save-load-controls label {
+  flex-basis: 100%;
 }
 
-/* Cancel background overlays from modern theme */
-.card::before {
-  content: none !important;
+/* Buttons */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: linear-gradient(135deg, var(--accent), #f8983c);
+  color: #23120b;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 
-/* === CHECKBOX VISUAL TWEAK === */
-input[type="checkbox"] {
-  appearance: none !important;
-  background-color: transparent !important;
-  border: 1px solid #5c4226 !important;
-  width: 14px !important;
-  height: 14px !important;
-  border-radius: 3px !important;
-  cursor: pointer !important;
-  position: relative !important;
+.button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--border);
+  box-shadow: none;
 }
 
-input[type="checkbox"]:checked {
-  background-color: #8c6a3d !important;
+.button.small {
+  padding: 3px 8px;
+  font-size: 10px;
 }
 
-input[type="checkbox"]:checked::before {
-  content: "\2713";
+/* Tables (Skills + Events base) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+th,
+td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 5px 4px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+tbody tr:hover {
+  background: rgba(244, 199, 107, 0.06);
+}
+
+/* Cost tags */
+.tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--muted);
+}
+
+.tag.free {
+  color: var(--success);
+  border: 1px solid rgba(126, 217, 87, 0.6);
+  background: rgba(126, 217, 87, 0.08);
+}
+
+.tag.paid {
+  color: var(--accent);
+  border: 1px solid rgba(244, 199, 107, 0.6);
+  background: rgba(244, 199, 107, 0.08);
+}
+
+/* Skills row layout on mobile */
+.skills-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+/* Re-map skill fields into a 2x2 grid:
+   Row 1: Path | Skill
+   Row 2: Earned for Free? | Add Skill
+*/
+.skills-row .field:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.skills-row .field:nth-child(3) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.skills-row .field:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.skills-row .field:nth-child(4) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.select-path {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Align "Earned for free?" checkbox properly
+   and force label to one line "Earned for Free?" */
+.skill-free-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.skill-free-field label[for="skillFreeFlag"] {
+  font-size: 0;
+  /* hide original (with <br/>) */;
+}
+
+.skill-free-field label[for="skillFreeFlag"]::after {
+  content: "Earned for Free?";
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.skill-free-field input[type="checkbox"] {
+  margin-top: 2px;
+}
+
+.skill-add-field {
+  align-items: flex-end;
+}
+
+/* Organizations: 2 columns, checkbox + label inline */
+.org-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 8px;
+  margin-top: 2px;
+}
+
+.org-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.org-item input[type="checkbox"] {
+  margin: 0;
+}
+
+/* Tier & Skill Points width (3 digits) on mobile too */
+#tier,
+#totalSkillPoints {
+  max-width: 60px;
+}
+
+/* --------- SKILLS: spacing & shorter label text --------- */
+
+/* Right-align cost & add a bit of space from the skill name */
+#selectedSkillsBody td:last-child {
+  text-align: right;
+  padding-left: 10px;
+}
+
+/* Shorten the text under the selected skills table to "Skill points spent" */
+#selectedSkillsBody + .total-row {
+  font-size: 0;
+  /* hide original text visually */
+  text-align: right;
+  margin-top: 4px;
+}
+
+#selectedSkillsBody + .total-row::before {
+  content: "Skill points spent: ";
+  font-size: 11px;
+  color: var(--muted);
+}
+
+#selectedSkillsBody + .total-row span {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Make the Skills header's 3rd column show "Path / Prof." on two lines */
+#skillsTable thead tr th:nth-child(3) {
+  position: relative;
+  font-size: 0;
+  /* hide original text */;
+}
+
+#skillsTable thead tr th:nth-child(3)::after {
+  content: "Path /\A Prof.";
+  white-space: pre;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Center Tier column in Selected Skills table */
+.skills-table th:nth-child(2),
+.skills-table td:nth-child(2) {
+  text-align: center;
+}
+
+/* --------- EVENTS: add-event editor (mobile) --------- */
+/* 3 lines:
+   Line 1: Event Name full width
+   Line 2: Type (wide) + Date (narrow)
+   Line 3: NPC, Merch OT?, Bonus SP, Add Event
+*/
+.event-input-row {
+  display: grid !important;
+  grid-template-columns: 3fr 1.5fr 1fr 1fr;
+  grid-template-areas: "ename ename ename ename"
+    "etype etype edate edate"
+    "enpc  emot  ebonus eadd";
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.event-input-row .field:nth-child(1) {
+  grid-area: ename;
+}
+
+.event-input-row .field:nth-child(2) {
+  grid-area: edate;
+}
+
+.event-input-row .field:nth-child(3) {
+  grid-area: etype;
+}
+
+.event-input-row .field:nth-child(4) {
+  grid-area: ebonus;
+}
+
+.event-input-row .field:nth-child(5) {
+  grid-area: enpc;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.event-input-row .field:nth-child(6) {
+  grid-area: emot;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.event-input-row .field:nth-child(7) {
+  grid-area: eadd;
+  align-self: flex-end;
+  justify-self: flex-start;
+}
+
+/* Labels in the add-event row */
+.event-input-row .field label {
+  display: block;
+}
+
+/* Make event inputs fill their grid cells */
+.event-input-row input[type="text"],
+.event-input-row input[type="date"],
+.event-input-row select,
+.event-input-row input[type="number"] {
+  width: 100%;
+}
+
+/* Keep Add Event button from stretching too wide */
+.event-input-row #addEventBtn {
+  width: auto;
+}
+
+/* Change "Merchant OT?" label text to "Merch OT?" */
+.event-input-row label[for="eventMotInput"] {
+  font-size: 0;
+}
+
+.event-input-row label[for="eventMotInput"]::after {
+  content: "Merch OT?";
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* "Bonus SP" label on one line */
+.event-input-row label[for="eventBonusInput"] {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Make Bonus SP box narrower (3 digits) */
+#eventBonusInput {
+  max-width: 60px;
+}
+
+/* --------- EVENTS: listing on mobile as stacked cards (two abreast) --------- */
+
+.events-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Hide the header on mobile and rely on per-row labels */
+.events-table thead {
+  display: none;
+}
+
+/* Two cards per row */
+.events-table tbody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Each event row as a "card" */
+.events-table tbody tr {
+  display: block;
+  width: calc(50% - 8px);
+  background: rgba(8, 12, 30, 0.95);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 8px;
+  margin-bottom: 0;
+}
+
+.events-table tbody td {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: none;
+  padding: 2px 0;
+  font-size: 11px;
+  white-space: normal;
+}
+
+/* Label before each value, except the first cell (buttons) */
+.events-table tbody td::before {
+  content: attr(data-label);
+  font-size: 10px;
+  color: var(--muted);
+  margin-right: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* First cell contains just buttons, no label */
+.events-table tbody td:first-child::before {
+  content: "";
+  margin-right: 0;
+}
+
+/* Make the first cell (buttons) left-aligned with a bit of gap */
+.events-table tbody td:first-child {
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+/* Slight emphasis for the event name row */
+.events-table tbody td[data-label="Name"] span,
+.events-table tbody td[data-label="Name"] {
+  font-weight: 600;
+}
+
+/* ==== NEW: Path + Tier inline layout in Basic Info (mobile) ==== */
+
+.path-tier-inline {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.path-tier-inline select#pathDisplay {
+  flex: 1 1 auto;
+  max-width: 65%;
+}
+
+.main-tier-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.main-tier-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+#mainPathTierBox {
+  width: 40px;
+  text-align: center;
+  padding-inline: 4px;
+}
+/* Skills header with Unspent SP */
+.skills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.unspent-sp-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.unspent-sp-box {
+  display: inline-block;
+  min-width: 2.2em;
+  padding: 2px 6px;
+  margin-left: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+/* Prevent the -4 SP pill from wrapping on mobile */
+.tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+/* Skills header with Unspent SP */
+.skills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.skills-header-separator {
+  margin: 0 4px;
+  opacity: 0.7;
+}
+
+.unspent-sp-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.unspent-sp-box {
+  display: inline-block;
+  min-width: 2.2em;
+  padding: 2px 6px;
+  margin-left: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+/* Prevent the -4 SP pill from wrapping */
+.tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Clickable skill name */
+.skill-clickable {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Simple modal for skill details */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #fdf7e6;
+  max-width: 640px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.modal-close {
   position: absolute;
-  top: -1px;
-  left: 1px;
-  font-size: 14px;
-  color: black !important;
+  top: 6px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
 }
 
-/* === MOBILE OVERRIDES FOR FANTASY THEME === */
-@media (max-width: 700px) {
-  body {
-    padding: 10px !important;
-    font-size: 15px !important;
-  }
-
-  input,
-  select,
-  textarea,
-  button,
-  .btn,
-  .unspent-sp-box,
-  .tag,
-  .milestone-block,
-  .org-block {
-    font-size: 15px !important;
-    padding: 8px 10px !important;
-  }
-
-  h1 {
-    font-size: 1.5rem !important;
-  }
-
-  h2, h3 {
-    font-size: 1.1rem !important;
-  }
-
-  .section,
-  .section-box,
-  .panel {
-    padding: 12px !important;
-  }
-
-  .card,
-  .card-inner {
-    padding: 12px !important;
-  }
-
-  .skills-row,
-  .event-input-row {
-    display: block !important;
-  }
-
-  .milestone-checkbox {
-    gap: 8px !important;
-    font-size: 14px !important;
-  }
-
-  .org-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .org-item {
-    font-size: 14px !important;
-  }
-
-  .button,
-  .btn {
-    padding: 10px 14px !important;
-    font-size: 14px !important;
-  }
-
-  .modal-content {
-    font-size: 14px !important;
-    padding: 16px !important;
-  }
+#skillModalBody p {
+  margin: 4px 0 8px;
+}
+/* Override: Unspent Skill Points color */
+.unspent-sp-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  /* label text white */;
 }
 
-/* === FANTASY MOBILE FIXES === */
-@media (max-width: 700px) {
-  /* Fix duplicate "Earned for Free?" label */
-  .skill-free-field label[for="skillFreeFlag"] {
-    display: none !important;
-  }
+.unspent-sp-display .unspent-sp-box {
+  color: #ffffff;
+  /* number white as well */
+  border-color: rgba(255, 255, 255, 0.7);
+}
 
-  .skill-free-field label[for="skillFreeFlag"]::after {
-    content: "Earned for Free?";
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #1a0e06 !important;
-    font-weight: bold !important;
-  }
 
-  /* Fix duplicate Merchant OT? label */
-  .event-input-row label[for="eventMotInput"] {
-    display: none !important;
-  }
+/* Override: Skill detail modal styling */
+.modal-content {
+  background: #243b53;
+  /* deep bluish panel */
+  color: #fdf7e6;
+  /* light text */
+  max-width: 640px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  position: relative;
+  font-size: 0.95rem;
+}
 
-  .event-input-row label[for="eventMotInput"]::after {
-    content: "Merch OT?";
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #1a0e06 !important;
-    font-weight: bold !important;
-  }
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #ffe6b3;
+  /* slightly warmer heading */;
+}
 
-  /* Fix duplicate Bonus SP label */
-  .event-input-row label[for="eventBonusInput"] {
-    color: #1a0e06 !important;
-    font-weight: bold !important;
-  }
+#skillModalBody p {
+  margin: 4px 0 8px;
+  color: #fdf7e6;
+  /* ensure body text stays readable */;
+}
 
-  /* Fix path/profession header override */
-  #skillsTable thead tr th:nth-child(3)::after {
-    color: #1a0e06 !important;
-    font-weight: bold !important;
-  }
+.modal-close {
+  color: #fdf7e6;
+}
+/* Hide the vertical bar between Skills and Unspent Skill Points */
+.skills-header-separator {
+  display: none;
+}
+/* Keep label same color as Skills, but make the value white */
+.unspent-sp-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: inherit;
+  /* inherit the yellow from the h2 */;
+}
 
-  /* General label override */
-  label {
-    color: #1a0e06 !important;
-    font-weight: bold !important;
-  }
-
-  /* Fix skill table overflow and make rows readable */
-  #skillsTable,
-  .skills-table,
-  #skillsTable th,
-  #skillsTable td {
-    display: block !important;
-    width: 100% !important;
-    text-align: left !important;
-    white-space: normal !important;
-  }
-
-  #skillsTable thead {
-    display: none !important;
-  }
-
-  .selected-skills-row {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 4px !important;
-    padding: 8px !important;
-    border-bottom: 1px solid #a68b5c !important;
-  }
+.unspent-sp-display .unspent-sp-box {
+  color: #ffffff;
+  /* number in the box is white */
+  border-color: rgba(255, 255, 255, 0.7);
+  /* subtle light border */;
 }
