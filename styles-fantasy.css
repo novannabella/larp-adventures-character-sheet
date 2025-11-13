@@ -1062,3 +1062,17 @@ input[type="text"], input[type="number"], input[type="date"], select, textarea {
   --muted: #3b250f;
   --border: #8c6a3d;
 }
+
+
+/* Reduce double-thick borders on main boxes */
+.card-inner,
+.box,
+.section-box {
+  border-width: 0 !important;
+}
+
+/* Thin outer border on the main section boxes */
+.card,
+.section {
+  border: 1px solid #8c6a3d !important;
+}
