@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-  
   <head>
     <meta charset="UTF-8" />
     <title>Larp Adventures Character Sheet</title>
-    <link rel="icon" type="image/png" href="quill.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
+    <link rel="icon" type="image/png" href="quill.png" />
 
+    <!-- Dynamically controlled styles -->
+    <link id="desktopModernStylesheet" rel="stylesheet" href="styles-desktop.css" disabled>
+    <link id="mobileModernStylesheet" rel="stylesheet" href="styles-mobile.css" disabled>
+    <link id="fantasyStylesheet" rel="stylesheet" href="styles-fantasy.css" disabled>
+    <link id="fantasyMobileStylesheet" rel="stylesheet" href="styles-fantasy-mobile.css" disabled>
+</head>
   <body>
-    <button id="uiModeToggle" class="btn" style="position:absolute;top:10px;right:10px;z-index:1000;">Toggle Theme</button>
+    <button id="uiModeToggle" class="button secondary" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">Toggle Theme</button>
     <h1>Larp Adventures</h1>
     <p class="subtitle">Character Sheet</p>
 
@@ -419,5 +423,11 @@
     <script src="pdf-export.js"></script>
   </body>
 </html>
+
+
+
+
+
+
 
 
