@@ -392,7 +392,7 @@ tbody tr:hover {
 }
 
 .milestone-checkbox {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 4px;
   font-size: 11px;
@@ -431,13 +431,13 @@ tbody tr:hover {
 .event-input-row {
   display: grid;
   grid-template-columns:
-    minmax(0, 3fr)
-    130px
-    1.5fr
-    70px
-    auto
-    auto
-    auto;
+    minmax(0, 3fr)  /* Event Name */
+    130px           /* Date */
+    1.5fr           /* Type */
+    70px            /* Bonus SP */
+    auto            /* NPC? */
+    auto            /* Merchant OT? */
+    auto;           /* Add Event */
   gap: 8px;
   align-items: end;
   margin-bottom: 8px;
@@ -620,13 +620,13 @@ tbody tr:hover {
   .event-input-row {
   display: grid;
   grid-template-columns:
-    minmax(0, 3fr)
-    130px
-    1.5fr
-    70px
-    auto
-    auto
-    auto;
+    minmax(0, 3fr)  /* Event Name */
+    130px           /* Date */
+    1.5fr           /* Type */
+    70px            /* Bonus SP */
+    auto            /* NPC? */
+    auto            /* Merchant OT? */
+    auto;           /* Add Event */
   gap: 8px;
   align-items: end;
   margin-bottom: 8px;
