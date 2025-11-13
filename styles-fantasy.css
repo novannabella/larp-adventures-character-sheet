@@ -392,7 +392,7 @@ tbody tr:hover {
 }
 
 .milestone-checkbox {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 11px;
@@ -426,19 +426,6 @@ tbody tr:hover {
 
 .skill-add-field {
   align-items: flex-end;
-}
-
-.event-input-row {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 8px;
-  align-items: flex-end;
-  margin-bottom: 8px;
-}
-
-.event-input-row .field {
-  flex: 1 1 auto;
-  min-width: 0;
 }
 
 .event-input-row #eventDateInput {
@@ -615,20 +602,7 @@ tbody tr:hover {
     grid-template-columns: 1fr;
   }
 
-  .event-input-row {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 3fr)  /* Event Name */
-    130px           /* Date */
-    1.5fr           /* Type */
-    70px            /* Bonus SP */
-    auto            /* NPC? */
-    auto            /* Merchant OT? */
-    auto;           /* Add Event */
-  gap: 8px;
-  align-items: end;
-  margin-bottom: 8px;
-}
+  
 
   .selected-skills-row {
     grid-template-columns: 24px 1fr;
@@ -639,3 +613,30 @@ tbody tr:hover {
 .skills-header-separator {
   display: none;
 }
+
+
+/* === Event row layout copied from modern desktop CSS === */
+/* Desktop layout for the event input row */
+.event-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr)   /* Event Name */
+    130px           /* Date */
+    1.5fr           /* Type */
+    auto            /* NPC? */
+    auto            /* Merchant OT? */
+    70px            /* Bonus SP */
+    auto !important;
+  /* Add Event */
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+.event-input-row #eventDateInput {
+  max-width: 130px;
+}
+
+.event-input-row #eventBonusInput {
+  max-width: 60px;
+}
+
