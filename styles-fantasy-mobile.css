@@ -1,3 +1,4 @@
+
 /* ==========================================================
    FANTASY MOBILE THEME — for widths <= 700px
    Built to override styles-mobile.css when fantasy mode is active
@@ -122,43 +123,4 @@
     padding: 8px !important;
     border-bottom: 1px solid #a68b5c !important;
   }
-}
-
-/* === NORMALIZED SIZING TO MATCH MODERN THEME === */
-body,
-input,
-select,
-textarea,
-button,
-.btn,
-.tag,
-.unspent-sp-box,
-.milestone-block,
-.org-block,
-.panel,
-.section,
-.card,
-.card-inner,
-.skills-row,
-.event-row,
-.modal-content {
-  font-size: 13px !important;
-  padding: 6px 8px !important;
-  line-height: 1.4 !important;
-}
-
-.button,
-.btn {
-  font-size: 13px !important;
-  padding: 6px 10px !important;
-}
-
-h1 {
-  font-size: 1.8rem !important;
-}
-
-h2,
-h3,
-.section-title {
-  font-size: 1.1rem !important;
 }
