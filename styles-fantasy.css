@@ -429,18 +429,16 @@ tbody tr:hover {
 }
 
 .event-input-row {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 3fr)  /* Event Name */
-    130px           /* Date */
-    1.5fr           /* Type */
-    70px            /* Bonus SP */
-    auto            /* NPC? */
-    auto            /* Merchant OT? */
-    auto;           /* Add Event */
+  display: flex;
+  flex-wrap: nowrap;
   gap: 8px;
-  align-items: end;
+  align-items: flex-end;
   margin-bottom: 8px;
+}
+
+.event-input-row .field {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .event-input-row #eventDateInput {
@@ -640,18 +638,4 @@ tbody tr:hover {
 
 .skills-header-separator {
   display: none;
-}
-.event-input-row {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 3fr)   /* Event Name */
-    130px            /* Date */
-    1.5fr            /* Type */
-    70px             /* Bonus SP */
-    auto             /* NPC? */
-    auto             /* Merchant OT? */
-    auto;            /* Add Event button */
-  gap: 8px;
-  align-items: end;
-  margin-bottom: 8px;
 }
