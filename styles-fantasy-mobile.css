@@ -190,3 +190,70 @@ tbody tr:hover {
 .modal-close {
   color: #3b250f !important;
 }
+
+
+/* === FINAL FANTASY PATCHES === */
+
+/* Character Sheet Heading: Simulate bold */
+h1 {
+  font-family: 'Uncial Antiqua', serif !important;
+  color: #3b250f !important;
+  text-shadow: 0.7px 0.7px #1a0e06;
+  font-size: 26px;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #5c4226;
+  background-color: transparent;
+  border-radius: 2px;
+  margin-right: 6px;
+  cursor: pointer;
+  position: relative;
+}
+input[type="checkbox"]:checked {
+  background-color: #8c6a3d;
+}
+input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  left: 2px;
+  top: -2px;
+  font-size: 16px;
+  color: black;
+  font-weight: bold;
+}
+
+/* Ensure fantasy colors on any missed headers */
+.skills-table th, .events-table th, #selectedSkillsTable th,
+.total-label, .event-label, label, th {
+  color: #3b250f !important;
+  font-family: 'Uncial Antiqua', serif !important;
+  font-weight: bold;
+}
+
+/* Tighten up box appearance but ensure spacing */
+.card, .box, .section {
+  border: 1px solid #8c6a3d !important;
+  background-color: #faecd2 !important;
+  padding: 14px !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+/* Unspent SP numbers and totals in black */
+.total-row span,
+.unspent-sp-box {
+  color: #1a0e06 !important;
+  font-weight: bold;
+}
+
+/* Slight spacing and clarity for mobile */
+.card h2, .box h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
