@@ -1585,6 +1585,22 @@ window.addEventListener("DOMContentLoaded", () => {
   playerNameInput.addEventListener("input", markDirty);
   factionSelect.addEventListener("change", markDirty);
 
+  // Update faction image on fantasy sheet if present
+  const factionImage = document.getElementById("factionImage");
+  if (factionImage && factionSelect) {
+    function updateFactionImage() {
+      const chosen = (factionSelect.value || "").trim();
+      if (chosen) {
+        factionImage.src = `pix/${chosen}.jpg`;
+      } else {
+        factionImage.src = "pix/The Free Folk.jpg";
+      }
+    }
+    factionSelect.addEventListener("change", updateFactionImage);
+    // Initialize on load
+    updateFactionImage();
+  }
+
   organizationsContainer
     .querySelectorAll('input[type="checkbox"]')
     .forEach((cb) => {
