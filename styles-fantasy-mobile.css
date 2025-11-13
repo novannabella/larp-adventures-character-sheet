@@ -1,3 +1,14 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cardo&display=swap');
+
+body {
+  font-family: 'Cardo', serif;
+  background: url("parchment.jpg") center / cover repeat fixed !important;
+  color: #1a0e06 !important;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --bg: #0b1020;
   --bg-alt: #151b30;
@@ -910,4 +921,67 @@ tbody tr:hover {
   /* number in the box is white */
   border-color: rgba(255, 255, 255, 0.7);
   /* subtle light border */;
+}
+
+
+.card, .card-inner, .panel, .section-box, .section, .field, .skill-row, .event-row, .box {
+  background-color: #faecd2 !important;
+  border: 1px solid #8c6a3d !important;
+  color: #1a0e06 !important;
+  box-shadow: none !important;
+  border-radius: 4px;
+}
+
+.milestone-block, .org-block {
+  background-color: #f9e9c4 !important;
+  border-color: #8c6a3d !important;
+  color: #1a0e06 !important;
+}
+
+input, select, textarea {
+  background: #fff6dc !important;
+  color: #1a0e06 !important;
+  border: 1px solid #b29564 !important;
+  font-family: 'Cardo', serif !important;
+}
+
+button, .btn {
+  background: linear-gradient(#dbc691, #b89863) !important;
+  border: 1px solid #7a5d35 !important;
+  color: #1a0e06 !important;
+  font-family: 'Uncial Antiqua', serif !important;
+  font-weight: bold !important;
+}
+
+input[type="checkbox"] {
+  appearance: none !important;
+  background-color: #8c6a3d !important;
+  border: 1px solid #5c4226 !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+input[type="checkbox"]:checked::before {
+  content: "\2713";
+  position: absolute;
+  top: -1px;
+  left: 1px;
+  font-size: 14px;
+  color: black;
+}
+
+h1, h2, h3, .section-title, label {
+  font-family: 'Uncial Antiqua', serif !important;
+  color: #1a0e06 !important;
+  font-weight: bold !important;
+}
+
+.unspent-sp-box {
+  background: #f6e7c2 !important;
+  color: black !important;
+  border: 1px solid #5c4226 !important;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
