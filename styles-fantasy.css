@@ -1,5 +1,5 @@
 
-/* FANTASY THEME — Desktop Version */
+/* FANTASY THEME — Desktop Version (Fixed Layout + Style) */
 @import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cardo&display=swap');
 
 body {
@@ -7,25 +7,25 @@ body {
   background: url("parchment.jpg") center / cover repeat fixed !important;
   color: #2a1d0d !important;
   margin: 0;
-  padding: 0;
+  padding: 12px;
 }
 
-/* Common parchment box styling */
 .card, .card-inner, .panel, .section-box, .section, .field, .skill-row, .event-row, .box {
   background-color: #faecd2 !important;
   border: 1px solid #8c6a3d !important;
   color: #1a0e06 !important;
   box-shadow: none !important;
+  margin-bottom: 10px !important;
+  border-radius: 4px !important;
+  padding: 12px !important;
 }
 
-/* Headers */
 h1, h2, h3, .section-title, label {
   font-family: 'Uncial Antiqua', serif !important;
   color: #1a0e06 !important;
   font-weight: bold !important;
 }
 
-/* Inputs & textareas */
 input, select, textarea {
   background: #fff6dc !important;
   color: #1a0e06 !important;
@@ -33,22 +33,21 @@ input, select, textarea {
   font-family: 'Cardo', serif !important;
 }
 
-/* Buttons */
 button, .btn {
   background: linear-gradient(#dbc691, #b89863) !important;
   border: 1px solid #7a5d35 !important;
   color: #1a0e06 !important;
   font-family: 'Uncial Antiqua', serif !important;
   font-weight: bold !important;
+  padding: 6px 12px;
 }
 
-/* Checkboxes */
 input[type="checkbox"] {
   appearance: none !important;
   background-color: #8c6a3d !important;
   border: 1px solid #5c4226 !important;
-  width: 14px !important;
-  height: 14px !important;
+  width: 16px !important;
+  height: 16px !important;
   border-radius: 3px !important;
   cursor: pointer !important;
   position: relative !important;
@@ -62,20 +61,56 @@ input[type="checkbox"]:checked::before {
   color: black;
 }
 
-/* Milestones and Organizations */
 .milestone-block, .org-block {
   background-color: #f9e9c4 !important;
-  border-color: #8c6a3d !important;
+  border: 1px solid #8c6a3d !important;
   color: #1a0e06 !important;
+  padding: 6px !important;
+  margin-top: 5px !important;
 }
+
 .org-item, .milestone-title {
   font-weight: bold !important;
   color: #1a0e06 !important;
 }
 
-/* Unspent Skill Point Display */
+/* Layout Fixes */
+.section-row,
+.basic-bottom-row,
+.skills-row,
+.event-input-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+
+.field {
+  flex: 1 1 45% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.path-tier-inline {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.main-tier-box {
+  flex: 0 0 auto !important;
+}
+
+.total-row {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #1a0e06 !important;
+}
+
 .unspent-sp-box {
   background: #f6e7c2 !important;
   color: black !important;
   border: 1px solid #5c4226 !important;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
