@@ -347,7 +347,14 @@ tbody tr:hover {
 /* ========== ORGANIZATIONS & MILESTONES ========== */
 
 .org-block,
-
+.milestone-block {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background-color: var(--parchment-deep);
+  margin-top: 4px;
+  color: var(--ink);
+}
 
 .org-grid {
   display: grid;
@@ -385,7 +392,7 @@ tbody tr:hover {
 }
 
 .milestone-checkbox {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 11px;
@@ -634,11 +641,3 @@ tbody tr:hover {
 .skills-header-separator {
   display: none;
 }
-
-
-.milestone-block {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
