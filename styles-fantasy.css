@@ -378,7 +378,7 @@ tbody tr:hover {
 
 .basic-milestones {
   display: flex;
-  flex-direction: row;
+  flex-direction: column; /* vertical stack of Artificer / Bard / Scholar */
   align-items: flex-start;
   gap: 8px;
 }
@@ -428,16 +428,17 @@ tbody tr:hover {
   align-items: flex-end;
 }
 
+/* All event inputs on one line (desktop & mobile) */
 .event-input-row {
   display: grid;
   grid-template-columns:
-    minmax(0, 3fr)
-    130px
-    1.5fr
-    auto
-    auto
-    70px
-    auto;
+    minmax(0, 3fr)  /* Event Name */
+    130px           /* Date */
+    1.5fr           /* Type */
+    70px            /* Bonus SP */
+    auto            /* NPC? */
+    auto            /* Merchant OT? */
+    auto;           /* Add Event button */
   gap: 8px;
   align-items: end;
   margin-bottom: 8px;
@@ -489,6 +490,11 @@ tbody tr:hover {
   justify-content: space-between;
   align-items: baseline;
   gap: 8px;
+}
+
+/* Hide the ' | ' separator element entirely */
+.skills-header-separator {
+  display: none;
 }
 
 .unspent-sp-display {
@@ -617,8 +623,9 @@ tbody tr:hover {
     grid-template-columns: 1fr;
   }
 
+  /* Keep event inputs on one line even on mobile by allowing horizontal scrolling if needed */
   .event-input-row {
-    grid-template-columns: 1fr;
+    overflow-x: auto;
   }
 
   .selected-skills-row {
