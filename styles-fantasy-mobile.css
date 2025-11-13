@@ -17,7 +17,7 @@ body {
   --accent-soft: rgba(244, 199, 107, 0.2);
   --text: #f2f4ff;
   --muted: #b7bdd7;
-  --border: #2b3658;
+  --border: #8c6a3d;
   --danger: #ff6b81;
   --success: #7ed957;
   --radius-lg: 14px;
@@ -41,14 +41,12 @@ body {
 
 h1 {
   color: #3b250f !important;
-
-  color: #3b250f !important;
   text-align: center;
   margin-bottom: 6px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 22px;
-  color: #3b250f !important;
+  color: #3b250f;
 }
 
 .subtitle {
@@ -73,7 +71,7 @@ h1 {
   border-radius: var(--radius-lg);
   padding: 12px 14px 14px;
   box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border);
+  border: 1px solid #8c6a3d;
   position: relative;
   overflow: hidden;
 }
@@ -97,7 +95,7 @@ h1 {
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: #3b250f !important;
+  color: #3b250f;
 }
 
 /* Layout helpers */
@@ -229,7 +227,7 @@ select,
 textarea {
   padding: 5px 7px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border: 1px solid #8c6a3d;
   background: rgba(10, 15, 34, 0.9);
   color: var(--text);
   font-size: 12px;
@@ -242,7 +240,7 @@ input[type="number"]:focus,
 input[type="date"]:focus,
 select:focus,
 textarea:focus {
-  border-color: #3b250f !important;
+  border-color: #3b250f;
   box-shadow: 0 0 0 1px var(--accent-soft);
 }
 
@@ -292,7 +290,7 @@ textarea {
 }
 
 .total-row span {
-  color: #3b250f !important;
+  color: #3b250f;
   font-weight: 600;
 }
 
@@ -328,8 +326,8 @@ textarea {
   gap: 4px;
   padding: 5px 10px;
   border-radius: 999px;
-  border: 1px solid var(--accent);
-  background: linear-gradient(135deg, var(--accent), #f8983c);
+  border: 1px solid #3b250f;
+  background: linear-gradient(135deg, #3b250f, #f8983c);
   color: #23120b;
   font-size: 11px;
   font-weight: 600;
@@ -342,8 +340,8 @@ textarea {
 
 .button.secondary {
   background: transparent;
-  color: #3b250f !important;
-  border-color: var(--border);
+  color: #3b250f;
+  border-color: #8c6a3d;
   box-shadow: none;
 }
 
@@ -400,7 +398,7 @@ tbody tr:hover {
 }
 
 .tag.paid {
-  color: #3b250f !important;
+  color: #3b250f;
   border: 1px solid rgba(244, 199, 107, 0.6);
   background: rgba(244, 199, 107, 0.08);
 }
@@ -524,7 +522,7 @@ tbody tr:hover {
 
 #selectedSkillsBody + .total-row span {
   font-size: 11px;
-  color: #3b250f !important;
+  color: #3b250f;
   font-weight: 600;
 }
 
@@ -1107,8 +1105,6 @@ button, .btn {
 /* Character Sheet Title */
 h1 {
   color: #3b250f !important;
-
-  color: #3b250f !important;
   color: #3b250f !important;
 }
 
@@ -1233,41 +1229,10 @@ input[type="checkbox"]:checked::before {
   color: black !important;
 }
 
-/* FINAL PATCHES: Remove lingering blue borders */
-.card, .card-inner, .section, .box, .panel, .field, .skill-row, .event-row {
-  border: 1px solid #8c6a3d !important;
-  background-color: #faecd2 !important;
-  color: #1a0e06 !important;
-  box-shadow: none !important;
-}
-
-/* Character Sheet Title */
+/* Character Sheet header */
 h1 {
   color: #3b250f !important;
-  text-align: center !important;
   font-family: 'Uncial Antiqua', serif !important;
   font-weight: bold !important;
-}
-
-/* Checkbox default and checked */
-input[type="checkbox"] {
-  appearance: none !important;
-  background-color: transparent !important;
-  border: 1px solid #5c4226 !important;
-  width: 16px !important;
-  height: 16px !important;
-  border-radius: 3px !important;
-  cursor: pointer !important;
-  position: relative !important;
-}
-input[type="checkbox"]:checked {
-  background-color: #8c6a3d !important;
-}
-input[type="checkbox"]:checked::before {
-  content: "\2713";
-  position: absolute;
-  top: -1px;
-  left: 1px;
-  font-size: 14px;
-  color: black;
+  text-align: center !important;
 }
