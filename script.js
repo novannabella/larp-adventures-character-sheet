@@ -1663,9 +1663,9 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // ========== THEME MODE TOGGLE ==========
-document.addEventListener("DOMContentLoaded", () => {
+(function() {
   const toggleBtn = document.getElementById("uiModeToggle");
-  const savedMode = localStorage.getItem("uiMode") || "modern";
+  if (!toggleBtn) return; // Button must exist
 
   function isMobile() {
     return window.innerWidth <= 700;
@@ -1677,9 +1677,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function applyStylesheet(mode) {
-    const path = getStylesheet(mode, isMobile());
+    const mobile = isMobile();
+    const path = getStylesheet(mode, mobile);
 
-    // Remove theme-related styles
+    // Remove existing theme stylesheets only (not layout/base/etc)
     document.querySelectorAll("link[rel=stylesheet]").forEach(link => {
       const href = link.getAttribute("href");
       if (href && (
@@ -1692,24 +1693,24 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Inject selected stylesheet
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = path;
-    document.head.appendChild(link);
+    // Add the correct stylesheet
+    const styleLink = document.createElement("link");
+    styleLink.rel = "stylesheet";
+    styleLink.href = path;
+    styleLink.onload = () => console.log("Theme applied:", path);
+    document.head.appendChild(styleLink);
 
-    // Update button and storage
     localStorage.setItem("uiMode", mode);
-    if (toggleBtn) toggleBtn.textContent = mode === "fantasy" ? "Switch to Modern" : "Switch to Fantasy";
+    toggleBtn.textContent = mode === "fantasy" ? "Switch to Modern" : "Switch to Fantasy";
   }
 
-  if (toggleBtn) {
-    toggleBtn.addEventListener("click", () => {
-      const current = localStorage.getItem("uiMode") || "modern";
-      const next = current === "fantasy" ? "modern" : "fantasy";
-      applyStylesheet(next);
-    });
-  }
+  toggleBtn.addEventListener("click", () => {
+    const current = localStorage.getItem("uiMode") || "modern";
+    const next = current === "fantasy" ? "modern" : "fantasy";
+    applyStylesheet(next);
+  });
 
-  applyStylesheet(savedMode);
-});
+  // Apply saved theme at load
+  const saved = localStorage.getItem("uiMode") || "modern";
+  applyStylesheet(saved);
+})();
