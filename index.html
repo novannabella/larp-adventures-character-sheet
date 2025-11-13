@@ -4,16 +4,20 @@
     <meta charset="UTF-8" />
     <title>Larp Adventures Character Sheet</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" href="quill.png" />
-
-    <!-- Dynamically controlled styles -->
-    <link id="desktopModernStylesheet" rel="stylesheet" href="styles-desktop.css" disabled>
-    <link id="mobileModernStylesheet" rel="stylesheet" href="styles-mobile.css" disabled>
-    <link id="fantasyStylesheet" rel="stylesheet" href="styles-fantasy.css" disabled>
-    <link id="fantasyMobileStylesheet" rel="stylesheet" href="styles-fantasy-mobile.css" disabled>
-</head>
+    <link
+      rel="stylesheet"
+      href="styles-desktop.css"
+      media="(min-width: 701px)"
+    />
+      <!-- Add this favicon line -->
+  <link rel="icon" type="image/png" href="quill.png">
+    <link
+      rel="stylesheet"
+      href="styles-mobile.css"
+      media="(max-width: 700px)"
+    />
+  </head>
   <body>
-    <button id="uiModeToggle" class="button secondary" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">Toggle Theme</button>
     <h1>Larp Adventures</h1>
     <p class="subtitle">Character Sheet</p>
 
@@ -423,11 +427,5 @@
     <script src="pdf-export.js"></script>
   </body>
 </html>
-
-
-
-
-
-
 
 
