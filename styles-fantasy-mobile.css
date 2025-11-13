@@ -431,12 +431,22 @@ tbody tr:hover {
   justify-content: flex-start;
 }
 
-/* Milestones: vertical stack (Artificer, Bard, Scholar) */
+/* Milestones: horizontal blocks, vertical checkboxes inside
+   Artificer | Bard | Scholar
+   [ ] 2    | [ ] 2 | [ ] 2
+   [ ] 3    | [ ] 3 | [ ] 3
+*/
 .basic-milestones {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.milestone-block {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+  gap: 4px;
 }
 
 .milestone-title {
@@ -444,7 +454,6 @@ tbody tr:hover {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ink-soft);
-  margin-bottom: 3px;
 }
 
 .milestone-checkbox {
@@ -660,20 +669,6 @@ tbody tr:hover {
   letter-spacing: 0.08em;
   color: var(--muted);
 }
-
-/* Optional: shorten "Merchant OT?" text if desired */
-/*
-.event-input-row label[for="eventMotInput"] {
-  font-size: 0;
-}
-.event-input-row label[for="eventMotInput"]::after {
-  content: "Merch OT?";
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-*/
 
 /* Keep Add Event button from stretching too wide */
 .event-input-row #addEventBtn {
