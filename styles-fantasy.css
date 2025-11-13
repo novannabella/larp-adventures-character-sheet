@@ -6,8 +6,23 @@ body {
   background: url("parchment.jpg") center / cover repeat fixed !important;
   color: #1a0e06 !important;
   margin: 0;
-  padding: 24px; /* Keep padding from base styles */
-  box-sizing: border-box; /* Ensure proper box sizing */
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* === RESTORED STRUCTURAL LAYOUT (Desktop) === */
+.app {
+  max-width: 1200px; /* <--- CRITICAL: Defines max width */
+  margin: 0 auto 40px auto; /* <--- CRITICAL: Centers the sheet */
+  display: grid; /* <--- CRITICAL: Enables grid layout */
+  gap: 20px; /* <--- CRITICAL: Space between cards/sections */
+}
+
+.section-row {
+  display: grid; /* <--- CRITICAL: Creates two-column layout */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+  margin-bottom: 10px;
 }
 
 /* Character Sheet Title */
@@ -44,13 +59,14 @@ h2, h3, .section-title, label,
 /* === Box/Card Appearance Fixes (Thin Brown Border, Parchment Background) === */
 
 .card, .card-inner, .section, .box {
-  /* Thin brown border for all structural boxes */
-  border: 1px solid #8c6a3d !important; 
-  /* Light parchment background */
-  background-color: #faecd2 !important; 
+  border: 1px solid #8c6a3d !important;
+  background-color: #faecd2 !important;
   color: #1a0e06 !important;
   box-shadow: none !important;
-  border-radius: 4px; /* Rounded corners for fantasy look */
+  border-radius: 4px;
+  padding: 16px 18px 18px; /* <--- CRITICAL: Restores card padding */
+  position: relative; /* <--- CRITICAL: Restores positioning context */
+  overflow: hidden; /* <--- CRITICAL: Hides overflow */
 }
 
 /* Inner block colors */
@@ -78,11 +94,14 @@ h2, h3, .section-title, label,
 }
 
 /* === Input/Field Appearance Fixes (No Border) === */
-input[type="text"], input[type="number"], input[type="date"], select, textarea {
-  background: #fff6dc !important; /* Lighter parchment for inputs */
+input, select, textarea {
+  background: #fff6dc !important;
   color: #1a0e06 !important;
-  border: none !important; /* <--- YOUR REQUEST: NO BORDER */
+  border: none !important;
   font-family: 'Cardo', serif !important;
+  padding: 6px 8px; /* <--- CRITICAL: Restores input padding */
+  border-radius: 4px; /* Restores border radius */
+  width: 100%; /* <--- CRITICAL: Makes input fill container */
 }
 
 /* === Buttons, Pills, and Checkbox Appearance Fixes === */
