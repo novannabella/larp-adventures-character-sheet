@@ -945,7 +945,7 @@ tbody tr:hover {
 input, select, textarea {
   background: #fff6dc !important;
   color: #1a0e06 !important;
-  border: 1px solid #b29564 !important;
+  border: none !important; /* <--- MODIFIED: Removed thin brown border */
   font-family: 'Cardo', serif !important;
 }
 
@@ -1058,7 +1058,7 @@ input[type="checkbox"]:checked::before {
   color: black;
 }
 
-/* Main box borders (basic info, skills, events) */
+/* Main box borders (basic info, skills, events) - Makes it thin brown */
 .section, .card, .box, .card-inner {
   background-color: #faecd2 !important;
   border: 1px solid #8c6a3d !important;
@@ -1084,7 +1084,7 @@ input[type="checkbox"]:checked::before {
 input, select, textarea {
   background: #fff6dc !important;
   color: #1a0e06 !important;
-  border: 1px solid #b29564 !important;
+  border: none !important; /* <--- MODIFIED: Removed thin brown border */
   font-family: 'Cardo', serif !important;
 }
 
@@ -1139,7 +1139,7 @@ h1 {
   color: black !important;
 }
 
-/* Box borders */
+/* Box borders - Ensures 1px brown border is applied */
 .section, .card, .card-inner, .box {
   background-color: #faecd2 !important;
   border: 1px solid #8c6a3d !important;
@@ -1234,8 +1234,9 @@ input[type="checkbox"]:checked::before {
 }
 
 /* === PATCH: Strong override for input, select, textarea borders === */
+/* MODIFIED: Removes the thin brown border around input fields */
 input[type="text"], input[type="number"], input[type="date"], select, textarea {
-  border: 1px solid #b29564 !important;
+  border: none !important; /* <--- MODIFIED */
   background: #fff6dc !important;
   color: #1a0e06 !important;
 }
@@ -1244,32 +1245,4 @@ input[type="text"], input[type="number"], input[type="date"], select, textarea {
 :root {
   --muted: #3b250f;
   --border: #8c6a3d;
-}
-
-
-/* === FINAL PATCHES (Place at bottom of file) === */
-
-/* Bolden Character Sheet title */
-h1 {
-  font-family: 'Uncial Antiqua', serif !important;
-  color: #3b250f !important;
-  font-weight: normal !important;
-  text-shadow: 0.5px 0.5px #1a0e06;
-}
-
-/* Kill any blue borders, enforce parchment theme boxes */
-.card, .card-inner, .panel, .section-box, .section, .field, .skill-row, .event-row, .box {
-  border: 1px solid #8c6a3d !important;
-  background-color: #faecd2 !important;
-  color: #1a0e06 !important;
-  box-shadow: none !important;
-  border-radius: 4px !important;
-}
-
-/* Inputs should use the fantasy theme border, make slightly thicker if needed */
-input, select, textarea {
-  background: #fff6dc !important;
-  color: #1a0e06 !important;
-  border: 2px solid #8c6a3d !important;
-  font-family: 'Cardo', serif !important;
 }
