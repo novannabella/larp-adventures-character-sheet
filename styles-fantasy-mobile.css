@@ -1245,3 +1245,31 @@ input[type="text"], input[type="number"], input[type="date"], select, textarea {
   --muted: #3b250f;
   --border: #8c6a3d;
 }
+
+
+/* === FINAL PATCHES (Place at bottom of file) === */
+
+/* Bolden Character Sheet title */
+h1 {
+  font-family: 'Uncial Antiqua', serif !important;
+  color: #3b250f !important;
+  font-weight: normal !important;
+  text-shadow: 0.5px 0.5px #1a0e06;
+}
+
+/* Kill any blue borders, enforce parchment theme boxes */
+.card, .card-inner, .panel, .section-box, .section, .field, .skill-row, .event-row, .box {
+  border: 1px solid #8c6a3d !important;
+  background-color: #faecd2 !important;
+  color: #1a0e06 !important;
+  box-shadow: none !important;
+  border-radius: 4px !important;
+}
+
+/* Inputs should use the fantasy theme border, make slightly thicker if needed */
+input, select, textarea {
+  background: #fff6dc !important;
+  color: #1a0e06 !important;
+  border: 2px solid #8c6a3d !important;
+  font-family: 'Cardo', serif !important;
+}
