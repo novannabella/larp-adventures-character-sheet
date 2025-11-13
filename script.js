@@ -1648,14 +1648,18 @@ window.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("uiMode", newMode);
     });
 
-    function applyUIMode(mode) {
+    const mobileModernCSS = document.getElementById("mobileModernStylesheet");
+
+function applyUIMode(mode) {
       if (mode === "fantasy") {
         fantasyCSS.disabled = false;
         fantasyMobileCSS.disabled = false;
+        if (mobileModernCSS) mobileModernCSS.disabled = true;
         toggleBtn.textContent = "Modern Mode";
       } else {
         fantasyCSS.disabled = true;
         fantasyMobileCSS.disabled = true;
+        if (mobileModernCSS) mobileModernCSS.disabled = false;
         toggleBtn.textContent = "Fantasy Mode";
       }
     }
