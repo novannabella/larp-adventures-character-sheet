@@ -272,16 +272,33 @@ textarea *,
   color: #1a0e06 !important;
 }
 
-/* === OVERRIDE MODERN .card STYLES IN FANTASY MODE === */
-.card,
-.card-inner {
-  background: #faecd2 !important;
-  border: 1px solid #8c6a3d !important;
+/* === FINAL VISIBILITY FIXES & BOLD FONTS === */
+
+/* Force darker ink on milestone titles and checkboxes */
+.milestone-title,
+.milestone-checkbox,
+.milestone-checkbox span {
   color: #1a0e06 !important;
-  box-shadow: none !important;
+  font-weight: bold !important;
 }
 
-/* Cancel background overlays from modern theme */
-.card::before {
-  content: none !important;
+/* Force dark ink and bold on header text */
+h1, h2, h3, .section-title, .subtitle {
+  color: #1a0e06 !important;
+  font-weight: bold !important;
+}
+
+/* Also darken and bold any lingering label or UI text */
+label,
+.field-label,
+input,
+select,
+textarea,
+button,
+.btn,
+table th,
+table td,
+.org-item {
+  font-weight: bold !important;
+  color: #1a0e06 !important;
 }
