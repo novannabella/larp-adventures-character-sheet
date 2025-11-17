@@ -1,21 +1,23 @@
-// Sharp Mind beta overlay - non-destructive tester
-// This file is meant to be loaded AFTER script.js in a test HTML (e.g. index-sharpmind-beta.html)
+// Sharp Mind beta overlay v2 - non-destructive tester
+// Load this AFTER script.js in a test HTML (e.g. index-sharpmind-beta.html)
 
 (function () {
-  if (!window.addSelectedSkill || !window.selectedSkills) {
-    console.warn("Sharp Mind beta: addSelectedSkill or selectedSkills not found; beta overlay not applied.");
+  // We only require addSelectedSkill to exist; selectedSkills is a top-level binding, not window property.
+  if (typeof addSelectedSkill !== "function") {
+    console.warn("Sharp Mind beta v2: addSelectedSkill not found; overlay not applied.");
     return;
   }
 
-  console.log("Sharp Mind beta overlay loaded.");
+  console.log("Sharp Mind beta overlay v2 loaded.");
 
-  const original_addSelectedSkill = window.addSelectedSkill;
+  const original_addSelectedSkill = addSelectedSkill;
   const sharpMindAssignments_beta = [];
+  // Expose for debugging if desired
   window.sharpMindAssignments_beta = sharpMindAssignments_beta;
 
   function getScholarTier_beta() {
     let maxTier = 0;
-    (window.selectedSkills || []).forEach((sk) => {
+    (selectedSkills || []).forEach((sk) => {
       if (sk.path === "Scholar") {
         const t = parseInt(sk.tier || 0, 10) || 0;
         if (t > maxTier) maxTier = t;
@@ -35,17 +37,17 @@
 
     const scholarTier = getScholarTier_beta();
 
-    // Skills on main path, not above Scholar tier, not already boosted
+    // Build set of already-boosted skills (by path+name)
     const alreadyBoosted = new Set(
       sharpMindAssignments_beta.map((a) => `${a.targetPath}::${a.targetName}`)
     );
 
-    const eligible = (window.selectedSkills || []).filter((sk) => {
+    const eligible = (selectedSkills || []).filter((sk) => {
       if (sk.path !== mainPath) return false;
       const key = `${sk.path}::${sk.name}`;
       if (alreadyBoosted.has(key)) return false;
       const t = parseInt(sk.tier || 0, 10) || 0;
-      if (scholarTier > 0 && t > scholarTier) return false; // strict RAW
+      if (scholarTier > 0 && t > scholarTier) return false; // strict RAW; relax if desired
       return true;
     });
 
@@ -98,28 +100,27 @@
     );
   }
 
-  window.addSelectedSkill_beta_original = original_addSelectedSkill;
+  // Wrap the existing addSelectedSkill in a beta layer
+  addSelectedSkill = function () {
+    const beforeCount = (selectedSkills || []).length;
 
-  window.addSelectedSkill = function () {
-    const beforeCount = (window.selectedSkills || []).length;
-
-    // Call the real function
+    // Call original logic
     original_addSelectedSkill();
 
-    const afterCount = (window.selectedSkills || []).length;
+    const afterCount = (selectedSkills || []).length;
     if (afterCount <= beforeCount) {
-      // Skill was not actually added (failed validation etc.)
+      // No new skill was actually added
       return;
     }
 
-    const last = window.selectedSkills[afterCount - 1];
+    const last = (selectedSkills || [])[afterCount - 1];
     if (!last) return;
 
     if (last.path === "Scholar" && /Sharp Mind\b/i.test(last.name)) {
       try {
         handleSharpMindSelection_beta(last);
       } catch (e) {
-        console.warn("Sharp Mind beta error:", e);
+        console.warn("Sharp Mind beta v2 error:", e);
       }
     }
   };
