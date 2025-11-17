@@ -1,14 +1,14 @@
-// Sharp Mind beta overlay v3 - non-destructive tester
+// Sharp Mind beta overlay v4 - non-destructive tester
 // Load this AFTER script.js in a test HTML (e.g. index-sharpmind-beta.html)
 
 (function () {
-  // We only require addSelectedSkill to exist
+  // Require the core addSelectedSkill to exist
   if (typeof addSelectedSkill !== "function") {
-    console.warn("Sharp Mind beta v3: addSelectedSkill not found; overlay not applied.");
+    console.warn("Sharp Mind beta v4: addSelectedSkill not found; overlay not applied.");
     return;
   }
 
-  console.log("Sharp Mind beta overlay v3 loaded.");
+  console.log("Sharp Mind beta overlay v4 loaded.");
 
   const original_addSelectedSkill = addSelectedSkill;
   const sharpMindAssignments_beta = [];
@@ -27,7 +27,6 @@
   }
 
   function handleSharpMindSelection_beta(sharpMindSkill) {
-    // 🔧 FIX: read directly from DOM instead of window.pathDisplaySelect
     const pathSelect = document.getElementById("pathDisplay");
     const mainPath = pathSelect ? (pathSelect.value || "") : "";
 
@@ -93,11 +92,26 @@
       targetTier: parseInt(target.tier || 0, 10) || 0
     });
 
+    // === NEW IN v4: rename the Sharp Mind entry in the selected skills list ===
+    try {
+      if (sharpMindSkill && target && sharpMindSkill.name) {
+        const originalName = sharpMindSkill.name;
+        const newName = `${originalName} - ${target.name}`;
+        sharpMindSkill.name = newName;
+        // If the UI uses selectedSkills for rendering, re-render so the new name shows up
+        if (typeof renderSelectedSkills === "function") {
+          renderSelectedSkills();
+        }
+      }
+    } catch (e) {
+      console.warn("Sharp Mind beta v4 rename error:", e);
+    }
+
     alert(
       "Sharp Mind applied (beta):\n\n" +
         `Source: ${sharpMindSkill.name} (Scholar Tier ${sharpMindSkill.tier || "?"})\n` +
         `Target: ${target.name} (Tier ${target.tier || 0})\n\n` +
-        "This is a TEST ONLY overlay; it does not yet change uses/day or printed text."
+        "This is still a TEST overlay; uses/day math is not yet changed."
     );
   }
 
@@ -121,7 +135,7 @@
       try {
         handleSharpMindSelection_beta(last);
       } catch (e) {
-        console.warn("Sharp Mind beta v3 error:", e);
+        console.warn("Sharp Mind beta v4 error:", e);
       }
     }
   };
