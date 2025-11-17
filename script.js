@@ -94,6 +94,7 @@ let skillsData = [];
 let skillsByPath = {};
 let selectedSkills = [];
 let skillNameSet = new Set();
+let sharpMindAssignments = [];
 
 let eventsData = [];
 let editingEventIndex = null;
@@ -452,6 +453,144 @@ try {
   };
 }
 
+
+function getScholarTierFromSelected() {
+  let maxTier = 0;
+  (selectedSkills || []).forEach((sk) => {
+    if (sk.path === "Scholar") {
+      const t = parseInt(sk.tier || 0, 10) || 0;
+      if (t > maxTier) maxTier = t;
+    }
+  });
+  return maxTier;
+}
+
+function buildSharpMindNotes(path, name) {
+  if (!path || !sharpMindAssignments.length) return "";
+
+  const asTarget = sharpMindAssignments.filter(
+    (a) => a.targetPath === path && a.targetName === name
+  );
+
+  const asSource = sharpMindAssignments.filter(
+    (a) => a.sharpPath === path
+  );
+
+  const parts = [];
+
+  if (asTarget.length) {
+    const tiers = Array.from(
+      new Set(asTarget.map((a) => parseInt(a.sharpTier || 0, 10) || 0))
+    ).sort((a, b) => a - b);
+    const tierLabel = tiers.map((t) => `Scholar Tier ${t}`).join(", ");
+    const bonus = asTarget.length;
+    parts.push(
+      `This skill has been enhanced by Sharp Mind (${tierLabel}): +${bonus} use(s) per day.`
+    );
+  }
+
+  if (asSource.length && /^Sharp Mind\b/.test(name || "")) {
+    const targets = asSource.map(
+      (a) => `${a.targetName} (Tier ${a.targetTier || 0})`
+    );
+    const tierSet = Array.from(
+      new Set(asSource.map((a) => parseInt(a.sharpTier || 0, 10) || 0))
+    ).sort((a, b) => a - b);
+    const tierLabel = tierSet.map((t) => `Scholar Tier ${t}`).join(", ");
+    parts.push(
+      `This Sharp Mind (${tierLabel}) is applied to: ${targets.join(", ")}.`
+    );
+  }
+
+  return parts.join("\n");
+}
+
+function handleSharpMindSelection(sharpMindRecord) {
+  const pathSelect = document.getElementById("pathDisplay");
+  const mainPath = pathSelect ? (pathSelect.value || "") : "";
+
+  if (!mainPath) {
+    alert("Sharp Mind: Please choose your main Path in Basic Information first.");
+    return;
+  }
+
+  const scholarTier = getScholarTierFromSelected();
+
+  const alreadyBoosted = new Set(
+    sharpMindAssignments.map((a) => `${a.targetPath}::${a.targetName}`)
+  );
+
+  const eligible = (selectedSkills || []).filter((sk) => {
+    if (sk.path !== mainPath) return false;
+    const key = `${sk.path}::${sk.name}`;
+    if (alreadyBoosted.has(key)) return false;
+    const t = parseInt(sk.tier || 0, 10) || 0;
+    if (scholarTier > 0 && t > scholarTier) return false;
+    return true;
+  });
+
+  if (!eligible.length) {
+    alert(
+      "Sharp Mind: You have no eligible Main Path skills to apply this to.\n\n" +
+        "It cannot be applied to the same skill more than once,\n" +
+        "and cannot be applied to a Main Path skill above your Scholar tier."
+    );
+    return;
+  }
+
+  const listText = eligible
+    .map((s, i) => `${i + 1}. ${s.name} (Tier ${s.tier || 0})`)
+    .join("\\n");
+
+  const choiceStr = prompt(
+    "Sharp Mind: choose a Main Path skill to enhance.\\n\\n" +
+      listText +
+      "\\n\\nEnter the number of the skill (or Cancel to leave Sharp Mind unassigned):"
+  );
+
+  if (choiceStr === null) {
+    return;
+  }
+
+  const index = parseInt(choiceStr, 10) - 1;
+  if (isNaN(index) || index < 0 || index >= eligible.length) {
+    alert("Sharp Mind: invalid choice. No skill was enhanced.");
+    return;
+  }
+
+  const target = eligible[index];
+
+  const assignment = {
+    sharpPath: sharpMindRecord.path,
+    sharpName: "", // filled after rename
+    sharpTier: parseInt(sharpMindRecord.tier || 0, 10) || 0,
+    targetPath: target.path,
+    targetName: target.name,
+    targetTier: parseInt(target.tier || 0, 10) || 0
+  };
+  sharpMindAssignments.push(assignment);
+
+  try {
+    if (sharpMindRecord && target && sharpMindRecord.name) {
+      const originalName = sharpMindRecord.name;
+      const newName = `${originalName} - ${target.name}`;
+      sharpMindRecord.name = newName;
+      assignment.sharpName = newName;
+      if (typeof renderSelectedSkills === "function") {
+        renderSelectedSkills();
+      }
+    }
+  } catch (e) {
+    console.warn("Sharp Mind rename error:", e);
+  }
+
+  alert(
+    "Sharp Mind applied:\\n\\n" +
+      `Source: ${sharpMindRecord.name} (Scholar Tier ${sharpMindRecord.tier || "?"})\\n` +
+      `Target: ${target.name} (Tier ${target.tier || 0})\\n\\n` +
+      "Uses/day in the table remain the base value; see notes in descriptions/details."
+  );
+}
 // ----- Prereq parsing -----
 function extractPrereqSkillNames(prereqRaw) {
   const names = new Set();
@@ -648,6 +787,11 @@ function updateSkillDescriptionFromSelect() {
     desc += `\n\nUsage: ${usesInfo.display}`;
   }
 
+  const note = buildSharpMindNotes(path, name);
+  if (note) {
+    desc += `\n\n${note}`;
+  }
+
   skillDescription.value = desc.trim();
 }
 
@@ -826,7 +970,23 @@ function closeSkillModal() {
 function showSkillDetail(selectedRecord) {
   if (!skillModal || !skillModalTitle || !skillModalBody) return;
 
-  const { path, name } = selectedRecord;
+  let recordToUse = selectedRecord;
+  let fullSharpMindName = null;
+
+  try {
+    if (
+      selectedRecord &&
+      selectedRecord.path === "Scholar" &&
+      /^Sharp Mind\b/.test(selectedRecord.name || "")
+    ) {
+      fullSharpMindName = selectedRecord.name;
+      recordToUse = Object.assign({}, selectedRecord, { name: "Sharp Mind" });
+    }
+  } catch (e) {
+    console.warn("Sharp Mind pre-call detail logic error:", e);
+  }
+
+  const { path, name } = recordToUse;
   const list = skillsByPath[path] || [];
   const skill = list.find((s) => s.name === name);
   if (!skill) {
@@ -836,7 +996,8 @@ function showSkillDetail(selectedRecord) {
 
   const usesInfo = computeSkillUses(skill);
 
-  skillModalTitle.textContent = skill.name || "Skill";
+  const titleText = fullSharpMindName || skill.name || "Skill";
+  skillModalTitle.textContent = titleText;
 
   let html = "";
   html += `<p><strong>Path/Profession:</strong> ${escapeHtml(
@@ -853,6 +1014,11 @@ function showSkillDetail(selectedRecord) {
 
   if (usesInfo && usesInfo.display) {
     html += `<p><strong>Uses:</strong> ${escapeHtml(usesInfo.display)}</p>`;
+  }
+
+  const note = buildSharpMindNotes(selectedRecord.path, selectedRecord.name);
+  if (note) {
+    html += `<p>${escapeHtml(note)}</p>`;
   }
 
   if (!html.trim()) {
@@ -973,6 +1139,35 @@ function addSelectedSkill() {
         }
       }
     }
+
+    // --- Scholar-specific "Sharp Mind" rules ---
+    if (path === "Scholar") {
+      const isSharpMindSkill = /^Sharp Mind\b/i.test(skill.name);
+
+      if (isSharpMindSkill) {
+        const existingSharpMinds = selectedSkills.filter(
+          (sk) => sk.path === "Scholar" && /^Sharp Mind\b/i.test(sk.name)
+        ).length;
+
+        const map = window.pathTierMap || {};
+        const currentScholarTier =
+          typeof map["Scholar"] === "number" ? map["Scholar"] : 0;
+
+        const newScholarTier = Math.max(
+          currentScholarTier,
+          skill.tier || 0
+        );
+
+        if (existingSharpMinds >= newScholarTier) {
+          alert(
+            `You can only have a number of Sharp Mind skills equal to your Scholar tier.\n\n` +
+              `Current Scholar tier (including this purchase): ${newScholarTier}\n` +
+              `Existing Sharp Mind skills: ${existingSharpMinds}`
+          );
+          return;
+        }
+      }
+    }
   }
 
   // Main path gating
@@ -1019,6 +1214,8 @@ function addSelectedSkill() {
   }
 
   const free = skillFreeFlag.checked;
+  const isSharpMindSkill =
+    path === "Scholar" && /^Sharp Mind\b/i.test(skill.name);
 
   const candidateRecord = {
     name,
@@ -1041,6 +1238,13 @@ function addSelectedSkill() {
   skillFreeFlag.checked = false;
   populateSkillSelect();
   recomputeTotals();
+
+  if (isSharpMindSkill) {
+    const last = selectedSkills[selectedSkills.length - 1];
+    if (last) {
+      handleSharpMindSelection(last);
+    }
+  }
 }
 
 function renderSelectedSkills() {
@@ -1095,7 +1299,51 @@ function renderSelectedSkills() {
         }
       }
 
+      // Sharp Mind safety: do not allow removing a Scholar skill
+      // if that would leave more Sharp Mind skills than your Scholar tier.
+      if (skillToRemove.path === "Scholar") {
+        const remainingSkills = selectedSkills.filter(
+          (s, idx) => idx !== originalIndex
+        );
+
+        let remainingScholarTier = 0;
+        remainingSkills.forEach((s) => {
+          if (s.path === "Scholar") {
+            const t = parseInt(s.tier || 0, 10) || 0;
+            if (t > remainingScholarTier) remainingScholarTier = t;
+          }
+        });
+
+        const remainingSharpMinds = remainingSkills.filter(
+          (s) => s.path === "Scholar" && /^Sharp Mind\b/i.test(s.name)
+        ).length;
+
+        if (remainingSharpMinds > remainingScholarTier) {
+          alert(
+            "You cannot remove this Scholar skill because it would leave you with more Sharp Mind skills than your Scholar Tier."
+          );
+          return;
+        }
+      }
+
       if (confirm("Are you sure you want to remove this skill?")) {
+        // Clean up any Sharp Mind assignments that reference this skill
+        sharpMindAssignments = sharpMindAssignments.filter((a) => {
+          if (
+            a.sharpPath === skillToRemove.path &&
+            a.sharpName === skillToRemove.name
+          ) {
+            return false;
+          }
+          if (
+            a.targetPath === skillToRemove.path &&
+            a.targetName === skillToRemove.name
+          ) {
+            return false;
+          }
+          return true;
+        });
+
         selectedSkills.splice(originalIndex, 1);
         markDirty();
         populateSkillSelect();
