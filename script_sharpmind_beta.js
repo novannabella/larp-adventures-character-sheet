@@ -1,18 +1,16 @@
-// Sharp Mind beta overlay v5 - label + description notes
+// Sharp Mind beta overlay v6 - label + description notes + better detail support
 // Load this AFTER script.js in a test HTML (e.g. index-sharpmind-beta.html)
 
 (function () {
-  // Require the core addSelectedSkill to exist
   if (typeof addSelectedSkill !== "function") {
-    console.warn("Sharp Mind beta v5: addSelectedSkill not found; overlay not applied.");
+    console.warn("Sharp Mind beta v6: addSelectedSkill not found; overlay not applied.");
     return;
   }
 
-  console.log("Sharp Mind beta overlay v5 loaded.");
+  console.log("Sharp Mind beta overlay v6 loaded.");
 
   const original_addSelectedSkill = addSelectedSkill;
   const sharpMindAssignments_beta = [];
-  // Expose for debugging if desired
   window.sharpMindAssignments_beta = sharpMindAssignments_beta;
 
   function getScholarTier_beta() {
@@ -27,14 +25,16 @@
   }
 
   function buildSharpMindNotes_beta(path, name) {
-    if (!path || !name || !sharpMindAssignments_beta.length) return "";
+    if (!path || !sharpMindAssignments_beta.length) return "";
 
     const asTarget = sharpMindAssignments_beta.filter(
       (a) => a.targetPath === path && a.targetName === name
     );
 
+    // For source (Sharp Mind itself), match by path only so it works for both
+    // "Sharp Mind" and "Sharp Mind - X" views.
     const asSource = sharpMindAssignments_beta.filter(
-      (a) => a.sharpPath === path && a.sharpName === name
+      (a) => a.sharpPath === path
     );
 
     const parts = [];
@@ -50,7 +50,7 @@
       );
     }
 
-    if (asSource.length) {
+    if (asSource.length && /^Sharp Mind\b/.test(name || "")) {
       const targets = asSource.map(
         (a) => `${a.targetName} (Tier ${a.targetTier || 0})`
       );
@@ -77,7 +77,6 @@
 
     const scholarTier = getScholarTier_beta();
 
-    // Build set of already-boosted skills (by path+name)
     const alreadyBoosted = new Set(
       sharpMindAssignments_beta.map((a) => `${a.targetPath}::${a.targetName}`)
     );
@@ -111,7 +110,6 @@
     );
 
     if (choiceStr === null) {
-      // user cancelled
       return;
     }
 
@@ -123,47 +121,47 @@
 
     const target = eligible[index];
 
-    sharpMindAssignments_beta.push({
+    const assignment = {
       sharpPath: sharpMindSkill.path,
-      sharpName: sharpMindSkill.name,
+      sharpName: "", // will fill after rename
       sharpTier: parseInt(sharpMindSkill.tier || 0, 10) || 0,
       targetPath: target.path,
       targetName: target.name,
       targetTier: parseInt(target.tier || 0, 10) || 0
-    });
+    };
+    sharpMindAssignments_beta.push(assignment);
 
-    // Rename the Sharp Mind entry in the selected skills list
     try {
       if (sharpMindSkill && target && sharpMindSkill.name) {
         const originalName = sharpMindSkill.name;
         const newName = `${originalName} - ${target.name}`;
         sharpMindSkill.name = newName;
+        assignment.sharpName = newName;
+
         if (typeof renderSelectedSkills === "function") {
           renderSelectedSkills();
         }
       }
     } catch (e) {
-      console.warn("Sharp Mind beta v5 rename error:", e);
+      console.warn("Sharp Mind beta v6 rename error:", e);
     }
 
     alert(
       "Sharp Mind applied (beta):\n\n" +
         `Source: ${sharpMindSkill.name} (Scholar Tier ${sharpMindSkill.tier || "?"})\n` +
         `Target: ${target.name} (Tier ${target.tier || 0})\n\n` +
-        "Uses/day and descriptions now include beta notes."
+        "Uses/day display is still original; notes are shown in descriptions/details only."
     );
   }
 
-  // Wrap the existing addSelectedSkill in a beta layer
+  // ---- Wrap addSelectedSkill ----
   addSelectedSkill = function () {
     const beforeCount = (selectedSkills || []).length;
 
-    // Call original logic
     original_addSelectedSkill();
 
     const afterCount = (selectedSkills || []).length;
     if (afterCount <= beforeCount) {
-      // No new skill was actually added
       return;
     }
 
@@ -174,12 +172,12 @@
       try {
         handleSharpMindSelection_beta(last);
       } catch (e) {
-        console.warn("Sharp Mind beta v5 error:", e);
+        console.warn("Sharp Mind beta v6 error:", e);
       }
     }
   };
 
-  // ---- Description hook: add Sharp Mind notes in the description box ----
+  // ---- Description hook ----
   if (typeof updateSkillDescriptionFromSelect === "function") {
     const original_updateDesc = updateSkillDescriptionFromSelect;
     updateSkillDescriptionFromSelect = function () {
@@ -188,40 +186,66 @@
         if (!skillSelect || !skillDescription) return;
         const val = skillSelect.value;
         if (!val) return;
-        const [path, name] = val.split("::");
+        const parts = val.split("::");
+        const path = parts[0] || "";
+        const name = parts[1] || "";
         const note = buildSharpMindNotes_beta(path, name);
         if (note) {
           const base = skillDescription.value || "";
-          // Avoid duplicate appends if run multiple times
           if (!base.includes("This skill has been enhanced by Sharp Mind") &&
               !base.includes("This Sharp Mind (Scholar Tier")) {
             skillDescription.value = (base + "\n\n" + note).trim();
           }
         }
       } catch (e) {
-        console.warn("Sharp Mind beta v5 description hook error:", e);
+        console.warn("Sharp Mind beta v6 description hook error:", e);
       }
     };
   }
 
-  // ---- Detail modal hook: add Sharp Mind notes in the popup ----
+  // ---- Detail modal hook ----
   if (typeof showSkillDetail === "function") {
     const original_showSkillDetail = showSkillDetail;
     showSkillDetail = function (selectedRecord) {
-      original_showSkillDetail(selectedRecord);
+      let recordToUse = selectedRecord;
+      let fullSharpMindName = null;
+
       try {
-        if (!selectedRecord) return;
-        // After the modal HTML is set, append Sharp Mind info if relevant.
+        if (
+          selectedRecord &&
+          selectedRecord.path === "Scholar" &&
+          /^Sharp Mind\b/.test(selectedRecord.name || "")
+        ) {
+          fullSharpMindName = selectedRecord.name;
+          recordToUse = Object.assign({}, selectedRecord, { name: "Sharp Mind" });
+        }
+      } catch (e) {
+        console.warn("Sharp Mind beta v6 pre-call detail logic error:", e);
+      }
+
+      original_showSkillDetail(recordToUse);
+
+      try {
+        if (!selectedRecord || !window.skillModalBody) return;
+
+        // If this is a Sharp Mind - X, fix the heading to show the full name
+        if (fullSharpMindName) {
+          const heading = skillModalBody.querySelector("h3");
+          if (heading) {
+            heading.textContent = fullSharpMindName;
+          }
+        }
+
         const path = selectedRecord.path;
         const name = selectedRecord.name;
         const note = buildSharpMindNotes_beta(path, name);
-        if (!note || !window.skillModalBody) return;
+        if (!note) return;
 
         const p = document.createElement("p");
         p.textContent = note;
         skillModalBody.appendChild(p);
       } catch (e) {
-        console.warn("Sharp Mind beta v5 detail hook error:", e);
+        console.warn("Sharp Mind beta v6 detail hook error:", e);
       }
     };
   }
