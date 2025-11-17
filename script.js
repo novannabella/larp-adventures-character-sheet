@@ -555,6 +555,14 @@ function handleSharpMindSelection(sharpMindRecord) {
   const index = parseInt(choiceStr, 10) - 1;
   if (isNaN(index) || index < 0 || index >= eligible.length) {
     alert("Sharp Mind: invalid choice. No skill was enhanced.");
+    // Remove the just-added Sharp Mind if the choice was invalid
+    const idx = selectedSkills.indexOf(sharpMindRecord);
+    if (idx !== -1) {
+      selectedSkills.splice(idx, 1);
+      markDirty();
+      populateSkillSelect();
+      recomputeTotals();
+    }
     return;
   }
 
@@ -586,7 +594,8 @@ function handleSharpMindSelection(sharpMindRecord) {
 
   alert(
     "Sharp Mind applied:\\n\\n" +
-      `Source: ${sharpMindRecord.name} (Scholar Tier ${sharpMindRecord.tier || "?"})\\n` +
+      `Source: ${sharpMindRecord.name} (Scholar Tier ${sharpMindRecord.tier || "?"})
+` +
       `Target: ${target.name} (Tier ${target.tier || 0})\\n\\n` +
       "Uses/day in the table remain the base value; see notes in descriptions/details."
   );
