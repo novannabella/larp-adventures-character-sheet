@@ -540,12 +540,12 @@ function handleSharpMindSelection(sharpMindRecord) {
 
   const listText = eligible
     .map((s, i) => `${i + 1}. ${s.name} (Tier ${s.tier || 0})`)
-    .join("\\n");
+    .join("\n");
 
   const choiceStr = prompt(
-    "Sharp Mind: choose a Main Path skill to enhance.\\n\\n" +
+    "Sharp Mind: choose a Main Path skill to enhance.\n\n" +
       listText +
-      "\\n\\nEnter the number of the skill (or Cancel to leave Sharp Mind unassigned):"
+      "\n\nEnter the number of the skill (or Cancel to leave Sharp Mind unassigned):"
   );
 
   if (choiceStr === null) {
