@@ -302,13 +302,14 @@ function computeSkillCost(record) {
   const isMainPath = path === mainPath;
   const isProfession = PROFESSION_NAMES.has(path);
 
-  if (isMainPath || isProfession) {
-    if (tier === 0) return 0;
-    return tier;
-  } else {
-    if (tier === 0) return 1;
-    return tier * 2;
-  }
+if (isMainPath || isProfession) {
+  if (tier === 0) return 0;
+  return tier;
+} else {
+  // Secondary path cost: Tier 0 = 2 SP, higher tiers = 2 × tier
+  if (tier === 0) return 2;
+  return tier * 2;
+}
 }
 
 function getMilestonesForPath(path) {
