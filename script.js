@@ -145,7 +145,7 @@ const totalEventPointsSpan = document.getElementById("totalEventPoints");
 const qualifyingEventsCountSpan = document.getElementById(
   "qualifyingEventsCount"
 );
-
+const eventsUntilNextTierSpan = document.getElementById("eventsUntilNextTier");
 const eventNameInput = document.getElementById("eventNameInput");
 const eventDateInput = document.getElementById("eventDateInput");
 const eventTypeSelect = document.getElementById("eventTypeSelect");
@@ -202,7 +202,23 @@ const unspentSkillPointsHeader = document.getElementById(
 function markDirty() {
   isDirty = true;
 }
+function computeEventsToNextTier(qualifyingCount) {
+  let remaining = qualifyingCount;
+  let needed = 1;
 
+  // This mirrors the tier progression logic:
+  // Tier 1 needs 1 event, Tier 2 needs +2, Tier 3 needs +3, etc.
+  while (remaining >= needed) {
+    remaining -= needed;
+    needed++;
+  }
+
+  // At this point, `needed` is the size of the *next* tier’s block,
+  // and `remaining` is how many events we have already put into it.
+  // So the difference is how many more qualifying events we need.
+  return needed - remaining;
+}
+ 
 function markClean() {
   isDirty = false;
 }
@@ -1605,8 +1621,15 @@ function recomputeTotals() {
   totalEventPointsSpan.textContent = totalEventPoints;
   qualifyingEventsCountSpan.textContent = qualifyingCount;
 
-  const tier = computeTierFromEvents(qualifyingCount);
-  tierInput.value = tier;
+const tier = computeTierFromEvents(qualifyingCount);
+tierInput.value = tier;
+
+// How many qualifying events until the *next* tier?
+const eventsUntilNext = computeEventsToNextTier(qualifyingCount);
+if (eventsUntilNextTierSpan) {
+  eventsUntilNextTierSpan.textContent = eventsUntilNext;
+}
+
 
   const totalSkillCost = selectedSkills.reduce(
     (sum, sk) => sum + computeSkillCost(sk),
