@@ -34,10 +34,8 @@ const totalSkillCostSpan = document.getElementById("totalSkillCost");
 const addEventBtn = document.getElementById("addEventBtn");
 const eventsBody = document.getElementById("eventsBody");
 const totalEventPointsSpan = document.getElementById("totalEventPoints");
-const qualifyingEventsCountSpan = document.getElementById(
+const qualifyingEventsCountSpan = document.getElementById("qualifyingEventsCount");
 const eventsUntilNextTierSpan = document.getElementById("eventsUntilNextTier");
-  "qualifyingEventsCount"
-);
 
 const eventNameInput = document.getElementById("eventNameInput");
 const eventDateInput = document.getElementById("eventDateInput");
