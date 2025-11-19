@@ -1474,6 +1474,17 @@ function computeTierFromEvents(qualifyingCount) {
     remaining -= needed;
     needed++;
   }
+function computeEventsToNextTier(qualifyingCount, currentTier) {
+  if (currentTier >= 10) return 0;
+  const nextTier = currentTier + 1;
+  const totalNeededForNext = (nextTier * (nextTier + 1)) / 2;
+  const remaining = totalNeededForNext - qualifyingCount;
+  return remaining > 0 ? remaining : 0;
+}
+
+
+  return Math.min(tier, 10);
+}
 
   // Hard cap: never allow a Tier above 10
   return Math.min(tier, 10);
@@ -1503,6 +1514,11 @@ function recomputeTotals() {
 
   const tier = computeTierFromEvents(qualifyingCount);
   tierInput.value = tier;
+
+  if (eventsUntilNextTierSpan) {
+    const remaining = computeEventsToNextTier(qualifyingCount, tier);
+    eventsUntilNextTierSpan.textContent = remaining;
+  }
 
   const totalSkillCost = selectedSkills.reduce(
     (sum, sk) => sum + computeSkillCost(sk),
