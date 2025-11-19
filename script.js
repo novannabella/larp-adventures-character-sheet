@@ -1468,13 +1468,17 @@ function computeTierFromEvents(qualifyingCount) {
   let remaining = qualifyingCount;
   let tier = 0;
   let needed = 1;
-  while (remaining >= needed) {
+
+  while (remaining >= needed && tier < 10) {
     tier++;
     remaining -= needed;
     needed++;
   }
-  return tier;
+
+  // Hard cap: never allow a Tier above 10
+  return Math.min(tier, 10);
 }
+
 
 function recomputeTotals() {
   let totalEventPoints = 0;
