@@ -35,6 +35,7 @@ const addEventBtn = document.getElementById("addEventBtn");
 const eventsBody = document.getElementById("eventsBody");
 const totalEventPointsSpan = document.getElementById("totalEventPoints");
 const qualifyingEventsCountSpan = document.getElementById(
+const eventsUntilNextTierSpan = document.getElementById("eventsUntilNextTier");
   "qualifyingEventsCount"
 );
 
